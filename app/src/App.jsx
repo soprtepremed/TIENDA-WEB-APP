@@ -124,6 +124,11 @@ function App() {
     setAlertEvent(null);
   };
 
+  const handleLogout = () => {
+    storage.setUser('');
+    setUser(null);
+  };
+
   if (!user) {
     return <UserLogin onLogin={handleLogin} />;
   }
@@ -138,7 +143,7 @@ function App() {
         />
       )}
 
-      <Dashboard user={user} />
+      <Dashboard user={user} onLogout={handleLogout} />
 
       <HistoryLog />
     </div>

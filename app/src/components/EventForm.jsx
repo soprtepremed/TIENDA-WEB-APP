@@ -6,6 +6,7 @@ export function EventForm({ onClose, onSave }) {
         title: '',
         description: '',
         dueDate: '',
+        dueTime: '',
         recurrence: 'none' // none, daily, weekly, monthly
     });
 
@@ -22,12 +23,12 @@ export function EventForm({ onClose, onSave }) {
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)',
+            background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100
         }}>
-            <div className="glass-panel" style={{ width: '90%', maxWidth: '500px', textAlign: 'left' }}>
+            <div className="glass-panel" style={{ width: '90%', maxWidth: '500px', textAlign: 'left', background: '#fff' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                    <h2 style={{ margin: 0 }}>Nuevo Evento</h2>
+                    <h2 style={{ margin: 0, color: 'var(--accent-primary)' }}>Nuevo Evento</h2>
                     <button onClick={onClose} className="btn-secondary" style={{ border: 'none', padding: '4px' }}>
                         <X />
                     </button>
@@ -50,14 +51,22 @@ export function EventForm({ onClose, onSave }) {
                         rows={3}
                     />
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
                         <div>
-                            <label><Calendar size={14} /> Fecha Límite</label>
+                            <label><Calendar size={14} /> Fecha</label>
                             <input
                                 type="date"
                                 required
                                 value={formData.dueDate}
                                 onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label><Clock size={14} /> Hora</label>
+                            <input
+                                type="time"
+                                value={formData.dueTime}
+                                onChange={e => setFormData({ ...formData, dueTime: e.target.value })}
                             />
                         </div>
                         <div>

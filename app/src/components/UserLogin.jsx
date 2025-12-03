@@ -14,8 +14,8 @@ export function UserLogin({ onLogin }) {
     return (
         <div className="glass-panel" style={{ maxWidth: '400px', margin: '100px auto' }}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                <div style={{ background: 'rgba(139, 92, 246, 0.2)', padding: '1rem', borderRadius: '50%' }}>
-                    <User size={48} color="#8b5cf6" />
+                <div style={{ background: 'rgba(0, 0, 128, 0.1)', padding: '1rem', borderRadius: '50%' }}>
+                    <User size={48} color="var(--accent-primary)" />
                 </div>
             </div>
             <h2>Bienvenido</h2>

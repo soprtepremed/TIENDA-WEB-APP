@@ -1,17 +1,27 @@
 :root {
-  /* Colors */
-  --bg-dark: #0f172a;
-  --bg-card: rgba(30, 41, 59, 0.7);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --accent-primary: #8b5cf6; /* Violet */
-  --accent-secondary: #3b82f6; /* Blue */
+  /* Colors - White/Navy/Gold Theme */
+  --bg-dark: #f8fafc;
+  /* White/Light Gray */
+  --bg-card: #ffffff;
+  /* Pure White */
+  --text-primary: #0f172a;
+  /* Navy/Black */
+  --text-secondary: #475569;
+  /* Slate Gray */
+  --accent-primary: #000080;
+  /* Navy Blue */
+  --accent-secondary: #1e3a8a;
+  /* Lighter Navy */
+  --accent-gold: #fbbf24;
+  /* Gold */
   --alert-red: #ef4444;
-  --alert-bg: rgba(239, 68, 68, 0.2);
-  
-  /* Glassmorphism */
-  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  --alert-bg: rgba(239, 68, 68, 0.1);
+
+  /* Glassmorphism / Card Styles */
+  --glass-border: 1px solid rgba(0, 0, 128, 0.1);
+  /* Navy tint border */
+  --glass-shadow: 0 4px 20px rgba(0, 0, 128, 0.05);
+  /* Navy tint shadow */
   --backdrop-blur: blur(10px);
 
   /* Spacing */
@@ -42,8 +52,8 @@ body {
 /* Utilities */
 .glass-panel {
   background: var(--bg-card);
-  backdrop-filter: var(--backdrop-blur);
-  -webkit-backdrop-filter: var(--backdrop-blur);
+  /* Removed backdrop-filter as we are using solid white for cleaner look, 
+     but kept class name for consistency. Added border/shadow for depth. */
   border: var(--glass-border);
   box-shadow: var(--glass-shadow);
   border-radius: 16px;
@@ -53,33 +63,45 @@ body {
 .btn {
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   color: white;
-  border: none;
+  /* White text on Navy button */
+  border: 1px solid var(--accent-primary);
   padding: 0.6em 1.2em;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.1s, opacity 0.2s;
+  transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .btn:hover {
-  opacity: 0.9;
+  opacity: 0.95;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 128, 0.2);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #fff;
+  border: none;
 }
 
 .btn-danger {
   background: var(--alert-red);
+  border-color: var(--alert-red);
 }
 
 .btn-secondary {
   background: transparent;
-  border: 1px solid var(--text-secondary);
-  color: var(--text-secondary);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
 }
 
-input, select, textarea {
-  background: rgba(15, 23, 42, 0.5);
-  border: var(--glass-border);
-  color: white;
+input,
+select,
+textarea {
+  background: #f1f5f9;
+  /* Light gray input bg */
+  border: 1px solid #cbd5e1;
+  color: var(--text-primary);
   padding: 0.6em;
   border-radius: 8px;
   width: 100%;
@@ -87,16 +109,27 @@ input, select, textarea {
   margin-bottom: var(--spacing-md);
 }
 
-input:focus, select:focus, textarea:focus {
-  outline: 2px solid var(--accent-primary);
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--accent-gold);
+  /* Gold focus ring */
   border-color: transparent;
 }
 
 /* Animations */
 @keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }
 
 .animate-pulse-red {
