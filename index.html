@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareas Recurrentes</title>
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+
+<body>
+  <div id="app">
+    <!-- Login View -->
+    <div id="login-view" class="container"
+      style="height: 100vh; display: flex; align-items: center; justify-content: center;">
+      <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+        <h1 style="margin-bottom: var(--spacing-lg); color: var(--accent-color);">Bienvenido</h1>
+        <p style="margin-bottom: var(--spacing-lg); color: var(--text-secondary);">Ingresa tu nombre para comenzar</p>
+        <form id="login-form">
+          <input type="text" id="username-input" class="input-field" placeholder="Nombre del Trabajador" required
+            style="margin-bottom: var(--spacing-md);">
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Ingresar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="container hidden">
+      <header
+        style="background-color: var(--primary-brand); color: white; padding: var(--spacing-md) var(--spacing-xl); margin-bottom: var(--spacing-xl); display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 var(--radius-lg) var(--radius-lg); box-shadow: var(--shadow-md);">
+        <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+          <img src="/logo.png" alt="Logo"
+            style="height: 80px; border-radius: var(--radius-md); box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+          <h1 style="font-weight: 700; margin: 0; font-size: 2rem; white-space: nowrap;">Panel de Tareas</h1>
+        </div>
+        <div style="text-align: right; display: flex; align-items: center; gap: var(--spacing-lg);">
+          <div style="display: flex; flex-direction: column; align-items: flex-end;">
+            <span style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.8);">Usuario:</span>
+            <span id="user-display"
+              style="font-weight: 700; color: var(--accent-color); font-size: 1.1rem;">Usuario</span>
+          </div>
+          <button id="btn-logout" class="btn"
+            style="background-color: white; color: var(--primary-brand); font-weight: 600; padding: 8px 16px; border-radius: var(--radius-md);">Salir</button>
+        </div>
+      </header>
+
+      <section class="card" style="margin-bottom: var(--spacing-xl);">
+        <h3 style="margin-bottom: var(--spacing-md);">Nueva Tarea Recurrente</h3>
+        <form id="task-form">
+          <div style="margin-bottom: var(--spacing-md);">
+            <label style="display: block; margin-bottom: var(--spacing-xs); font-size: 0.875rem;">Nombre de la
+              Tarea</label>
+            <input type="text" id="task-name" class="input-field" placeholder="Ej. Revisar correo" required>
+          </div>
+
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+            <div>
+              <label style="display: block; margin-bottom: var(--spacing-xs); font-size: 0.875rem;">Hora</label>
+              <input type="time" id="task-time" class="input-field" required>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: var(--spacing-xs); font-size: 0.875rem;">Fecha de
+                Inicio</label>
+              <input type="date" id="task-start-date" class="input-field" required>
+            </div>
+          </div>
+
+          <div style="margin-bottom: var(--spacing-md);">
+            <label style="display: block; margin-bottom: var(--spacing-xs); font-size: 0.875rem;">Tipo de
+              Recurrencia</label>
+            <select id="task-recurrence" class="input-field">
+              <option value="daily">Diaria (Todos los días)</option>
+              <option value="weekly">Semanal (Mismo día de la semana)</option>
+              <option value="monthly">Mensual (Mismo día del mes)</option>
+              <option value="custom">Personalizada (Elegir días)</option>
+            </select>
+          </div>
+
+          <div id="custom-days-container" class="hidden" style="margin-bottom: var(--spacing-lg);">
+            <label style="display: block; margin-bottom: var(--spacing-xs); font-size: 0.875rem;">Días de
+              Repetición</label>
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <label class="day-selector"><input type="checkbox" name="day" value="1"> Lun</label>
+              <label class="day-selector"><input type="checkbox" name="day" value="2"> Mar</label>
+              <label class="day-selector"><input type="checkbox" name="day" value="3"> Mié</label>
+              <label class="day-selector"><input type="checkbox" name="day" value="4"> Jue</label>
+              <label class="day-selector"><input type="checkbox" name="day" value="5"> Vie</label>
+              <label class="day-selector"><input type="checkbox" name="day" value="6"> Sáb</label>
+              <label class="day-selector"><input type="checkbox" name="day" value="0"> Dom</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Crear Tarea</button>
+        </form>
+      </section>
+
+      <section style="margin-bottom: var(--spacing-xl);">
+        <h3 style="margin-bottom: var(--spacing-md);">Tareas Activas</h3>
+        <div id="tasks-list" style="display: grid; gap: var(--spacing-md);">
+          <!-- Task items will be injected here -->
+          <p style="color: var(--text-secondary); font-style: italic;">No hay tareas activas.</p>
+        </div>
+      </section>
+
+      <section>
+        <h3 style="margin-bottom: var(--spacing-md);">Historial de Finalización</h3>
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background-color: rgba(255,255,255,0.05);">
+              <tr>
+                <th style="padding: var(--spacing-md); font-size: 0.875rem; font-weight: 600;">Tarea</th>
+                <th style="padding: var(--spacing-md); font-size: 0.875rem; font-weight: 600;">Hora</th>
+                <th style="padding: var(--spacing-md); font-size: 0.875rem; font-weight: 600;">Usuario</th>
+              </tr>
+            </thead>
+            <tbody id="history-list">
+              <!-- History items will be injected here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Alarm Overlay -->
+  <div id="alarm-overlay" class="hidden"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(239, 68, 68, 0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+    <div style="animation: pulse 2s infinite;">
+      <h1 style="font-size: 4rem; margin-bottom: var(--spacing-md); font-weight: 800;">¡ALARMA!</h1>
+      <h2 id="alarm-task-name" style="font-size: 2.5rem; margin-bottom: var(--spacing-xl);">Nombre de la Tarea</h2>
+    </div>
+
+    <div style="display: flex; gap: var(--spacing-lg);">
+      <button id="btn-snooze" class="btn"
+        style="background-color: white; color: var(--danger-color); font-size: 1.25rem; padding: var(--spacing-md) var(--spacing-xl);">Posponer
+        (5m)</button>
+      <button id="btn-complete" class="btn"
+        style="background-color: #1e293b; color: white; border: 2px solid white; font-size: 1.25rem; padding: var(--spacing-md) var(--spacing-xl);">FINALIZAR</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+
+  <style>
+    .day-selector {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .day-selector:has(input:checked) {
+      background: var(--accent-color);
+      color: var(--bg-color);
+      border-color: var(--accent-color);
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+  </style>
+</body>
+
+</html>
