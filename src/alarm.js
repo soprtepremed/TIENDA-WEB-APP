@@ -12,10 +12,10 @@ export const Alarm = {
             // 1. Check Time
             if (task.time !== currentTime) return false;
 
-            // 2. Check Start Date (must be today or past)
+            // 2. Check Start Date (must be today or past)..
             // task.startDate is YYYY-MM-DD
             if (task.startDate) {
-                // Create date objects for comparison (set time to 00:00:00)
+                // Create date objects for comparison (set time to 00:00:00)*
                 // Parse YYYY-MM-DD manually to avoid timezone issues or use simple string comparison if format is consistent
                 const [y, m, d] = task.startDate.split('-').map(Number);
                 const start = new Date(y, m - 1, d);
