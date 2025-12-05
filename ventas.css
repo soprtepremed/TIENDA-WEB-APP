@@ -80,7 +80,7 @@ body {
     font-size: var(--font-size-base);
     line-height: 1.6;
     color: var(--color-gray-800);
-    background-color: var(--color-white);
+    background-color: #f5f5f5;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
