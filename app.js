@@ -4,7 +4,7 @@
 let products = [];
 
 // ===================================
-// Inicialización
+// Inicialización..
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
