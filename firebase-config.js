@@ -1,4 +1,4 @@
-// Configuración de Firebase
+// Configuración de Firebase..
 const firebaseConfig = {
     apiKey: "AIzaSyAsmY4X7OjzK-zF9w6CusNU3YwLQJuPjPg",
     authDomain: "tienda-web-premed.firebaseapp.com",
