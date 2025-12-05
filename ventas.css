@@ -915,3 +915,35 @@ textarea.sale-input {
         transform: translateY(-2px);
     }
 }
+
+/* ===================================
+   Botón Procesar Venta - Verde y Grande
+   =================================== */
+.process-sale-btn {
+    width: 100% !important;
+    padding: var(--spacing-5) var(--spacing-6) !important;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    color: var(--color-white) !important;
+    border: none !important;
+    border-radius: var(--radius-lg) !important;
+    font-size: var(--font-size-xl) !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all var(--transition-base) !important;
+    font-family: var(--font-family) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--spacing-3) !important;
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.4) !important;
+}
+
+.process-sale-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5) !important;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+}
+
+.process-sale-btn .btn-icon {
+    font-size: var(--font-size-2xl) !important;
+}
