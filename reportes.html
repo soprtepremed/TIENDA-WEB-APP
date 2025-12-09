@@ -8,137 +8,172 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="reportes.css">
 </head>
 
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <span class="logo-icon">☕</span>
-                    Cafe Premed
-                </div>
-                <nav class="nav">
-                    <a href="index.html" class="nav-item">Productos</a>
-                    <a href="ventas.html" class="nav-item">💰 Ventas</a>
-                    <div class="nav-item active">📊 Reportes</div>
-                </nav>
+    <div class="app-container">
+        <!-- Global Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <span>☕</span> Cafe Premed
+                </a>
             </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <!-- Cash Register Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2 class="section-title">Corte de Caja</h2>
-                    <p class="section-subtitle">Resumen diario de ventas por método de pago</p>
-                </div>
-
-                <div class="date-selector-container">
-                    <label for="reportDate" class="date-label">Fecha del reporte:</label>
-                    <input type="date" id="reportDate" class="date-input">
-                </div>
-
-                <div class="stats-grid">
-                    <!-- Cash Card -->
-                    <div class="stat-card">
-                        <div class="stat-icon cash">💵</div>
-                        <div class="stat-info">
-                            <h3 class="stat-label">Efectivo</h3>
-                            <div class="stat-value" id="totalCash">$0.00</div>
-                            <div class="stat-count" id="countCash">0 ventas</div>
-                        </div>
-                    </div>
-
-                    <!-- Card Card -->
-                    <div class="stat-card">
-                        <div class="stat-icon card">💳</div>
-                        <div class="stat-info">
-                            <h3 class="stat-label">Tarjeta</h3>
-                            <div class="stat-value" id="totalCard">$0.00</div>
-                            <div class="stat-count" id="countCard">0 ventas</div>
-                        </div>
-                    </div>
-
-                    <!-- Transfer Card -->
-                    <div class="stat-card">
-                        <div class="stat-icon transfer">🏦</div>
-                        <div class="stat-info">
-                            <h3 class="stat-label">Transferencia</h3>
-                            <div class="stat-value" id="totalTransfer">$0.00</div>
-                            <div class="stat-count" id="countTransfer">0 ventas</div>
-                        </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="app2.html" class="sidebar-link">
+                    <span class="sidebar-icon">📱</span> Aplicación 2
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin</span>
+                        <span class="user-role">Administrador</span>
                     </div>
                 </div>
-
-                <!-- Total Summary -->
-                <div class="total-summary-card">
-                    <h3 class="total-summary-label">Total del Día</h3>
-                    <div class="total-summary-value" id="totalDaily">$0.00</div>
-                </div>
-            </section>
-
-            <!-- Sales History Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2 class="section-title">Historial de Ventas</h2>
-                    <p class="section-subtitle">Registro detallado de todas las transacciones</p>
-                </div>
-
-                <div class="table-container">
-                    <table class="sales-table">
-                        <thead>
-                            <tr>
-                                <th>Fecha / Hora</th>
-                                <th>Total</th>
-                                <th>Método Pago</th>
-                                <th>Productos</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="salesTableBody">
-                            <!-- Rows will be populated by JS -->
-                        </tbody>
-                    </table>
-                    <div id="emptyHistory" class="empty-history" style="display: none;">
-                        <div class="empty-icon">📅</div>
-                        <p>No hay ventas registradas para esta fecha</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Modal for Sale Details -->
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Detalle de Venta</h3>
-                <button class="close-modal">&times;</button>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Details injected by JS -->
+        </aside>
+
+        <!-- Main Content (Cafetería App) -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <h1 class="logo">
+                            <span class="logo-icon">☕</span>
+                            Cafe Premed
+                        </h1>
+                        <nav class="nav">
+                            <a href="index.html" class="nav-item">Productos</a>
+                            <a href="ventas.html" class="nav-item">💰 Ventas</a>
+                            <div class="nav-item active">📊 Reportes</div>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <div class="main">
+                <div class="container">
+                    <!-- Cash Register Section -->
+                    <section class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Corte de Caja</h2>
+                            <p class="section-subtitle">Resumen diario de ventas por método de pago</p>
+                        </div>
+
+                        <div class="date-selector-container">
+                            <label for="reportDate" class="date-label">Fecha del reporte:</label>
+                            <input type="date" id="reportDate" class="date-input">
+                        </div>
+
+                        <div class="stats-grid">
+                            <!-- Cash Card -->
+                            <div class="stat-card">
+                                <div class="stat-icon cash">💵</div>
+                                <div class="stat-info">
+                                    <h3 class="stat-label">Efectivo</h3>
+                                    <div class="stat-value" id="totalCash">$0.00</div>
+                                    <div class="stat-count" id="countCash">0 ventas</div>
+                                </div>
+                            </div>
+
+                            <!-- Card Card -->
+                            <div class="stat-card">
+                                <div class="stat-icon card">💳</div>
+                                <div class="stat-info">
+                                    <h3 class="stat-label">Tarjeta</h3>
+                                    <div class="stat-value" id="totalCard">$0.00</div>
+                                    <div class="stat-count" id="countCard">0 ventas</div>
+                                </div>
+                            </div>
+
+                            <!-- Transfer Card -->
+                            <div class="stat-card">
+                                <div class="stat-icon transfer">🏦</div>
+                                <div class="stat-info">
+                                    <h3 class="stat-label">Transferencia</h3>
+                                    <div class="stat-value" id="totalTransfer">$0.00</div>
+                                    <div class="stat-count" id="countTransfer">0 ventas</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Summary -->
+                        <div class="total-summary-card">
+                            <h3 class="total-summary-label">Total del Día</h3>
+                            <div class="total-summary-value" id="totalDaily">$0.00</div>
+                        </div>
+                    </section>
+
+                    <!-- Sales History Section -->
+                    <section class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Historial de Ventas</h2>
+                            <p class="section-subtitle">Registro detallado de todas las transacciones</p>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha / Hora</th>
+                                        <th>Total</th>
+                                        <th>Método Pago</th>
+                                        <th>Productos</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody">
+                                    <!-- Rows will be populated by JS -->
+                                </tbody>
+                            </table>
+                            <div id="emptyHistory" class="empty-history" style="display: none;">
+                                <div class="empty-icon">📅</div>
+                                <p>No hay ventas registradas para esta fecha</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
-        </div>
+
+            <!-- Modal for Sale Details -->
+            <div id="detailsModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Detalle de Venta</h3>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body" id="modalBody">
+                        <!-- Details injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container">
+                    <p class="footer-text">© 2025 Cafe Premed - Sistema de Punto de Venta</p>
+                </div>
+            </footer>
+
+            <!-- Firebase Scripts -->
+            <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+            <script src="firebase-config.js"></script>
+            <script src="reportes.js"></script>
+        </main>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p class="footer-text">© 2025 Cafe Premed - Sistema de Punto de Venta</p>
-        </div>
-    </footer>
-
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="reportes.js"></script>
 </body>
 
 </html>

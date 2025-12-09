@@ -8,143 +8,178 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="ventas.css">
 </head>
 
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <span class="logo-icon">☕</span>
-                    Cafe Premed
+    <div class="app-container">
+        <!-- Global Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <span>☕</span> Cafe Premed
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">�️</span> Soporte
+                </a>
+                <a href="app2.html" class="sidebar-link">
+                    <span class="sidebar-icon">📱</span> Aplicación 2
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin</span>
+                        <span class="user-role">Administrador</span>
+                    </div>
                 </div>
-                <nav class="nav">
-                    <a href="index.html" class="nav-item">Productos</a>
-                    <div class="nav-item active">💰 Ventas</div>
-                    <a href="reportes.html" class="nav-item">📊 Reportes</a>
-                </nav>
             </div>
-        </div>
-    </header>
+        </aside>
 
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <div class="sales-layout">
-                <!-- Products Section -->
-                <section class="products-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Productos Disponibles</h2>
-                        <p class="section-subtitle">Selecciona productos para agregar al carrito</p>
+        <!-- Main Content (Cafetería App) -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <h1 class="logo">
+                            <span class="logo-icon">☕</span>
+                            Cafe Premed
+                        </h1>
+                        <nav class="nav">
+                            <a href="index.html" class="nav-item">Productos</a>
+                            <div class="nav-item active">💰 Ventas</div>
+                            <a href="reportes.html" class="nav-item">📊 Reportes</a>
+                        </nav>
                     </div>
+                </div>
+            </header>
 
-                    <!-- Products Grid -->
-                    <div id="productsGrid" class="products-grid">
-                        <!-- Products will be rendered here -->
-                    </div>
-
-                    <!-- Empty State -->
-                    <div id="emptyState" class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        <h3 class="empty-state-title">No hay productos disponibles</h3>
-                        <p class="empty-state-text">Agrega productos desde el módulo de gestión</p>
-                    </div>
-                </section>
-
-                <!-- Cart Sidebar -->
-                <aside class="cart-sidebar">
-                    <div class="cart-header">
-                        <h3 class="cart-title">🛒 Carrito de Compras</h3>
-                        <button id="clearCartBtn" class="clear-cart-btn" style="display: none;">Limpiar</button>
-                    </div>
-
-                    <!-- Cart Items -->
-                    <div id="cartItems" class="cart-items">
-                        <!-- Cart items will be rendered here -->
-                    </div>
-
-                    <!-- Empty Cart Message -->
-                    <div id="emptyCart" class="empty-cart">
-                        <div class="empty-cart-icon">🛒</div>
-                        <p class="empty-cart-text">Tu carrito está vacío</p>
-                        <p class="empty-cart-hint">Agrega productos para comenzar</p>
-                    </div>
-
-                    <!-- Cart Summary -->
-                    <div id="cartSummary" class="cart-summary" style="display: none;">
-                        <div class="summary-row">
-                            <span class="summary-label">Subtotal:</span>
-                            <span id="subtotalAmount" class="summary-value">$0.00</span>
-                        </div>
-                        <div class="summary-row total-row">
-                            <span class="summary-label">Total:</span>
-                            <span id="totalAmount" class="summary-value">$0.00</span>
-                        </div>
-
-                        <!-- Payment Details -->
-                        <div class="payment-details">
-                            <div class="form-group-sale">
-                                <label class="sale-label">Comentarios:</label>
-                                <textarea id="saleComments" class="sale-input"
-                                    placeholder="Notas adicionales (opcional)" rows="2"></textarea>
+            <!-- Main Content Area -->
+            <div class="main">
+                <div class="container-fluid" style="padding: 0 var(--spacing-6);">
+                    <div class="sales-layout">
+                        <!-- Products Section -->
+                        <section class="products-section">
+                            <div class="section-header">
+                                <h2 class="section-title">Productos Disponibles</h2>
+                                <p class="section-subtitle">Selecciona productos para agregar al carrito</p>
                             </div>
 
-                            <div class="form-group-sale">
-                                <label class="sale-label">Método de pago: *</label>
-                                <select id="paymentMethod" class="sale-input" required>
-                                    <option value="">Seleccionar...</option>
-                                    <option value="efectivo">Efectivo</option>
-                                    <option value="tarjeta">Tarjeta</option>
-                                    <option value="transferencia">Transferencia</option>
-                                </select>
+                            <!-- Products Grid -->
+                            <div id="productsGrid" class="products-grid">
+                                <!-- Products will be rendered here -->
                             </div>
 
-                            <div id="cashPaymentFields" class="cash-payment-fields" style="display: none;">
-                                <div class="form-group-sale">
-                                    <label class="sale-label">Monto con el que paga: *</label>
-                                    <input type="number" id="amountPaid" class="sale-input" placeholder="0.00" min="0"
-                                        step="0.01">
+                            <!-- Empty State -->
+                            <div id="emptyState" class="empty-state">
+                                <div class="empty-state-icon">📦</div>
+                                <h3 class="empty-state-title">No hay productos disponibles</h3>
+                                <p class="empty-state-text">Agrega productos desde el módulo de gestión</p>
+                            </div>
+                        </section>
+
+                        <!-- Cart Sidebar -->
+                        <aside class="cart-sidebar">
+                            <div class="cart-header">
+                                <h3 class="cart-title">🛒 Carrito de Compras</h3>
+                                <button id="clearCartBtn" class="clear-cart-btn" style="display: none;">Limpiar</button>
+                            </div>
+
+                            <!-- Cart Items -->
+                            <div id="cartItems" class="cart-items">
+                                <!-- Cart items will be rendered here -->
+                            </div>
+
+                            <!-- Empty Cart Message -->
+                            <div id="emptyCart" class="empty-cart">
+                                <div class="empty-cart-icon">🛒</div>
+                                <p class="empty-cart-text">Tu carrito está vacío</p>
+                                <p class="empty-cart-hint">Agrega productos para comenzar</p>
+                            </div>
+
+                            <!-- Cart Summary -->
+                            <div id="cartSummary" class="cart-summary" style="display: none;">
+                                <div class="summary-row">
+                                    <span class="summary-label">Subtotal:</span>
+                                    <span id="subtotalAmount" class="summary-value">$0.00</span>
+                                </div>
+                                <div class="summary-row total-row">
+                                    <span class="summary-label">Total:</span>
+                                    <span id="totalAmount" class="summary-value">$0.00</span>
                                 </div>
 
-                                <div id="changeDisplay" class="change-display" style="display: none;">
-                                    <span class="change-label">Cambio:</span>
-                                    <span id="changeAmount" class="change-value">$0.00</span>
+                                <!-- Payment Details -->
+                                <div class="payment-details">
+                                    <div class="form-group-sale">
+                                        <label class="sale-label">Comentarios:</label>
+                                        <textarea id="saleComments" class="sale-input"
+                                            placeholder="Notas adicionales (opcional)" rows="2"></textarea>
+                                    </div>
+
+                                    <div class="form-group-sale">
+                                        <label class="sale-label">Método de pago: *</label>
+                                        <select id="paymentMethod" class="sale-input" required>
+                                            <option value="">Seleccionar...</option>
+                                            <option value="efectivo">Efectivo</option>
+                                            <option value="tarjeta">Tarjeta</option>
+                                            <option value="transferencia">Transferencia</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="cashPaymentFields" class="cash-payment-fields" style="display: none;">
+                                        <div class="form-group-sale">
+                                            <label class="sale-label">Monto con el que paga: *</label>
+                                            <input type="number" id="amountPaid" class="sale-input" placeholder="0.00"
+                                                min="0" step="0.01">
+                                        </div>
+
+                                        <div id="changeDisplay" class="change-display" style="display: none;">
+                                            <span class="change-label">Cambio:</span>
+                                            <span id="changeAmount" class="change-value">$0.00</span>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <button id="processSaleBtn" class="process-sale-btn">
+                                    <span class="btn-icon">✓</span>
+                                    Procesar Venta
+                                </button>
                             </div>
-                        </div>
 
-                        <button id="processSaleBtn" class="process-sale-btn">
-                            <span class="btn-icon">✓</span>
-                            Procesar Venta
-                        </button>
+                            <!-- Reports Link (Bottom of Sidebar) -->
+                            <div class="sidebar-footer">
+                                <a href="reportes.html" class="btn-reportes">
+                                    <span class="btn-icon">📊</span>
+                                    Ir a Reportes y Corte
+                                </a>
+                            </div>
+                        </aside>
                     </div>
-
-                    <!-- Reports Link (Bottom of Sidebar) -->
-                    <div class="sidebar-footer">
-                        <a href="reportes.html" class="btn-reportes">
-                            <span class="btn-icon">📊</span>
-                            Ir a Reportes y Corte
-                        </a>
-                    </div>
-                </aside>
+                </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p class="footer-text">© 2024 Cafe Premed - Sistema de Punto de Venta</p>
-        </div>
-    </footer>
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container">
+                    <p class="footer-text">© 2024 Cafe Premed - Sistema de Punto de Venta</p>
+                </div>
+            </footer>
 
-    <!-- Firebase Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="ventas.js"></script>
+            <!-- Firebase Scripts -->
+            <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+            <script src="firebase-config.js"></script>
+            <script src="ventas.js"></script>
+        </main>
+    </div>
 </body>
 
 </html>

@@ -14,137 +14,171 @@
 </head>
 
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <h1 class="logo">
-                    <span class="logo-icon">☕</span>
-                    Cafe Premed
-                </h1>
-                <nav class="nav">
-                    <div class="nav-item active">Productos</div>
-                    <a href="ventas.html" class="nav-item">💰 Ventas</a>
-                    <a href="reportes.html" class="nav-item">📊 Reportes</a>
-                </nav>
+    <div class="app-container">
+        <!-- Global Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <span>☕</span> Cafe Premed
+                </a>
             </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <!-- Product Registration Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2 class="section-title">Registrar Producto</h2>
-                    <p class="section-subtitle">Agregue nuevos productos al inventario</p>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link active">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="app2.html" class="sidebar-link">
+                    <span class="sidebar-icon">📱</span> Aplicación 2
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin</span>
+                        <span class="user-role">Administrador</span>
+                    </div>
                 </div>
+            </div>
+        </aside>
 
-                <form id="productForm" class="product-form">
-                    <div class="form-grid">
-                        <!-- Product Name -->
-                        <div class="form-group">
-                            <label for="productName" class="form-label">Nombre del Producto *</label>
-                            <input type="text" id="productName" name="productName" class="form-input"
-                                placeholder="Ej: Paracetamol 500mg" required>
+        <!-- Main Content (Cafetería App) -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="container">
+                    <div class="header-content">
+                        <h1 class="logo">
+                            <span class="logo-icon">☕</span>
+                            Cafe Premed
+                        </h1>
+                        <nav class="nav">
+                            <div class="nav-item active">Productos</div>
+                            <a href="ventas.html" class="nav-item">💰 Ventas</a>
+                            <a href="reportes.html" class="nav-item">📊 Reportes</a>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <div class="main">
+                <div class="container">
+                    <!-- Product Registration Section -->
+                    <section class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Registrar Producto</h2>
+                            <p class="section-subtitle">Agregue nuevos productos al inventario</p>
                         </div>
 
-                        <!-- Product Description -->
-                        <div class="form-group">
-                            <label for="productDescription" class="form-label">Descripción</label>
-                            <input type="text" id="productDescription" name="productDescription" class="form-input"
-                                placeholder="Descripción breve del producto">
-                        </div>
+                        <form id="productForm" class="product-form">
+                            <div class="form-grid">
+                                <!-- Product Name -->
+                                <div class="form-group">
+                                    <label for="productName" class="form-label">Nombre del Producto *</label>
+                                    <input type="text" id="productName" name="productName" class="form-input"
+                                        placeholder="Ej: Paracetamol 500mg" required>
+                                </div>
 
-                        <!-- Quantity -->
-                        <div class="form-group">
-                            <label for="productQuantity" class="form-label">Cantidad *</label>
-                            <input type="number" id="productQuantity" name="productQuantity" class="form-input"
-                                placeholder="0" min="0" step="1" required>
-                        </div>
+                                <!-- Product Description -->
+                                <div class="form-group">
+                                    <label for="productDescription" class="form-label">Descripción</label>
+                                    <input type="text" id="productDescription" name="productDescription"
+                                        class="form-input" placeholder="Descripción breve del producto">
+                                </div>
 
-                        <!-- Price -->
-                        <div class="form-group">
-                            <label for="productPrice" class="form-label">Precio (MXN) *</label>
-                            <input type="number" id="productPrice" name="productPrice" class="form-input"
-                                placeholder="0.00" min="0" step="0.01" required>
-                        </div>
+                                <!-- Quantity -->
+                                <div class="form-group">
+                                    <label for="productQuantity" class="form-label">Cantidad *</label>
+                                    <input type="number" id="productQuantity" name="productQuantity" class="form-input"
+                                        placeholder="0" min="0" step="1" required>
+                                </div>
 
-                        <!-- Minimum Stock -->
-                        <div class="form-group">
-                            <label for="productMinStock" class="form-label">Stock Mínimo</label>
-                            <input type="number" id="productMinStock" name="productMinStock" class="form-input"
-                                placeholder="10" min="0" step="1" value="10">
-                            <small class="form-hint">Se mostrará alerta cuando la cantidad sea menor a este
-                                valor</small>
-                        </div>
+                                <!-- Price -->
+                                <div class="form-group">
+                                    <label for="productPrice" class="form-label">Precio (MXN) *</label>
+                                    <input type="number" id="productPrice" name="productPrice" class="form-input"
+                                        placeholder="0.00" min="0" step="0.01" required>
+                                </div>
 
-                        <!-- Image Upload -->
-                        <div class="form-group form-group-full">
-                            <label for="productImage" class="form-label">Imagen del Producto</label>
-                            <div class="image-upload-wrapper">
-                                <input type="file" id="productImage" name="productImage" class="form-input-file"
-                                    accept="image/*">
-                                <label for="productImage" class="file-upload-label">
-                                    <span class="file-upload-icon">📁</span>
-                                    <span class="file-upload-text">Seleccionar imagen</span>
-                                </label>
-                                <div id="imagePreview" class="image-preview"></div>
+                                <!-- Minimum Stock -->
+                                <div class="form-group">
+                                    <label for="productMinStock" class="form-label">Stock Mínimo</label>
+                                    <input type="number" id="productMinStock" name="productMinStock" class="form-input"
+                                        placeholder="10" min="0" step="1" value="10">
+                                    <small class="form-hint">Se mostrará alerta cuando la cantidad sea menor a este
+                                        valor</small>
+                                </div>
+
+                                <!-- Image Upload -->
+                                <div class="form-group form-group-full">
+                                    <label for="productImage" class="form-label">Imagen del Producto</label>
+                                    <div class="image-upload-wrapper">
+                                        <input type="file" id="productImage" name="productImage" class="form-input-file"
+                                            accept="image/*">
+                                        <label for="productImage" class="file-upload-label">
+                                            <span class="file-upload-icon">📁</span>
+                                            <span class="file-upload-text">Seleccionar imagen</span>
+                                        </label>
+                                        <div id="imagePreview" class="image-preview"></div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="btn-icon">✓</span>
+                                    Registrar Producto
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <span class="btn-icon">↻</span>
+                                    Limpiar Formulario
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- Products List Section -->
+                    <section class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Inventario de Productos</h2>
+                            <p class="section-subtitle">Vista de todos los productos registrados</p>
                         </div>
-                    </div>
 
-                    <!-- Submit Button -->
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="btn-icon">✓</span>
-                            Registrar Producto
-                        </button>
-                        <button type="reset" class="btn btn-secondary">
-                            <span class="btn-icon">↻</span>
-                            Limpiar Formulario
-                        </button>
-                    </div>
-                </form>
-            </section>
+                        <div id="productsList" class="products-grid">
+                            <!-- Products will be dynamically inserted here -->
+                        </div>
 
-            <!-- Products List Section -->
-            <section class="section">
-                <div class="section-header">
-                    <h2 class="section-title">Inventario de Productos</h2>
-                    <p class="section-subtitle">Vista de todos los productos registrados</p>
+                        <div id="emptyState" class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h3 class="empty-state-title">No hay productos registrados</h3>
+                            <p class="empty-state-text">Comience agregando su primer producto usando el formulario de
+                                arriba</p>
+                        </div>
+                    </section>
                 </div>
+        </main>
 
-                <div id="productsList" class="products-grid">
-                    <!-- Products will be dynamically inserted here -->
-                </div>
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p class="footer-text">© 2025 Cafe Premed - Sistema de Punto de Venta</p>
+            </div>
+        </footer>
+        <!-- Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-                <div id="emptyState" class="empty-state">
-                    <div class="empty-state-icon">📦</div>
-                    <h3 class="empty-state-title">No hay productos registrados</h3>
-                    <p class="empty-state-text">Comience agregando su primer producto usando el formulario de arriba</p>
-                </div>
-            </section>
-        </div>
-    </main>
+        <!-- Configuración de Firebase -->
+        <script src="firebase-config.js"></script>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p class="footer-text">© 2025 Cafe Premed - Sistema de Punto de Venta</p>
-        </div>
-    </footer>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-    <!-- Configuración de Firebase -->
-    <script src="firebase-config.js"></script>
-
-    <!-- Script principal de la aplicación -->
-    <script src="app.js"></script>
+        <!-- Script principal de la aplicación -->
+        <script src="app.js"></script>
+        </main> <!-- End Main Content Wrapper -->
+    </div> <!-- End App Container -->
 </body>
 
 </html>

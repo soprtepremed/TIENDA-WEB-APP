@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte - Cafe Premed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .placeholder-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: var(--spacing-12);
+        }
+
+        .placeholder-icon {
+            font-size: 6rem;
+            margin-bottom: var(--spacing-6);
+            opacity: 0.2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Global Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <span>☕</span> Cafe Premed
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link active">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="app2.html" class="sidebar-link">
+                    <span class="sidebar-icon">📱</span> Aplicación 2
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin</span>
+                        <span class="user-role">Administrador</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main">
+                <div class="container">
+                    <div class="placeholder-container">
+                        <div class="placeholder-icon">🛠️</div>
+                        <h1 class="section-title">Módulo de Soporte</h1>
+                        <p class="section-subtitle">Panel de administración y herramientas de soporte.</p>
+                        <br>
+                        <p class="section-subtitle">Próximamente: Gestión de usuarios, logs y configuración.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
