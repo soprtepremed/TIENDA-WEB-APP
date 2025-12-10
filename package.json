@@ -1,14 +1,14 @@
 {
-  "name": "tareas-recurrentes",
-  "private": true,
-  "version": "0.0.0",
+  "name": "tienda-premed-migration",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Script de migración de datos a Supabase",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "import": "node migration/import-data.js",
+    "generate-sql": "node migration/generate-sql.js"
   },
-  "devDependencies": {
-    "vite": "^7.2.4"
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "csv-parse": "^5.5.3"
   }
 }
