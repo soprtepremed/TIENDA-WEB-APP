@@ -35,12 +35,15 @@
             </nav>
             <div class="sidebar-footer">
                 <div class="user-profile">
-                    <div class="user-avatar">AD</div>
+                    <div class="user-avatar" id="userAvatar">AD</div>
                     <div class="user-info">
-                        <span class="user-name">Admin</span>
-                        <span class="user-role">Administrador</span>
+                        <span class="user-name" id="userName">Admin</span>
+                        <span class="user-role" id="userRole">Administrador</span>
                     </div>
                 </div>
+                <button onclick="logout()" class="btn-logout" title="Cerrar sesión">
+                    🚪
+                </button>
             </div>
         </aside>
 
@@ -171,6 +174,11 @@
         <!-- Firebase SDK -->
         <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+        <!-- Supabase & Auth -->
+        <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+        <script src="auth-config.js"></script>
+        <script>protectPage();</script>
 
         <!-- Configuración de Firebase -->
         <script src="firebase-config.js"></script>

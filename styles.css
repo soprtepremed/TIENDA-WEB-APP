@@ -657,9 +657,12 @@ body {
 
 /* Sidebar Footer */
 .sidebar-footer {
-    padding: var(--spacing-6);
+    padding: var(--spacing-4) var(--spacing-6);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     background-color: rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .user-profile {
@@ -678,6 +681,7 @@ body {
     justify-content: center;
     font-weight: 700;
     color: var(--color-navy);
+    font-size: var(--font-size-sm);
 }
 
 .user-info {
@@ -694,6 +698,28 @@ body {
 .user-role {
     font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.6);
+}
+
+/* Logout Button */
+.btn-logout {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-logout:hover {
+    background-color: #DC2626;
+    color: white;
+    transform: scale(1.05);
 }
 
 /* Main Content Wrapper */
