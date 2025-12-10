@@ -56,6 +56,9 @@
                         <span class="user-role">Administrador</span>
                     </div>
                 </div>
+                <button onclick="logout()" class="btn-logout">
+                    Cerrar Sesión
+                </button>
             </div>
         </aside>
 
@@ -72,6 +75,11 @@
             </div>
         </main>
     </div>
+
+    <!-- Supabase & Auth -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="auth-config.js"></script>
+    <script>protectPage();</script>
 </body>
 
 </html>

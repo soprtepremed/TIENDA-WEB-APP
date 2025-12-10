@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test API Directo</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <h1>Test de Conexión API - Directo a Kong</h1>
+    <button onclick="testAPI()">Probar API</button>
+    <pre id="result">Cargando...</pre>
+
+    <script>
+        // Conectar directamente a Kong (sin Traefik)
+        const SUPABASE_URL = 'http://77.37.67.103:8000';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            db: { schema: 'soporte' }
+        });
+
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.textContent = 'Probando conexión...\n';
+
+            try {
+                result.textContent += '1. Conectando a: ' + SUPABASE_URL + '\n';
+
+                const { data, error } = await supabase
+                    .from('asistencias')
+                    .select('id, nombre_alumno, numero')
+                    .limit(3);
+
+                if (error) {
+                    result.textContent += '❌ Error: ' + JSON.stringify(error, null, 2);
+                } else {
+                    result.textContent += '✅ Datos recibidos:\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (e) {
+                result.textContent += '❌ Excepción: ' + e.message + '\n' + e.stack;
+            }
+        }
+
+        window.onload = testAPI;
+    </script>
+</body>
+
+</html>

@@ -704,25 +704,25 @@ body {
 /* Logout Button */
 .btn-logout {
     width: 100%;
-    padding: var(--spacing-2) var(--spacing-3);
-    border: none;
-    border-radius: var(--radius-md);
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-lg);
+    background: transparent;
+    color: white;
     font-size: var(--font-size-sm);
-    font-weight: 500;
+    font-weight: 600;
     font-family: var(--font-family);
     cursor: pointer;
     transition: all var(--transition-base);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-logout:hover {
-    background-color: #DC2626;
-    color: white;
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
 }
 
 /* Main Content Wrapper */
