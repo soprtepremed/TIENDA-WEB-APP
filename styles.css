@@ -657,12 +657,12 @@ body {
 
 /* Sidebar Footer */
 .sidebar-footer {
-    padding: var(--spacing-4) var(--spacing-6);
+    padding: var(--spacing-4) var(--spacing-4);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     background-color: rgba(0, 0, 0, 0.1);
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: var(--spacing-3);
 }
 
 .user-profile {
@@ -682,6 +682,7 @@ body {
     font-weight: 700;
     color: var(--color-navy);
     font-size: var(--font-size-sm);
+    flex-shrink: 0;
 }
 
 .user-info {
@@ -702,24 +703,26 @@ body {
 
 /* Logout Button */
 .btn-logout {
-    width: 36px;
-    height: 36px;
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
     border: none;
     border-radius: var(--radius-md);
     background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    font-family: var(--font-family);
     cursor: pointer;
     transition: all var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: var(--spacing-2);
 }
 
 .btn-logout:hover {
     background-color: #DC2626;
     color: white;
-    transform: scale(1.05);
 }
 
 /* Main Content Wrapper */
