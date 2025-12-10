@@ -651,8 +651,14 @@ body {
     box-shadow: var(--shadow-gold);
 }
 
+.sidebar-link.active .sidebar-icon {
+    transform: scale(1.15);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
 .sidebar-icon {
     font-size: 1.25rem;
+    transition: all var(--transition-base);
 }
 
 /* Sidebar Footer */
