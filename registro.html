@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Asistencia - Plataforma Premed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="asistencia.css">
+    <style>
+        /* Estilos específicos para la vista de solo registro */
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .main-content {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            border-radius: 16px;
+        }
+
+        .main {
+            padding: 0;
+        }
+
+        .asistencia-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .registro-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ocultar elementos innecesarios */
+        .sidebar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main">
+                <div class="container">
+                    <!-- Título Principal -->
+                    <div class="asistencia-header">
+                        <div class="header-icon" style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
+                        <h1 class="section-title" style="font-size: 1.8rem; color: var(--color-navy);">Control de
+                            Asistencia</h1>
+                        <p class="section-subtitle" id="nombreSesion" style="font-size: 1.1rem;">Cargando...</p>
+                    </div>
+
+                    <!-- TAB: REGISTRO DE ASISTENCIA (Directo, sin tabs) -->
+                    <div id="tabRegistro" class="tab-content active" style="display: block;">
+                        <div class="registro-card">
+                            <div class="info-banner"
+                                style="background-color: var(--color-bg); padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+                                <span class="info-icon">🛡️</span>
+                                <span>Ingresa tu correo y confirma tu turno actual.</span>
+                            </div>
+
+                            <!-- Selector de Turno -->
+                            <div class="form-section">
+                                <label class="form-label">1. Selecciona tu Turno</label>
+                                <div class="turno-selector">
+                                    <button type="button" class="turno-btn active" data-turno="matutino"
+                                        onclick="seleccionarTurno('matutino')">
+                                        <span class="turno-icon">☀️</span>
+                                        <span class="turno-text">Matutino</span>
+                                    </button>
+                                    <button type="button" class="turno-btn" data-turno="vespertino"
+                                        onclick="seleccionarTurno('vespertino')">
+                                        <span class="turno-icon">🌙</span>
+                                        <span class="turno-text">Vespertino</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Correo -->
+                            <div class="form-section">
+                                <label class="form-label">2. Correo Institucional</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">👤</span>
+                                    <input type="email" id="inputCorreo" class="form-input-large"
+                                        placeholder="correo@ejemplo.com">
+                                </div>
+                            </div>
+
+                            <!-- Mensaje de Error/Éxito -->
+                            <div id="mensajeRegistro" class="mensaje-registro hidden"></div>
+
+                            <!-- Botón de Registro -->
+                            <button id="btnMarcarAsistencia" class="btn-asistencia" onclick="marcarAsistencia()">
+                                MARCAR ASISTENCIA
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="auth-config.js"></script>
+    <!-- NOTA: No llamamos a protectPage() para que sea accesible públicamente por los alumnos -->
+    <script src="asistencia.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia - Plataforma Premed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="asistencia.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Global Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="asistencia.html" class="sidebar-logo">
+                    <span>📋</span> Asistencia
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="asistencia.html" class="sidebar-link active">
+                    <span class="sidebar-icon">📋</span> Asistencia
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin</span>
+                        <span class="user-role">Administrador</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="btn-logout">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main">
+                <div class="container">
+                    <!-- Título Principal -->
+                    <div class="asistencia-header">
+                        <div class="header-icon">🎓</div>
+                        <h1 class="section-title">Control de Asistencia</h1>
+                        <p class="section-subtitle" id="nombreSesion">Cargando...</p>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="tabs-container">
+                        <button class="tab-btn active" data-tab="registro" onclick="cambiarTab('registro')">
+                            ✍️ Registro
+                        </button>
+                        <button class="tab-btn" data-tab="admin" onclick="cambiarTab('admin')">
+                            ⚙️ Administración
+                        </button>
+                    </div>
+
+                    <!-- TAB: REGISTRO DE ASISTENCIA -->
+                    <div id="tabRegistro" class="tab-content active">
+                        <div class="registro-card">
+                            <div class="info-banner">
+                                <span class="info-icon">🛡️</span>
+                                <span>Ingresa tu correo y confirma tu turno actual.</span>
+                            </div>
+
+                            <!-- Selector de Turno -->
+                            <div class="form-section">
+                                <label class="form-label">1. Selecciona tu Turno</label>
+                                <div class="turno-selector">
+                                    <button type="button" class="turno-btn active" data-turno="matutino"
+                                        onclick="seleccionarTurno('matutino')">
+                                        <span class="turno-icon">☀️</span>
+                                        <span class="turno-text">Matutino</span>
+                                    </button>
+                                    <button type="button" class="turno-btn" data-turno="vespertino"
+                                        onclick="seleccionarTurno('vespertino')">
+                                        <span class="turno-icon">🌙</span>
+                                        <span class="turno-text">Vespertino</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Correo -->
+                            <div class="form-section">
+                                <label class="form-label">2. Correo Institucional</label>
+                                <div class="input-wrapper">
+                                    <span class="input-icon">👤</span>
+                                    <input type="email" id="inputCorreo" class="form-input-large"
+                                        placeholder="correo@ejemplo.com">
+                                </div>
+                            </div>
+
+                            <!-- Mensaje de Error/Éxito -->
+                            <div id="mensajeRegistro" class="mensaje-registro hidden"></div>
+
+                            <!-- Botón de Registro -->
+                            <button id="btnMarcarAsistencia" class="btn-asistencia" onclick="marcarAsistencia()">
+                                MARCAR ASISTENCIA
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB: ADMINISTRACIÓN -->
+                    <div id="tabAdmin" class="tab-content">
+                        <!-- Sub-tabs de Admin -->
+                        <div class="admin-subtabs">
+                            <button class="subtab-btn active" data-subtab="lista" onclick="cambiarSubtab('lista')">
+                                📋 Lista del Día
+                            </button>
+                            <button class="subtab-btn" data-subtab="estadisticas"
+                                onclick="cambiarSubtab('estadisticas')">
+                                📊 Estadísticas
+                            </button>
+                            <button class="subtab-btn" data-subtab="alumnos" onclick="cambiarSubtab('alumnos')">
+                                👥 Alumnos
+                            </button>
+                            <button class="subtab-btn" data-subtab="config" onclick="cambiarSubtab('config')">
+                                ⚙️ Config
+                            </button>
+                        </div>
+
+                        <!-- SUBTAB: Lista del Día -->
+                        <div id="subtabLista" class="subtab-content active">
+                            <div class="admin-card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>📋 Asistencia de Hoy</h3>
+                                        <p class="text-muted">Total: <span id="totalHoy">0</span> alumnos</p>
+                                    </div>
+                                    <div class="card-actions">
+                                        <select id="filtroTurno" class="filter-select" onchange="filtrarLista()">
+                                            <option value="todos">Todos</option>
+                                            <option value="matutino">☀️ Matutino</option>
+                                            <option value="vespertino">🌙 Vespertino</option>
+                                        </select>
+                                        <button class="btn-action btn-success" onclick="exportarCSV()">
+                                            📥 CSV
+                                        </button>
+                                        <button class="btn-action btn-danger" onclick="limpiarRegistros()">
+                                            🗑️ Limpiar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-container">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Hora</th>
+                                                <th>Alumno</th>
+                                                <th>Turno</th>
+                                                <th>Fecha</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tablaRegistros">
+                                            <!-- Se llena dinámicamente -->
+                                        </tbody>
+                                    </table>
+                                    <div id="listaVacia" class="empty-state hidden">
+                                        <span class="empty-icon">📅</span>
+                                        <p>No hay registros de asistencia hoy.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUBTAB: Estadísticas -->
+                        <div id="subtabEstadisticas" class="subtab-content">
+                            <div class="stats-grid">
+                                <div class="stat-card stat-matutino">
+                                    <div class="stat-icon">☀️</div>
+                                    <div class="stat-info">
+                                        <h4>Matutino</h4>
+                                        <div class="stat-value" id="statMatutino">0</div>
+                                        <div class="stat-label">asistencias</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card stat-vespertino">
+                                    <div class="stat-icon">🌙</div>
+                                    <div class="stat-info">
+                                        <h4>Vespertino</h4>
+                                        <div class="stat-value" id="statVespertino">0</div>
+                                        <div class="stat-label">asistencias</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card stat-total">
+                                    <div class="stat-icon">📊</div>
+                                    <div class="stat-info">
+                                        <h4>Total</h4>
+                                        <div class="stat-value" id="statTotal">0</div>
+                                        <div class="stat-label">registros</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUBTAB: Alumnos -->
+                        <div id="subtabAlumnos" class="subtab-content">
+                            <div class="admin-card">
+                                <div class="card-header">
+                                    <h3>👥 Gestión de Alumnos Autorizados</h3>
+                                </div>
+
+                                <!-- Agregar Individual -->
+                                <div class="agregar-section">
+                                    <h4>➕ Agregar Alumno Individual</h4>
+                                    <div class="agregar-form">
+                                        <input type="email" id="nuevoCorreo" class="form-input"
+                                            placeholder="correo@ejemplo.com">
+                                        <input type="text" id="nuevoNombre" class="form-input"
+                                            placeholder="Nombre (opcional)">
+                                        <select id="nuevoTurno" class="form-input">
+                                            <option value="matutino">☀️ Matutino</option>
+                                            <option value="vespertino">🌙 Vespertino</option>
+                                        </select>
+                                        <button class="btn-primary" onclick="agregarAlumnoIndividual()">Agregar</button>
+                                    </div>
+                                </div>
+
+                                <!-- Importar en Lote -->
+                                <div class="importar-section">
+                                    <h4>📋 Importar Lista (Pegar correos)</h4>
+                                    <div class="importar-grid">
+                                        <div class="importar-col">
+                                            <label class="turno-label matutino">☀️ Turno Matutino</label>
+                                            <textarea id="listaMatutino" class="importar-textarea"
+                                                placeholder="Pega los correos aquí (uno por línea)"></textarea>
+                                        </div>
+                                        <div class="importar-col">
+                                            <label class="turno-label vespertino">🌙 Turno Vespertino</label>
+                                            <textarea id="listaVespertino" class="importar-textarea"
+                                                placeholder="Pega los correos aquí (uno por línea)"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="importar-actions">
+                                        <button class="btn-primary btn-large" onclick="importarListas()">
+                                            💾 Guardar Listas
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Lista Actual -->
+                                <div class="lista-actual">
+                                    <h4>📝 Alumnos Registrados</h4>
+                                    <div class="alumnos-count">
+                                        <span>Matutino: <strong id="countMatutino">0</strong></span>
+                                        <span>Vespertino: <strong id="countVespertino">0</strong></span>
+                                    </div>
+                                    <div id="listaAlumnos" class="alumnos-list">
+                                        <!-- Se llena dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUBTAB: Configuración -->
+                        <div id="subtabConfig" class="subtab-content">
+                            <div class="admin-card">
+                                <div class="card-header">
+                                    <h3>⚙️ Configuración del Portal</h3>
+                                </div>
+                                <div class="config-form">
+                                    <div class="form-group">
+                                        <label class="form-label">Nombre de la Sesión / Clase</label>
+                                        <input type="text" id="configNombre" class="form-input"
+                                            placeholder="Ej: Biología Celular">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">URL Script (Google Sheets)</label>
+                                        <input type="text" id="configScript" class="form-input form-input-mono"
+                                            placeholder="https://script.google.com/...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Enlace para Alumnos (Solo Registro)</label>
+                                        <div class="input-group" style="display: flex; gap: 10px;">
+                                            <input type="text" id="linkAlumno" class="form-input" readonly
+                                                value="Cargando...">
+                                            <button class="btn-action" onclick="copiarEnlaceAlumno()"
+                                                title="Copiar al portapapeles">
+                                                📋 Copiar
+                                            </button>
+                                        </div>
+                                        <p class="help-text"
+                                            style="font-size: 0.85rem; color: #6b7280; margin-top: 5px;">
+                                            Comparte este enlace con los alumnos para que registren su asistencia.
+                                        </p>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button class="btn-primary" onclick="guardarConfiguracion()">
+                                            💾 Guardar Cambios
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="auth-config.js"></script>
+    <script>protectPage();</script>
+    <script src="asistencia.js"></script>
+</body>
+
+</html>

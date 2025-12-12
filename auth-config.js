@@ -5,7 +5,7 @@ const AUTH_SUPABASE_URL = 'https://api.premed.mx';
 const AUTH_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
 
 // Páginas que no requieren autenticación
-const PUBLIC_PAGES = ['login.html'];
+const PUBLIC_PAGES = ['login.html', 'registro.html'];
 
 // Crear cliente de Supabase para autenticación
 let authSupabase;
