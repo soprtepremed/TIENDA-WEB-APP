@@ -5,7 +5,7 @@
 // Configuración de Supabase
 const ASISTENCIA_SUPABASE_URL = 'https://api.premed.mx';
 const ASISTENCIA_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
-const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyErjDV93ovv-kEcSSR9m7yynwER8kTPBFtDsZXmFTSV-9u3ABEfqWLb9TD7MvwkjoQWw/exec';
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzc5wIAEuYbbFsxlCKPH9P9Bi0657z1LdAlBMIHA55nabzQQLyPWdRQ1dOH7G9ls3-4/exec';
 
 // Variables globales
 let asistenciaSupabase;
