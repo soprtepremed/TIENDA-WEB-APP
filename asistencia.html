@@ -52,7 +52,7 @@
                 <div class="container">
                     <!-- Título Principal -->
                     <div class="asistencia-header">
-                        <div class="header-icon">🎓</div>
+                        <div class="header-icon">📋</div>
                         <h1 class="section-title">Control de Asistencia</h1>
                         <p class="section-subtitle" id="nombreSesion">Cargando...</p>
                     </div>
@@ -203,6 +203,18 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="stats-actions"
+                                style="margin-top: 2rem; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 2rem;">
+                                <button class="btn-action btn-danger" onclick="limpiarRegistros()"
+                                    style="padding: 10px 20px; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                                    🗑️ Limpiar Estadísticas (Reset a 0)
+                                </button>
+                                <p style="margin-top: 10px; font-size: 0.85rem; color: #6b7280;">
+                                    ⚠️ <strong>Atención:</strong> Esta acción eliminará permanentemente todas las
+                                    asistencias registradas hoy.
+                                </p>
+                            </div>
                         </div>
 
                         <!-- SUBTAB: Alumnos -->
@@ -257,9 +269,32 @@
                                         <span>Matutino: <strong id="countMatutino">0</strong></span>
                                         <span>Vespertino: <strong id="countVespertino">0</strong></span>
                                     </div>
-                                    <div id="listaAlumnos" class="alumnos-list">
-                                        <!-- Se llena dinámicamente -->
+                                    <div class="alumnos-grid"
+                                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                        <!-- Columna Matutino -->
+                                        <div class="columna-turno">
+                                            <h5 class="turno-header matutino"
+                                                style="color: #B45309; padding: 10px; background: #FEF3C7; border-radius: 8px 8px 0 0; margin: 0; text-align: center; font-weight: 600;">
+                                                ☀️ Matutino</h5>
+                                            <div id="listaAlumnosMatutino" class="alumnos-list"
+                                                style="border-top: none; border-radius: 0 0 8px 8px; max-height: 400px;">
+                                                <!-- Lista Matutino -->
+                                            </div>
+                                        </div>
+
+                                        <!-- Columna Vespertino -->
+                                        <div class="columna-turno">
+                                            <h5 class="turno-header vespertino"
+                                                style="color: #4338CA; padding: 10px; background: #E0E7FF; border-radius: 8px 8px 0 0; margin: 0; text-align: center; font-weight: 600;">
+                                                🌙 Vespertino</h5>
+                                            <div id="listaAlumnosVespertino" class="alumnos-list"
+                                                style="border-top: none; border-radius: 0 0 8px 8px; max-height: 400px;">
+                                                <!-- Lista Vespertino -->
+                                            </div>
+                                        </div>
                                     </div>
+                                    <!-- Contenedor antiguo eliminado para evitar conflictos -->
+                                    <div id="listaAlumnos" style="display: none;"></div>
                                 </div>
                             </div>
                         </div>

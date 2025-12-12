@@ -275,15 +275,41 @@ async function cargarCorreosAutorizados() {
 }
 
 function renderizarListaAlumnos(alumnos) {
+    // Intentar obtener los contenedores separados (Nuevo diseño)
+    const containerMat = document.getElementById('listaAlumnosMatutino');
+    const containerVesp = document.getElementById('listaAlumnosVespertino');
+
+    // Si existen los contenedores separados (Vista Admin con columnas)
+    if (containerMat && containerVesp) {
+        // Filtrar alumnos
+        const matutinos = alumnos.filter(a => a.turno === 'matutino');
+        const vespertinos = alumnos.filter(a => a.turno === 'vespertino');
+
+        // Renderizar Matutinos
+        containerMat.innerHTML = matutinos.length ? matutinos.map(a => generarHTMLAlumno(a)).join('') :
+            '<div class="empty-state" style="padding: 20px;"><p>Sin alumnos</p></div>';
+
+        // Renderizar Vespertinos
+        containerVesp.innerHTML = vespertinos.length ? vespertinos.map(a => generarHTMLAlumno(a)).join('') :
+            '<div class="empty-state" style="padding: 20px;"><p>Sin alumnos</p></div>';
+
+        return;
+    }
+
+    // Fallback: Contenedor único (si existe, aunque ahora está oculto en el HTML nuevo)
     const container = document.getElementById('listaAlumnos');
-    if (!container) return; // Si no existe el contenedor (vista alumno), salir
+    if (!container) return; // Si no existe nada (vista alumno), salir
 
     if (!alumnos || alumnos.length === 0) {
         container.innerHTML = '<div class="empty-state"><span class="empty-icon">\uD83D\uDC65</span><p>No hay alumnos registrados</p></div>';
         return;
     }
 
-    container.innerHTML = alumnos.map(a => `
+    container.innerHTML = alumnos.map(a => generarHTMLAlumno(a)).join('');
+}
+
+function generarHTMLAlumno(a) {
+    return `
         <div class="alumno-item">
             <span class="alumno-email">${a.email}</span>
             <div class="alumno-actions">
@@ -291,7 +317,7 @@ function renderizarListaAlumnos(alumnos) {
                 <button class="btn-eliminar" onclick="eliminarAlumno('${a.email}')">\u2715</button>
             </div>
         </div>
-    `).join('');
+    `;
 }
 
 async function cargarRegistrosHoy() {
@@ -344,9 +370,11 @@ function formatearHora(timestamp) {
 
 async function cargarEstadisticas() {
     try {
+        const hoy = new Date().toISOString().split('T')[0];
         const { data } = await asistenciaSupabase
             .from('registros')
-            .select('turno');
+            .select('turno')
+            .eq('fecha', hoy);  // <--- IMPORTANTE: Filtrar solo por HOY
 
         let matutino = 0, vespertino = 0;
         (data || []).forEach(r => {
@@ -411,18 +439,26 @@ async function limpiarRegistros() {
 
     try {
         const hoy = new Date().toISOString().split('T')[0];
-        await asistenciaSupabase
+        const { error } = await asistenciaSupabase
             .from('registros')
             .delete()
             .eq('fecha', hoy);
+
+        if (error) throw error;
+
+        // Reset visual inmediato
+        document.getElementById('statMatutino').textContent = '0';
+        document.getElementById('statVespertino').textContent = '0';
+        document.getElementById('statTotal').textContent = '0';
+        document.getElementById('totalHoy').textContent = '0';
 
         await cargarRegistrosHoy();
         await cargarEstadisticas();
         alert('\u2705 Registros eliminados');
 
     } catch (e) {
-        console.error('Error:', e);
-        alert('Error al eliminar registros');
+        console.error('Error detallado:', e);
+        alert(`Error al eliminar: ${e.message || e.error_description || 'Desconocido'}`);
     }
 }
 
