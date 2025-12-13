@@ -743,14 +743,97 @@ body {
 }
 
 /* Responsive Adjustments */
+/* ===================================
+   Mobile & Responsive Logic
+   =================================== */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    background: var(--color-navy);
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: var(--radius-md);
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.mobile-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 1024px) {
     .sidebar {
         transform: translateX(-100%);
     }
 
-    .main-content {
-        margin-left: 0;
+    .sidebar.active {
+        transform: translateX(0);
     }
 
-    /* Add a toggle button logic later if needed */
+    .main-content {
+        margin-left: 0;
+        padding-top: 60px;
+        /* Space for mobile button */
+    }
+
+    .mobile-menu-btn {
+        display: flex;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--spacing-4);
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: var(--spacing-4);
+        text-align: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    /* Adjust Stats Grid for Mobile */
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }

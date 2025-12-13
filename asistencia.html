@@ -14,8 +14,12 @@
 
 <body>
     <div class="app-container">
+        <!-- Mobile Overlay & Button -->
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
         <!-- Global Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="asistencia.html" class="sidebar-logo">
                     <span>📋</span> Asistencia
@@ -97,7 +101,7 @@
 
                             <!-- Correo -->
                             <div class="form-section">
-                                <label class="form-label">2. Correo Institucional</label>
+                                <label class="form-label">2. Correo Electrónico</label>
                                 <div class="input-wrapper">
                                     <span class="input-icon">👤</span>
                                     <input type="email" id="inputCorreo" class="form-input-large"

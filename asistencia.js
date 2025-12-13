@@ -179,7 +179,7 @@ async function marcarAsistencia() {
         // Como solución temporal en JS solo podemos informar el error.
 
         if (error.code === '23505') {
-            mostrarMensaje('warning', '⚠️ El sistema de base de datos impidió el duplicado. Se requiere ajuste interno.');
+            mostrarMensaje('warning', '⚠️ Este correo ya ha sido registrado el día de hoy.');
         } else {
             mostrarMensaje('error', '❌ Error al registrar. Intenta de nuevo.');
         }
@@ -866,6 +866,18 @@ function exportarPDF() {
     }
 }
 
+// ===================================
+// RESPONSIVE SIDEBAR
+// ===================================
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileOverlay');
+
+    if (sidebar) sidebar.classList.toggle('active');
+    if (overlay) overlay.classList.toggle('active');
+}
+
 // Exponer funciones globalmente
 window.cambiarTab = cambiarTab;
 window.cambiarSubtab = cambiarSubtab;
@@ -873,11 +885,12 @@ window.seleccionarTurno = seleccionarTurno;
 window.marcarAsistencia = marcarAsistencia;
 window.filtrarLista = filtrarLista;
 window.exportarCSV = exportarCSV;
-window.exportarExcel = exportarExcel; // Nuevo
-window.exportarPDF = exportarPDF;     // Nuevo
+window.exportarExcel = exportarExcel;
+window.exportarPDF = exportarPDF;
 window.limpiarRegistros = limpiarRegistros;
 window.agregarAlumnoIndividual = agregarAlumnoIndividual;
 window.importarListas = importarListas;
 window.eliminarAlumno = eliminarAlumno;
 window.guardarConfiguracion = guardarConfiguracion;
 window.copiarEnlaceAlumno = copiarEnlaceAlumno;
+window.toggleSidebar = toggleSidebar;
