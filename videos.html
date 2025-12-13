@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos - Centro de Capacitación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="videos.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Global Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="videos.html" class="sidebar-logo">
+                    <span>🎥</span> Videos
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Asistencia
+                </a>
+                <a href="videos.html" class="sidebar-link active">
+                    <span class="sidebar-icon">🎥</span> Videos
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name" id="userName">Admin</span>
+                        <span class="user-role" id="userRole">Administrador</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="btn-logout">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main">
+                <div class="container video-library-container">
+
+                    <div class="section-header">
+                        <h1 class="section-title">Centro de Videos</h1>
+                        <p class="section-subtitle">Material educativo y capacitaciones grabadas</p>
+                    </div>
+
+                    <!-- Main Video Player -->
+                    <div id="mainVideoSection" class="video-player-section hidden">
+                        <div class="video-player-wrapper">
+                            <iframe id="mainVideoFrame" src="" title="Video Player"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="video-player-info">
+                            <h2 id="mainVideoTitle" class="video-player-title">Título del Video</h2>
+                            <div class="video-player-meta">
+                                <span id="mainVideoDate">12 Dic 2025</span>
+                                <span>•</span>
+                                <span id="mainVideoDuration">10:00</span>
+                            </div>
+                            <p id="mainVideoDescription" class="video-player-description">
+                                Descripción del video seleccionado.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Video Grid Section -->
+                    <div class="videos-grid-section">
+                        <div class="section-header-row">
+                            <h3 class="section-title" style="font-size: var(--font-size-xl);">Catálogo</h3>
+
+                            <!-- Categories/Filters -->
+                            <div class="video-categories">
+                                <button class="category-pill active" data-category="all">Todos</button>
+                                <button class="category-pill" data-category="capacitacion">Capacitación</button>
+                                <button class="category-pill" data-category="tutoriales">Tutoriales</button>
+                                <button class="category-pill" data-category="reuniones">Reuniones</button>
+                            </div>
+                        </div>
+
+                        <!-- Grid -->
+                        <div id="videosGrid" class="videos-grid">
+                            <!-- Video Items will be injected here by JS -->
+
+                            <!-- Example Static Item (Hidden by default when JS loads) -->
+                            <div class="video-card">
+                                <div class="video-thumbnail-wrapper">
+                                    <div class="video-thumbnail" style="background-color: #eee;"></div>
+                                    <span class="video-duration">15:30</span>
+                                    <div class="play-icon-overlay">▶</div>
+                                </div>
+                                <div class="video-card-content">
+                                    <h4 class="video-card-title">Introducción al Sistema</h4>
+                                    <div class="video-card-meta">
+                                        <span>Capacitación</span>
+                                        <div class="video-status">
+                                            <span class="status-indicator status-new"></span> New
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="auth-config.js"></script>
+    <script>protectPage();</script>
+    <!-- We might need firebase-config if used, but supabase seems primary for auth/data in recent tasks -->
+    <script src="videos.js"></script>
+</body>
+
+</html>

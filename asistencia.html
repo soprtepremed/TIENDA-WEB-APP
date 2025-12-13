@@ -31,6 +31,9 @@
                 <a href="asistencia.html" class="sidebar-link active">
                     <span class="sidebar-icon">📋</span> Asistencia
                 </a>
+                <a href="videos.html" class="sidebar-link">
+                    <span class="sidebar-icon">🎥</span> Videos
+                </a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-profile">
@@ -136,21 +139,53 @@
                             <div class="admin-card">
                                 <div class="card-header">
                                     <div>
-                                        <h3>📋 Asistencia de Hoy</h3>
-                                        <p class="text-muted">Total: <span id="totalHoy">0</span> alumnos</p>
+                                        <h3>📋 Registro de Asistencia <span id="fechaMostrada"
+                                                style="font-size: 0.8em; color: #666;"></span></h3>
+                                        <p class="text-muted">Mostrando: <span id="totalHoy">0</span> registros</p>
                                     </div>
-                                    <div class="card-actions">
-                                        <select id="filtroTurno" class="filter-select" onchange="filtrarLista()">
-                                            <option value="todos">Todos</option>
-                                            <option value="matutino">☀️ Matutino</option>
-                                            <option value="vespertino">🌙 Vespertino</option>
-                                        </select>
-                                        <button class="btn-action btn-success" onclick="exportarCSV()">
-                                            📥 CSV
-                                        </button>
-                                        <button class="btn-action btn-danger" onclick="limpiarRegistros()">
-                                            🗑️ Limpiar
-                                        </button>
+                                    <div class="card-actions" style="flex-direction: column; width: 100%; gap: 10px;">
+                                        <!-- Fila Superior: Título y Totales -->
+                                        <div
+                                            style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                                            <div style="display: flex; gap: 10px;">
+                                                <button class="btn-action btn-success" onclick="exportarExcel()"
+                                                    title="Descargar Excel">
+                                                    📊 Excel
+                                                </button>
+                                                <button class="btn-action btn-danger" onclick="exportarPDF()"
+                                                    style="background-color: #EF4444; border-color: #EF4444; color: white;"
+                                                    title="Descargar PDF">
+                                                    📄 PDF
+                                                </button>
+                                                <button class="btn-action" onclick="exportarCSV()"
+                                                    style="background-color: #3B82F6; color: white;"
+                                                    title="Descargar CSV">
+                                                    📥 CSV
+                                                </button>
+                                                <button class="btn-action btn-danger" onclick="limpiarRegistros()">
+                                                    🗑️ Limpiar
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Fila Inferior: Filtros -->
+                                        <div class="filters-row">
+                                            <input type="date" id="filtroFecha" class="filter-select"
+                                                onchange="cargarRegistros()">
+
+                                            <select id="filtroTurno" class="filter-select" onchange="filtrarLista()">
+                                                <option value="todos">Todos los Turnos</option>
+                                                <option value="matutino">☀️ Matutino</option>
+                                                <option value="vespertino">🌙 Vespertino</option>
+                                            </select>
+
+                                            <div class="search-container-modern">
+                                                <span class="search-icon-float">🔍</span>
+                                                <input type="text" id="buscadorGeneral" class="search-input-modern"
+                                                    placeholder="Buscar por correo o nombre..."
+                                                    onkeyup="filtrarLista()">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="table-container">
@@ -346,6 +381,11 @@
             </div>
         </main>
     </div>
+
+    <!-- Export Tools -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>

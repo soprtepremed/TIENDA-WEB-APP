@@ -12,15 +12,22 @@ let asistenciaSupabase;
 let turnoSeleccionado = 'matutino';
 let configuracion = { nombre_sesion: 'Clase General', script_url: DEFAULT_SCRIPT_URL };
 let correosAutorizados = { matutino: [], vespertino: [] };
-let registrosHoy = [];
+let registrosHoy = []; // Almacena los registros cargados (del día seleccionado)
+let fechaSeleccionada = new Date().toISOString().split('T')[0];
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('\uD83D\uDCCB Inicializando módulo de Asistencia...');
     initAsistenciaSupabase();
+    // Set default date
+    const fechaInput = document.getElementById('filtroFecha');
+    if (fechaInput) {
+        fechaInput.value = fechaSeleccionada;
+    }
+
     await cargarConfiguracion();
     await cargarCorreosAutorizados();
-    await cargarRegistrosHoy();
+    await cargarRegistros(); // Carga con la fecha seleccionada
     await cargarEstadisticas();
     console.log('\u2705 Módulo de Asistencia listo');
 });
@@ -41,6 +48,15 @@ function initAsistenciaSupabase() {
 // ===================================
 
 function cambiarTab(tab) {
+    // Expandir contenedor si es Admin
+    const container = document.querySelector('.container');
+    if (tab === 'admin') {
+        container.classList.add('admin-expanded');
+    } else {
+        container.classList.remove('admin-expanded');
+    }
+
+    // Actualizar botones
     // Actualizar botones
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === tab);
@@ -129,13 +145,19 @@ async function marcarAsistencia() {
             return;
         }
 
+        // Ajustar timestamp para que coincida con la hora local del usuario
+        // Esto evita que se guarde en UTC y se visualice con desfase si la DB no maneja zonas horarias
+        const fechaLocal = new Date();
+        const timestampLocal = new Date(fechaLocal.getTime() - (fechaLocal.getTimezoneOffset() * 60000)).toISOString();
+
         // Registrar en Supabase
         const { error } = await asistenciaSupabase
             .from('registros')
             .insert({
                 email: email,
                 turno: turnoAsignado,
-                fecha: hoy
+                fecha: hoy,
+                timestamp: timestampLocal
             });
 
         if (error) throw error;
@@ -150,7 +172,7 @@ async function marcarAsistencia() {
         inputCorreo.value = '';
 
         // Recargar lista
-        await cargarRegistrosHoy();
+        await cargarRegistros();
         await cargarEstadisticas();
 
     } catch (error) {
@@ -320,20 +342,26 @@ function generarHTMLAlumno(a) {
     `;
 }
 
-async function cargarRegistrosHoy() {
+async function cargarRegistros() {
     try {
-        const hoy = new Date().toISOString().split('T')[0];
+        const fechaInput = document.getElementById('filtroFecha');
+        const fecha = fechaInput ? fechaInput.value : new Date().toISOString().split('T')[0];
+        fechaSeleccionada = fecha;
+
+        // Actualizar título visual
+        const tituloFecha = document.getElementById('fechaMostrada');
+        if (tituloFecha) tituloFecha.textContent = `(${fecha})`;
 
         const { data } = await asistenciaSupabase
             .from('registros')
             .select('*')
-            .eq('fecha', hoy)
+            .eq('fecha', fecha)
             .order('timestamp', { ascending: false });
 
-        registrosHoy = data || [];
-        renderizarTabla(registrosHoy);
-        const totalHoyElem = document.getElementById('totalHoy');
-        if (totalHoyElem) totalHoyElem.textContent = registrosHoy.length;
+        registrosHoy = data || []; // "registrosHoy" ahora es genérico para "registrosCargados"
+
+        // Aplicar filtros actuales (si hay texto o turno puesto)
+        filtrarLista();
 
     } catch (e) {
         console.error('Error cargando registros:', e);
@@ -364,17 +392,20 @@ function renderizarTabla(registros) {
 
 function formatearHora(timestamp) {
     if (!timestamp) return '--:--';
-    const date = new Date(timestamp);
+    // Asegurar que se trate como hora local eliminando la Z de UTC si existe
+    // Esto hace que "T19:00:00Z" se interprete como "T19:00:00" (hora local)
+    const fechaLimpia = timestamp.endsWith('Z') ? timestamp.slice(0, -1) : timestamp;
+    const date = new Date(fechaLimpia);
     return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 }
 
 async function cargarEstadisticas() {
     try {
-        const hoy = new Date().toISOString().split('T')[0];
+        // Usar la fecha seleccionada para las estadisticas también
         const { data } = await asistenciaSupabase
             .from('registros')
             .select('turno')
-            .eq('fecha', hoy);  // <--- IMPORTANTE: Filtrar solo por HOY
+            .eq('fecha', fechaSeleccionada);  // Filter by selected date
 
         let matutino = 0, vespertino = 0;
         (data || []).forEach(r => {
@@ -400,15 +431,27 @@ async function cargarEstadisticas() {
 // ===================================
 
 function filtrarLista() {
-    const filtro = document.getElementById('filtroTurno').value;
+    const filtroTurno = document.getElementById('filtroTurno').value;
+    const busqueda = document.getElementById('buscadorGeneral').value.toLowerCase().trim();
 
     let registrosFiltrados = registrosHoy;
-    if (filtro !== 'todos') {
-        registrosFiltrados = registrosHoy.filter(r => r.turno === filtro);
+
+    // 1. Filtrar por Turno
+    if (filtroTurno !== 'todos') {
+        registrosFiltrados = registrosFiltrados.filter(r => r.turno === filtroTurno);
+    }
+
+    // 2. Filtrar por Búsqueda (Live Search)
+    if (busqueda) {
+        registrosFiltrados = registrosFiltrados.filter(r =>
+            r.email.toLowerCase().includes(busqueda) ||
+            (r.fecha && r.fecha.includes(busqueda))
+        );
     }
 
     renderizarTabla(registrosFiltrados);
-    document.getElementById('totalHoy').textContent = registrosFiltrados.length;
+    const totalHoyElem = document.getElementById('totalHoy');
+    if (totalHoyElem) totalHoyElem.textContent = registrosFiltrados.length;
 }
 
 function exportarCSV() {
@@ -438,11 +481,11 @@ async function limpiarRegistros() {
     if (!confirm('¿Estás seguro de eliminar TODOS los registros de hoy?')) return;
 
     try {
-        const hoy = new Date().toISOString().split('T')[0];
+        const fecha = fechaSeleccionada;
         const { error } = await asistenciaSupabase
             .from('registros')
             .delete()
-            .eq('fecha', hoy);
+            .eq('fecha', fecha);
 
         if (error) throw error;
 
@@ -452,7 +495,7 @@ async function limpiarRegistros() {
         document.getElementById('statTotal').textContent = '0';
         document.getElementById('totalHoy').textContent = '0';
 
-        await cargarRegistrosHoy();
+        await cargarRegistros();
         await cargarEstadisticas();
         alert('\u2705 Registros eliminados');
 
@@ -705,6 +748,115 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ===================================
+// EXPORTAR A EXCEL Y PDF
+// ===================================
+
+function exportarExcel() {
+    if (!registrosHoy || registrosHoy.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+    }
+
+    try {
+        // Preparar datos
+        const datosExportar = registrosHoy.map(r => ({
+            Fecha: r.fecha,
+            Hora: formatearHora(r.timestamp),
+            Correo: r.email,
+            Turno: r.turno.charAt(0).toUpperCase() + r.turno.slice(1)
+        }));
+
+        // Crear Libro y Hoja usando SheetJS
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(datosExportar);
+
+        // Ajustar ancho de columnas
+        const wscols = [
+            { wch: 12 }, // Fecha
+            { wch: 10 }, // Hora
+            { wch: 35 }, // Correo
+            { wch: 12 }  // Turno
+        ];
+        ws['!cols'] = wscols;
+
+        XLSX.utils.book_append_sheet(wb, ws, "Asistencia");
+
+        // Guardar archivo
+        const fileName = `Asistencia_${fechaSeleccionada}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+
+        console.log('✅ Excel exportado correctamente');
+
+    } catch (error) {
+        console.error('Error exportando a Excel:', error);
+        alert('Hubo un error al generar el Excel. Revisa si la librería XLSX cargó correctamente.');
+    }
+}
+
+function exportarPDF() {
+    if (!registrosHoy || registrosHoy.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+    }
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Título del PDF
+        doc.setFontSize(18);
+        doc.setTextColor(27, 58, 107); // Navy
+        doc.text("Reporte de Asistencia", 14, 22);
+
+        // Subtítulo con fecha
+        doc.setFontSize(11);
+        doc.setTextColor(100);
+        doc.text(`Fecha: ${fechaSeleccionada}`, 14, 30);
+
+        // Información de Sesión
+        const nombreSesion = configuracion.nombre_sesion || 'Clase General';
+        doc.text(`Sesión: ${nombreSesion}`, 14, 36);
+
+        // Resumen
+        const total = registrosHoy.length;
+        const matutino = registrosHoy.filter(r => r.turno === 'matutino').length;
+        const vespertino = registrosHoy.filter(r => r.turno === 'vespertino').length;
+        doc.text(`Total: ${total} | Matutino: ${matutino} | Vespertino: ${vespertino}`, 14, 42);
+
+        // Tabla
+        const tableColumn = ["Hora", "Correo", "Turno"];
+        const tableRows = [];
+
+        registrosHoy.forEach(r => {
+            const registroData = [
+                formatearHora(r.timestamp),
+                r.email,
+                r.turno.charAt(0).toUpperCase() + r.turno.slice(1)
+            ];
+            tableRows.push(registroData);
+        });
+
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 50,
+            theme: 'grid',
+            headStyles: { fillColor: [27, 58, 107] }, // Navy Header
+            alternateRowStyles: { fillColor: [240, 240, 240] },
+            margin: { top: 50 }
+        });
+
+        // Guardar PDF
+        doc.save(`Asistencia_${fechaSeleccionada}.pdf`);
+        console.log('✅ PDF exportado correctamente');
+
+    } catch (error) {
+        console.error('Error exportando a PDF:', error);
+        alert('Hubo un error al generar el PDF. Asegúrate de que las librerías se cargaron correctamente.');
+    }
+}
+
 // Exponer funciones globalmente
 window.cambiarTab = cambiarTab;
 window.cambiarSubtab = cambiarSubtab;
@@ -712,6 +864,8 @@ window.seleccionarTurno = seleccionarTurno;
 window.marcarAsistencia = marcarAsistencia;
 window.filtrarLista = filtrarLista;
 window.exportarCSV = exportarCSV;
+window.exportarExcel = exportarExcel; // Nuevo
+window.exportarPDF = exportarPDF;     // Nuevo
 window.limpiarRegistros = limpiarRegistros;
 window.agregarAlumnoIndividual = agregarAlumnoIndividual;
 window.importarListas = importarListas;
