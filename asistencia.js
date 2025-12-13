@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarCorreosAutorizados();
     await cargarRegistros(); // Carga con la fecha seleccionada
     await cargarEstadisticas();
-    console.log('\u2705 Módulo de Asistencia listo');
+    suscribirCambios(); // Iniciar Realtime
+    console.log('✅ Módulo de Asistencia listo');
 });
 
 // Inicializar cliente Supabase
@@ -43,9 +44,80 @@ function initAsistenciaSupabase() {
         asistenciaSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
             db: { schema: 'public' }
         });
-        console.log('\u2705 Supabase conectado (esquema: asistencia)');
+        console.log('✅ Supabase conectado (esquema: asistencia)');
     }
     return asistenciaSupabase;
+}
+
+// ===================================
+// REALTIME SUBSCRIPTION
+// ===================================
+function suscribirCambios() {
+    asistenciaSupabase
+        .channel('tabla_registros')
+        .on('postgres_changes',
+            { event: '*', schema: 'public', table: 'registros' },
+            (payload) => {
+                console.log('🔄 Cambio detectado en tiempo real:', payload);
+
+                // Manejar INSERT (Nuevo registro)
+                if (payload.eventType === 'INSERT') {
+                    const nuevoRegistro = payload.new;
+                    // Solo agregar si pertenece a la fecha que estamos viendo
+                    if (nuevoRegistro.fecha === fechaSeleccionada) {
+                        registrosHoy.unshift(nuevoRegistro);
+                        // Reordenar por timestamp descendente para asegurar "más reciente arriba"
+                        registrosHoy.sort((a, b) => {
+                            // Orden descendente (B - A)
+                            return (b.timestamp || '').localeCompare(a.timestamp || '');
+                        });
+
+                        filtrarLista(); // Actualiza la tabla visual
+                        cargarEstadisticas(); // Actualiza contadores
+
+                        // Notificación visual temporal
+                        mostrarNotificacionRealtime(`Nuevo registro: ${nuevoRegistro.email}`);
+                    }
+                }
+
+                // Manejar DELETE (Eliminar registro)
+                if (payload.eventType === 'DELETE') {
+                    const idEliminado = payload.old.id;
+                    const longitudAnterior = registrosHoy.length;
+                    registrosHoy = registrosHoy.filter(r => r.id !== idEliminado);
+
+                    if (registrosHoy.length !== longitudAnterior) {
+                        filtrarLista();
+                        cargarEstadisticas();
+                    }
+                }
+            }
+        )
+        .subscribe();
+    console.log('📡 Escuchando cambios en tiempo real...');
+}
+
+function mostrarNotificacionRealtime(texto) {
+    const notif = document.createElement('div');
+    notif.style.position = 'fixed';
+    notif.style.bottom = '20px';
+    notif.style.right = '20px';
+    notif.style.backgroundColor = '#1B3A6B';
+    notif.style.color = 'white';
+    notif.style.padding = '12px 24px';
+    notif.style.borderRadius = '8px';
+    notif.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+    notif.style.zIndex = '10000';
+    notif.style.fontFamily = 'var(--font-family)';
+    notif.style.animation = 'fadeIn 0.3s ease-out';
+    notif.textContent = texto;
+    document.body.appendChild(notif);
+
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transition = 'opacity 0.5s';
+        setTimeout(() => notif.remove(), 500);
+    }, 3000);
 }
 
 // ===================================
