@@ -35,30 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarRegistros(); // Carga con la fecha seleccionada
     await cargarEstadisticas();
     suscribirCambios(); // Iniciar Realtime
-    actualizarPerfilUsuario(); // Mostrar usuario actual
     console.log('✅ Módulo de Asistencia listo');
 });
-
-function actualizarPerfilUsuario() {
-    // Usar la función getCurrentUser de auth-config.js
-    if (typeof getCurrentUser === 'function') {
-        const usuario = getCurrentUser();
-        if (usuario) {
-            const userNameElem = document.getElementById('sidebarUserName');
-            const userRoleElem = document.getElementById('sidebarUserRole');
-            const userAvatarElem = document.getElementById('sidebarAvatar');
-
-            if (userNameElem) userNameElem.textContent = usuario.nombre || 'Usuario';
-            if (userRoleElem) userRoleElem.textContent = usuario.rol || 'Rol';
-
-            // Generar iniciales
-            if (userAvatarElem && usuario.nombre) {
-                const iniciales = usuario.nombre.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-                userAvatarElem.textContent = iniciales;
-            }
-        }
-    }
-}
 
 // Inicializar cliente Supabase
 function initAsistenciaSupabase() {
