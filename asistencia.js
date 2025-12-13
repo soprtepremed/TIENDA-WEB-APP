@@ -958,8 +958,25 @@ function exportarPDF() {
 }
 
 // ===================================
-// RESPONSIVE SIDEBAR
+// RESPONSIVE SIDEBAR & UI ACTIONS
 // ===================================
+
+async function refrescarTablaManual() {
+    const icon = document.getElementById('iconRefrescar');
+    if (icon) icon.classList.add('spin-anim');
+
+    try {
+        await cargarRegistros();
+        await cargarEstadisticas();
+    } catch (e) {
+        console.error(e);
+    } finally {
+        // Mantener animación al menos 500ms para feedback visual
+        setTimeout(() => {
+            if (icon) icon.classList.remove('spin-anim');
+        }, 800);
+    }
+}
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -985,3 +1002,4 @@ window.eliminarAlumno = eliminarAlumno;
 window.guardarConfiguracion = guardarConfiguracion;
 window.copiarEnlaceAlumno = copiarEnlaceAlumno;
 window.toggleSidebar = toggleSidebar;
+window.refrescarTablaManual = refrescarTablaManual; // Nuevo

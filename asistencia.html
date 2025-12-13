@@ -166,10 +166,12 @@
                                                     title="Descargar CSV">
                                                     📥 CSV
                                                 </button>
-                                                <button class="btn-action" onclick="cargarRegistros()"
+                                                <button id="btnRefrescar" class="btn-action"
+                                                    onclick="refrescarTablaManual()"
                                                     style="background-color: var(--color-navy); color: white;"
                                                     title="Actualizar Tabla">
-                                                    🔄 Refrescar
+                                                    <span id="iconRefrescar" style="display: inline-block;">🔄</span>
+                                                    Refrescar
                                                 </button>
                                                 <button class="btn-action btn-danger" onclick="limpiarRegistros()">
                                                     🗑️ Limpiar

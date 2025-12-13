@@ -306,6 +306,21 @@
     animation: fadeIn 0.3s ease;
 }
 
+/* Animation Keyframes */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spin-anim {
+    animation: spin 0.8s linear infinite;
+}
+
 /* Admin Cards */
 .admin-card {
     background: white;
