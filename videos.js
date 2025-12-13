@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             id: 1,
             title: "Introducción a la Plataforma",
-            description: "Un recorrido completo por las funcionalidades principales del sistema de gestión Cafe Premed. Aprende a navegar por los módulos de ventas, reportes y asistencia.",
+            description: "Un recorrido completo por las funcionalidades principales del sistema de gestión Soporte Plataforma. Aprende a navegar por los módulos de ventas, reportes y asistencia.",
             thumbnail: "https://via.placeholder.com/640x360/1B3A6B/FFFFFF?text=Intro+Plataforma",
             url: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Placeholder URL
             duration: "12:45",

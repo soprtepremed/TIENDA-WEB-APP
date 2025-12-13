@@ -1,5 +1,5 @@
 {
-  "name": "tienda-premed-migration",
+  "name": "soporte-plataforma",
   "version": "1.0.0",
   "type": "module",
   "description": "Script de migración de datos a Supabase",
