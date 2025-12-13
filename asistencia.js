@@ -463,6 +463,9 @@ function renderizarTabla(registros) {
     const tbody = document.getElementById('tablaRegistros');
     const emptyState = document.getElementById('listaVacia');
 
+    // Validación de seguridad por si estamos en vista alumno (registro.html) y no hay tabla
+    if (!tbody) return;
+
     if (!registros || registros.length === 0) {
         tbody.innerHTML = '';
         emptyState.classList.remove('hidden');
@@ -522,8 +525,14 @@ async function cargarEstadisticas() {
 // ===================================
 
 function filtrarLista() {
-    const filtroTurno = document.getElementById('filtroTurno').value;
-    const busqueda = document.getElementById('buscadorGeneral').value.toLowerCase().trim();
+    const filtroTurnoElem = document.getElementById('filtroTurno');
+    const busquedaElem = document.getElementById('buscadorGeneral');
+
+    // Validación de seguridad por si estamos en una página sin filtros
+    if (!filtroTurnoElem || !busquedaElem) return;
+
+    const filtroTurno = filtroTurnoElem.value;
+    const busqueda = busquedaElem.value.toLowerCase().trim();
 
     let registrosFiltrados = registrosHoy;
 
