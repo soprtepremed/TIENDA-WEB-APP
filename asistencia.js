@@ -13,7 +13,10 @@ let turnoSeleccionado = 'matutino';
 let configuracion = { nombre_sesion: 'Clase General', script_url: DEFAULT_SCRIPT_URL };
 let correosAutorizados = { matutino: [], vespertino: [] };
 let registrosHoy = []; // Almacena los registros cargados (del día seleccionado)
-let fechaSeleccionada = new Date().toISOString().split('T')[0];
+// Inicializar con fecha local (YYYY-MM-DD)
+const fechaLocalObj = new Date();
+const fechaLocalStr = new Date(fechaLocalObj.getTime() - (fechaLocalObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+let fechaSeleccionada = fechaLocalStr;
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -111,7 +114,7 @@ async function marcarAsistencia() {
     const enVespertino = correosAutorizados.vespertino.includes(email);
 
     if (!enMatutino && !enVespertino) {
-        mostrarMensaje('error', '\u274C Tu correo no está registrado en la base de datos.');
+        mostrarMensaje('error', '\u26A0 Coloca correctamente tu correo o en caso contrario este correo no está registrado.');
         return;
     }
 
@@ -131,19 +134,12 @@ async function marcarAsistencia() {
     btnMarcar.textContent = 'Registrando...';
 
     try {
-        // Verificar si ya registró hoy
-        const hoy = new Date().toISOString().split('T')[0];
-        const { data: existente } = await asistenciaSupabase
-            .from('registros')
-            .select('id')
-            .eq('email', email)
-            .eq('fecha', hoy)
-            .single();
+        // Calcular fecha local actual
+        const fechaLocalObj = new Date();
+        const hoy = new Date(fechaLocalObj.getTime() - (fechaLocalObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
-        if (existente) {
-            mostrarMensaje('warning', '\u26A0 Ya registraste tu asistencia hoy.');
-            return;
-        }
+        // Se eliminó la verificación de registro previo por solicitud del usuario
+        // Ahora permite múltiples registros del mismo correo en el mismo día
 
         // Ajustar timestamp para que coincida con la hora local del usuario
         // Esto evita que se guarde en UTC y se visualice con desfase si la DB no maneja zonas horarias
@@ -177,10 +173,15 @@ async function marcarAsistencia() {
 
     } catch (error) {
         console.error('Error:', error);
+        // Si el error es duplicado (23505), intentar mostrarlo como éxito si es lo que se desea,
+        // PERO si la base de datos lo rechaza, no se guarda.
+        // Si el usuario quiere múltiples, NECESITAMOS quitar la restricción en la BD.
+        // Como solución temporal en JS solo podemos informar el error.
+
         if (error.code === '23505') {
-            mostrarMensaje('warning', '\u26A0 Ya registraste tu asistencia hoy.');
+            mostrarMensaje('warning', '⚠️ El sistema de base de datos impidió el duplicado. Se requiere ajuste interno.');
         } else {
-            mostrarMensaje('error', '\u274C Error al registrar. Intenta de nuevo.');
+            mostrarMensaje('error', '❌ Error al registrar. Intenta de nuevo.');
         }
     } finally {
         btnMarcar.disabled = false;
@@ -345,7 +346,15 @@ function generarHTMLAlumno(a) {
 async function cargarRegistros() {
     try {
         const fechaInput = document.getElementById('filtroFecha');
-        const fecha = fechaInput ? fechaInput.value : new Date().toISOString().split('T')[0];
+
+        let fecha;
+        if (fechaInput && fechaInput.value) {
+            fecha = fechaInput.value;
+        } else {
+            const fechaLocalObj = new Date();
+            fecha = new Date(fechaLocalObj.getTime() - (fechaLocalObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+        }
+
         fechaSeleccionada = fecha;
 
         // Actualizar título visual
