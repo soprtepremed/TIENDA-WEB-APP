@@ -14,9 +14,11 @@ let configuracion = { nombre_sesion: 'Clase General', script_url: DEFAULT_SCRIPT
 let correosAutorizados = { matutino: [], vespertino: [] };
 let registrosHoy = []; // Almacena los registros cargados (del día seleccionado)
 // Inicializar con fecha local (YYYY-MM-DD)
-const fechaLocalObj = new Date();
-const fechaLocalStr = new Date(fechaLocalObj.getTime() - (fechaLocalObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-let fechaSeleccionada = fechaLocalStr;
+const ahoraIni = new Date();
+const yearIni = ahoraIni.getFullYear();
+const monthIni = String(ahoraIni.getMonth() + 1).padStart(2, '0');
+const dayIni = String(ahoraIni.getDate()).padStart(2, '0');
+let fechaSeleccionada = `${yearIni}-${monthIni}-${dayIni}`;
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -134,17 +136,22 @@ async function marcarAsistencia() {
     btnMarcar.textContent = 'Registrando...';
 
     try {
-        // Calcular fecha local actual
-        const fechaLocalObj = new Date();
-        const hoy = new Date(fechaLocalObj.getTime() - (fechaLocalObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+
 
         // Se eliminó la verificación de registro previo por solicitud del usuario
         // Ahora permite múltiples registros del mismo correo en el mismo día
 
-        // Ajustar timestamp para que coincida con la hora local del usuario
-        // Esto evita que se guarde en UTC y se visualice con desfase si la DB no maneja zonas horarias
-        const fechaLocal = new Date();
-        const timestampLocal = new Date(fechaLocal.getTime() - (fechaLocal.getTimezoneOffset() * 60000)).toISOString();
+        // Construir Fecha y Hora LOCAL manualmente (YYYY-MM-DDTHH:mm:ss)
+        const ahora = new Date();
+        const year = ahora.getFullYear();
+        const month = String(ahora.getMonth() + 1).padStart(2, '0');
+        const day = String(ahora.getDate()).padStart(2, '0');
+        const hours = String(ahora.getHours()).padStart(2, '0');
+        const minutes = String(ahora.getMinutes()).padStart(2, '0');
+        const seconds = String(ahora.getSeconds()).padStart(2, '0');
+
+        const hoy = `${year}-${month}-${day}`;
+        const timestampLocal = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 
         // Registrar en Supabase
         const { error } = await asistenciaSupabase
@@ -351,8 +358,11 @@ async function cargarRegistros() {
         if (fechaInput && fechaInput.value) {
             fecha = fechaInput.value;
         } else {
-            const fechaLocalObj = new Date();
-            fecha = new Date(fechaLocalObj.getTime() - (fechaLocalObj.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+            const ahora = new Date();
+            const year = ahora.getFullYear();
+            const month = String(ahora.getMonth() + 1).padStart(2, '0');
+            const day = String(ahora.getDate()).padStart(2, '0');
+            fecha = `${year}-${month}-${day}`;
         }
 
         fechaSeleccionada = fecha;
@@ -401,9 +411,9 @@ function renderizarTabla(registros) {
 
 function formatearHora(timestamp) {
     if (!timestamp) return '--:--';
-    // Asegurar que se trate como hora local eliminando la Z de UTC si existe
-    // Esto hace que "T19:00:00Z" se interprete como "T19:00:00" (hora local)
-    const fechaLimpia = timestamp.endsWith('Z') ? timestamp.slice(0, -1) : timestamp;
+    // Tomar solo YYYY-MM-DDTHH:mm:ss, ignorando offset Z, +00, etc.
+    // Esto fuerza a que se interprete como hora local del navegador.
+    const fechaLimpia = timestamp.substring(0, 19);
     const date = new Date(fechaLimpia);
     return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 }
