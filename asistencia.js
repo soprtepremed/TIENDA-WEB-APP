@@ -5,7 +5,7 @@
 // Configuración de Supabase
 const ASISTENCIA_SUPABASE_URL = 'https://api.premed.mx';
 const ASISTENCIA_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
-const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzc5wIAEuYbbFsxlCKPH9P9Bi0657z1LdAlBMIHA55nabzQQLyPWdRQ1dOH7G9ls3-4/exec';
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpHkJIv1aR5AXv2Jpwq2Kb7-FyhNXIvZ4yq-BMmzoqs3rdFeFkwrQL0rjAm2TtHDFSLA/exec';
 
 // Variables globales
 let asistenciaSupabase;
@@ -222,6 +222,19 @@ async function marcarAsistencia() {
         const minutes = String(ahora.getMinutes()).padStart(2, '0');
         const seconds = String(ahora.getSeconds()).padStart(2, '0');
 
+        // Determinar "Turno Asistido" (Real basado en hora)
+        let turnoAsistidoReal = 'otro';
+        const h = ahora.getHours();
+
+        // 8 AM a 1 PM (13:00) -> Matutino
+        if (h >= 8 && h < 13) {
+            turnoAsistidoReal = 'matutino';
+        }
+        // 4 PM (16:00) a 9 PM (21:00) -> Vespertino
+        else if (h >= 16 && h < 22) { // < 22 cubre hasta las 9:59 PM
+            turnoAsistidoReal = 'vespertino';
+        }
+
         const hoy = `${year}-${month}-${day}`;
         const timestampLocal = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 
@@ -230,7 +243,8 @@ async function marcarAsistencia() {
             .from('registros')
             .insert({
                 email: email,
-                turno: turnoAsignado,
+                turno: turnoAsignado, // Turno del alumno (oficial)
+                // turno_asistido: turnoAsistidoReal, // (COMENTADO TEMPORALMENTE hasta crear columna en BD)
                 fecha: hoy,
                 timestamp: timestampLocal
             });
@@ -240,7 +254,7 @@ async function marcarAsistencia() {
         // Enviar a Google Sheets
         // El usuario solicitó enviar "el turno que está colocando el alumno" (turnoSeleccionado) 
         // o el asignado. Para consistencia con el histórico, enviaremos Capitalizado.
-        await enviarAGoogleSheets(email, turnoAsignado);
+        await enviarAGoogleSheets(email, turnoAsignado, turnoAsistidoReal);
 
         // Éxito
         mostrarMensaje('success', `\u2705 ¡Asistencia registrada! Turno: ${turnoAsignado.toUpperCase()}`);
@@ -268,7 +282,7 @@ async function marcarAsistencia() {
     }
 }
 
-async function enviarAGoogleSheets(email, turno) {
+async function enviarAGoogleSheets(email, turno, turnoAsistidoReal = '') {
     if (!configuracion.script_url) return;
 
     // Convertir a formato "Matutino" / "Vespertino" (Capitalizado)
@@ -281,9 +295,10 @@ async function enviarAGoogleSheets(email, turno) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 email: email,
-                turno: turnoCapitalizado, // Clave estándar
-                Turno: turnoCapitalizado, // Clave alternativa por si el script busca mayúscula
-                shift: turnoCapitalizado, // Clave en inglés por si acaso
+                turno: turnoCapitalizado, // Clave estándar (Turno Oficial)
+                Turno: turnoCapitalizado,
+                shift: turnoCapitalizado,
+                turno_asistido: turnoAsistidoReal, // Nueva clave enviada
                 timestamp: new Date().toISOString()
             })
         });
@@ -480,6 +495,14 @@ function renderizarTabla(registros) {
             <td>${r.email}</td>
             <td><span class="badge-turno badge-${r.turno}">${r.turno === 'matutino' ? '\u2600' : '\uD83C\uDF19'} ${r.turno}</span></td>
             <td>${r.fecha}</td>
+            <td>
+                ${r.turno_asistido ?
+            `<span class="badge-turno badge-${r.turno_asistido}">
+                        ${r.turno_asistido === 'matutino' ? '☀️' : (r.turno_asistido === 'vespertino' ? '🌙' : '❓')} ${r.turno_asistido}
+                    </span>`
+            : '<span style="color: #ccc;">--</span>'
+        }
+            </td>
             <td style="text-align: center;">
                 <button class="btn-eliminar" onclick="eliminarRegistroIndividual('${r.id}')" title="Eliminar registro" style="border: none; background: transparent; font-size: 1.2rem; cursor: pointer;">
                     🗑️
