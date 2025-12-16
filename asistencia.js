@@ -480,6 +480,11 @@ function renderizarTabla(registros) {
             <td>${r.email}</td>
             <td><span class="badge-turno badge-${r.turno}">${r.turno === 'matutino' ? '\u2600' : '\uD83C\uDF19'} ${r.turno}</span></td>
             <td>${r.fecha}</td>
+            <td style="text-align: center;">
+                <button class="btn-eliminar" onclick="eliminarRegistroIndividual('${r.id}')" title="Eliminar registro" style="border: none; background: transparent; font-size: 1.2rem; cursor: pointer;">
+                    🗑️
+                </button>
+            </td>
         </tr>
     `).join('');
 }
@@ -986,7 +991,28 @@ function toggleSidebar() {
     if (overlay) overlay.classList.toggle('active');
 }
 
-// Exponer funciones globalmente
+async function eliminarRegistroIndividual(id) {
+    if (!confirm('¿Estás seguro de eliminar este registro?')) return;
+
+    try {
+        const { error } = await asistenciaSupabase
+            .from('registros')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        // Eliminar localmente para feedback inmediato
+        registrosHoy = registrosHoy.filter(r => r.id !== id);
+        filtrarLista(); // Actualiza tabla
+        cargarEstadisticas(); // Actualiza contadores
+
+    } catch (e) {
+        console.error('Error eliminando registro:', e);
+        alert('Error al eliminar el registro.');
+    }
+}
+
 window.cambiarTab = cambiarTab;
 window.cambiarSubtab = cambiarSubtab;
 window.seleccionarTurno = seleccionarTurno;
@@ -999,7 +1025,8 @@ window.limpiarRegistros = limpiarRegistros;
 window.agregarAlumnoIndividual = agregarAlumnoIndividual;
 window.importarListas = importarListas;
 window.eliminarAlumno = eliminarAlumno;
+window.eliminarRegistroIndividual = eliminarRegistroIndividual; // Nueva función expuesta
 window.guardarConfiguracion = guardarConfiguracion;
 window.copiarEnlaceAlumno = copiarEnlaceAlumno;
 window.toggleSidebar = toggleSidebar;
-window.refrescarTablaManual = refrescarTablaManual; // Nuevo
+window.refrescarTablaManual = refrescarTablaManual;
