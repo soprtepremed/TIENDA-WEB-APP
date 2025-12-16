@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initAsistenciaSupabase() {
     if (window.supabase && !asistenciaSupabase) {
         asistenciaSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
-            db: { schema: 'public' }
+            db: { schema: 'soporte' }
         });
         console.log('✅ Supabase conectado (esquema: asistencia)');
     }
@@ -244,7 +244,7 @@ async function marcarAsistencia() {
             .insert({
                 email: email,
                 turno: turnoAsignado, // Turno del alumno (oficial)
-                // turno_asistido: turnoAsistidoReal, // (COMENTADO TEMPORALMENTE hasta crear columna en BD)
+                turno_asistido: turnoAsistidoReal, // Nuev column: Turno según hora
                 fecha: hoy,
                 timestamp: timestampLocal
             });
