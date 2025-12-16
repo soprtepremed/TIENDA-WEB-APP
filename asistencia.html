@@ -269,50 +269,17 @@
                         <div id="subtabAlumnos" class="subtab-content">
                             <div class="admin-card">
                                 <div class="card-header">
-                                    <h3>👥 Gestión de Alumnos Autorizados</h3>
+                                    <h3>👥 Alumnos Activos (Base de Datos Central)</h3>
                                 </div>
 
-                                <!-- Agregar Individual -->
-                                <div class="agregar-section">
-                                    <h4>➕ Agregar Alumno Individual</h4>
-                                    <div class="agregar-form">
-                                        <input type="email" id="nuevoCorreo" class="form-input"
-                                            placeholder="correo@ejemplo.com">
-                                        <input type="text" id="nuevoNombre" class="form-input"
-                                            placeholder="Nombre (opcional)">
-                                        <select id="nuevoTurno" class="form-input">
-                                            <option value="matutino">☀️ Matutino</option>
-                                            <option value="vespertino">🌙 Vespertino</option>
-                                        </select>
-                                        <button class="btn-primary" onclick="agregarAlumnoIndividual()">Agregar</button>
-                                    </div>
-                                </div>
-
-                                <!-- Importar en Lote -->
-                                <div class="importar-section">
-                                    <h4>📋 Importar Lista (Pegar correos)</h4>
-                                    <div class="importar-grid">
-                                        <div class="importar-col">
-                                            <label class="turno-label matutino">☀️ Turno Matutino</label>
-                                            <textarea id="listaMatutino" class="importar-textarea"
-                                                placeholder="Pega los correos aquí (uno por línea)"></textarea>
-                                        </div>
-                                        <div class="importar-col">
-                                            <label class="turno-label vespertino">🌙 Turno Vespertino</label>
-                                            <textarea id="listaVespertino" class="importar-textarea"
-                                                placeholder="Pega los correos aquí (uno por línea)"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="importar-actions">
-                                        <button class="btn-primary btn-large" onclick="importarListas()">
-                                            💾 Guardar Listas
-                                        </button>
-                                    </div>
+                                <div class="info-banner" style="margin-bottom: 20px;">
+                                    <span class="info-icon">ℹ️</span>
+                                    <span>Esta lista se sincroniza automáticamente con la base de datos de alumnos
+                                        (Esquema PREMED). No es necesario agregar alumnos manualmente aquí.</span>
                                 </div>
 
                                 <!-- Lista Actual -->
                                 <div class="lista-actual">
-                                    <h4>📝 Alumnos Registrados</h4>
                                     <div class="alumnos-count">
                                         <span>Matutino: <strong id="countMatutino">0</strong></span>
                                         <span>Vespertino: <strong id="countVespertino">0</strong></span>
@@ -325,7 +292,7 @@
                                                 style="color: #B45309; padding: 10px; background: #FEF3C7; border-radius: 8px 8px 0 0; margin: 0; text-align: center; font-weight: 600;">
                                                 ☀️ Matutino</h5>
                                             <div id="listaAlumnosMatutino" class="alumnos-list"
-                                                style="border-top: none; border-radius: 0 0 8px 8px; max-height: 400px;">
+                                                style="border-top: none; border-radius: 0 0 8px 8px; max-height: 400px; overflow-y: auto;">
                                                 <!-- Lista Matutino -->
                                             </div>
                                         </div>
@@ -336,13 +303,17 @@
                                                 style="color: #4338CA; padding: 10px; background: #E0E7FF; border-radius: 8px 8px 0 0; margin: 0; text-align: center; font-weight: 600;">
                                                 🌙 Vespertino</h5>
                                             <div id="listaAlumnosVespertino" class="alumnos-list"
-                                                style="border-top: none; border-radius: 0 0 8px 8px; max-height: 400px;">
+                                                style="border-top: none; border-radius: 0 0 8px 8px; max-height: 400px; overflow-y: auto;">
                                                 <!-- Lista Vespertino -->
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Contenedor antiguo eliminado para evitar conflictos -->
                                     <div id="listaAlumnos" style="display: none;"></div>
+
+                                    <!-- Campos ocultos por compatibilidad con JS si quedan referencias, aunque se han limpiado -->
+                                    <textarea id="listaMatutino" style="display:none;"></textarea>
+                                    <textarea id="listaVespertino" style="display:none;"></textarea>
                                 </div>
                             </div>
                         </div>

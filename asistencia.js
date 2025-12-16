@@ -9,6 +9,7 @@ const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpHkJIv1aR5
 
 // Variables globales
 let asistenciaSupabase;
+let premedSupabase; // Cliente para el esquema 'premed'
 let turnoSeleccionado = 'matutino';
 let configuracion = { nombre_sesion: 'Clase General', script_url: DEFAULT_SCRIPT_URL };
 let correosAutorizados = { matutino: [], vespertino: [] };
@@ -22,29 +23,63 @@ let fechaSeleccionada = `${yearIni}-${monthIni}-${dayIni}`;
 
 // Inicializar
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('\uD83D\uDCCB Inicializando módulo de Asistencia...');
+    console.log('📋 Inicializando módulo de Asistencia...');
     initAsistenciaSupabase();
+
     // Set default date
     const fechaInput = document.getElementById('filtroFecha');
     if (fechaInput) {
         fechaInput.value = fechaSeleccionada;
     }
 
-    await cargarConfiguracion();
-    await cargarCorreosAutorizados();
-    await cargarRegistros(); // Carga con la fecha seleccionada
-    await cargarEstadisticas();
-    suscribirCambios(); // Iniciar Realtime
-    console.log('✅ Módulo de Asistencia listo');
+    // Helper para timeout
+    const timeoutPromise = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout de conexión')), ms));
+
+    try {
+        // Intentar cargar configuración con timeout de 5s
+        await Promise.race([
+            cargarConfiguracion(),
+            timeoutPromise(5000)
+        ]);
+    } catch (error) {
+        console.warn('⚠️ No se pudo cargar la configuración a tiempo (posible error de red). Usando valores por defecto.');
+        // Forzar actualización de UI para quitar "Cargando..."
+        const nombreSesionElem = document.getElementById('nombreSesion');
+        if (nombreSesionElem) nombreSesionElem.textContent = configuracion.nombre_sesion;
+        mostrarMensaje('warning', '⚠️ Modo sin conexión: Algunas funciones pueden ser limitadas.');
+    }
+
+    try {
+        await Promise.race([cargarCorreosAutorizados(), timeoutPromise(5000)]);
+    } catch (e) { console.warn('Error cargando alumnos:', e); }
+
+    try {
+        await cargarRegistros();
+        await cargarEstadisticas();
+        suscribirCambios(); // Iniciar Realtime
+    } catch (e) { console.error('Error en carga inicial de datos:', e); }
+
+    console.log('✅ Módulo de Asistencia listo (o en modo fallback)');
 });
 
 // Inicializar cliente Supabase
 function initAsistenciaSupabase() {
-    if (window.supabase && !asistenciaSupabase) {
-        asistenciaSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
-            db: { schema: 'soporte' }
-        });
-        console.log('✅ Supabase conectado (esquema: asistencia)');
+    if (window.supabase) {
+        // Cliente para registros (Esquema: soporte)
+        if (!asistenciaSupabase) {
+            asistenciaSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
+                db: { schema: 'soporte' }
+            });
+            console.log('✅ Supabase conectado (esquema: soporte)');
+        }
+
+        // Cliente para alumnos (Esquema: premed)
+        if (!premedSupabase) {
+            premedSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
+                db: { schema: 'premed' }
+            });
+            console.log('✅ Supabase conectado (esquema: premed)');
+        }
     }
     return asistenciaSupabase;
 }
@@ -179,7 +214,7 @@ async function marcarAsistencia() {
 
     // Validar correo
     if (!email || !email.includes('@') || email.length < 5) {
-        mostrarMensaje('error', '\u274C Por favor ingresa un correo válido.');
+        mostrarMensaje('error', '❌ Por favor ingresa un correo válido.');
         return;
     }
 
@@ -188,7 +223,7 @@ async function marcarAsistencia() {
     const enVespertino = correosAutorizados.vespertino.includes(email);
 
     if (!enMatutino && !enVespertino) {
-        mostrarMensaje('error', '\u26A0 Coloca correctamente tu correo o en caso contrario este correo no está registrado.');
+        mostrarMensaje('error', '⚠️ Este correo no está registrado en la base de datos de Alumnos.');
         return;
     }
 
@@ -199,7 +234,7 @@ async function marcarAsistencia() {
 
     // Avisar si el turno no coincide
     if (turnoAsignado !== turnoSeleccionado && !(enMatutino && enVespertino)) {
-        mostrarMensaje('warning', `\u26A0 Tu turno asignado es ${turnoAsignado.toUpperCase()}. Se registrará en tu turno correcto.`);
+        mostrarMensaje('warning', `⚠️ Tu turno asignado es ${turnoAsignado.toUpperCase()}. Se registrará en tu turno correcto.`);
         await new Promise(r => setTimeout(r, 1500));
     }
 
@@ -257,7 +292,7 @@ async function marcarAsistencia() {
         await enviarAGoogleSheets(email, turnoAsignado, turnoAsistidoReal);
 
         // Éxito
-        mostrarMensaje('success', `\u2705 ¡Asistencia registrada! Turno: ${turnoAsignado.toUpperCase()}`);
+        mostrarMensaje('success', `✅ ¡Asistencia registrada! Turno: ${turnoAsignado.toUpperCase()}`);
         inputCorreo.value = '';
 
         // Recargar lista
@@ -302,7 +337,7 @@ async function enviarAGoogleSheets(email, turno, turnoAsistidoReal = '') {
                 timestamp: new Date().toISOString()
             })
         });
-        console.log('\uD83D\uDCE4 Enviado a Google Sheets: ' + turnoCapitalizado);
+        console.log('📨 Enviado a Google Sheets: ' + turnoCapitalizado);
     } catch (e) {
         console.error('Error enviando a Sheets:', e);
     }
@@ -352,19 +387,30 @@ async function cargarConfiguracion() {
 
 async function cargarCorreosAutorizados() {
     try {
-        const { data } = await asistenciaSupabase
-            .from('correos_autorizados')
-            .select('email, turno')
-            .eq('activo', true);
+        console.log('🔄 Cargando alumnos desde esquema PREMED...');
+
+        // AHORA: Consultamos 'premed.alumnos'
+        // Incluimos 'modalidad' para filtrar
+        const { data } = await premedSupabase
+            .from('alumnos')
+            .select('email, turno, nombre, modalidad')
+            .eq('activo', true); // Solo activos
 
         correosAutorizados = { matutino: [], vespertino: [] };
 
         if (data) {
             data.forEach(item => {
+                const email = item.email ? item.email.toLowerCase() : '';
+                if (!email) return;
+
                 if (item.turno === 'matutino') {
-                    correosAutorizados.matutino.push(item.email.toLowerCase());
+                    correosAutorizados.matutino.push(email);
                 } else if (item.turno === 'vespertino') {
-                    correosAutorizados.vespertino.push(item.email.toLowerCase());
+                    // CONDICIÓN: Solo considerar alumnos PRESENCIALES en vespertino
+                    // (Ignorar alumnos 'en_linea' para este turno)
+                    if (item.modalidad === 'presencial') {
+                        correosAutorizados.vespertino.push(email);
+                    }
                 }
             });
         }
@@ -375,19 +421,30 @@ async function cargarCorreosAutorizados() {
         if (countMatElem) countMatElem.textContent = correosAutorizados.matutino.length;
         if (countVespElem) countVespElem.textContent = correosAutorizados.vespertino.length;
 
-        // Llenar textareas - Solo si existen
+        // Llenar textareas - Solo si existen (aunque ahora ya no se usan para importar)
         const listaMatElem = document.getElementById('listaMatutino');
         const listaVespElem = document.getElementById('listaVespertino');
         if (listaMatElem) listaMatElem.value = correosAutorizados.matutino.join('\n');
         if (listaVespElem) listaVespElem.value = correosAutorizados.vespertino.join('\n');
 
         // Renderizar lista - Función interna verifica si existe el contenedor
-        renderizarListaAlumnos(data || []);
+        // Nota: Pasamos 'registrados' filtrados locales, no la data cruda, OJO
+        // La función renderizarListaAlumnos espera el array original de objetos para pintar badges.
+        // Vamos a filtrar 'data' para pasarle solo lo que aprobamos.
 
-        console.log(`\uD83D\uDCE7 Correos cargados: Mat=${correosAutorizados.matutino.length}, Vesp=${correosAutorizados.vespertino.length}`);
+        const alumnosFiltrados = data.filter(item => {
+            if (!item.email) return false;
+            if (item.turno === 'matutino') return true;
+            if (item.turno === 'vespertino' && item.modalidad === 'presencial') return true;
+            return false;
+        });
+
+        renderizarListaAlumnos(alumnosFiltrados || []);
+
+        console.log(`📧 Alumnos cargados: Mat=${correosAutorizados.matutino.length}, Vesp=${correosAutorizados.vespertino.length}`);
 
     } catch (e) {
-        console.error('Error cargando correos:', e);
+        console.error('Error cargando alumnos de PREMED:', e);
     }
 }
 
@@ -418,7 +475,7 @@ function renderizarListaAlumnos(alumnos) {
     if (!container) return; // Si no existe nada (vista alumno), salir
 
     if (!alumnos || alumnos.length === 0) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">\uD83D\uDC65</span><p>No hay alumnos registrados</p></div>';
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">👥</span><p>No hay alumnos registrados</p></div>';
         return;
     }
 
@@ -426,12 +483,12 @@ function renderizarListaAlumnos(alumnos) {
 }
 
 function generarHTMLAlumno(a) {
+    // Ya no mostramos botón de eliminar porque es read-only desde asistencia
     return `
         <div class="alumno-item">
             <span class="alumno-email">${a.email}</span>
             <div class="alumno-actions">
-                <span class="badge-turno badge-${a.turno}">${a.turno === 'matutino' ? '\u2600' : '\uD83C\uDF19'} ${a.turno}</span>
-                <button class="btn-eliminar" onclick="eliminarAlumno('${a.email}')">\u2715</button>
+                <span class="badge-turno badge-${a.turno}">${a.turno === 'matutino' ? '☀️' : '🌙'} ${a.turno}</span>
             </div>
         </div>
     `;
@@ -493,7 +550,7 @@ function renderizarTabla(registros) {
         <tr>
             <td>${formatearHora(r.timestamp)}</td>
             <td>${r.email}</td>
-            <td><span class="badge-turno badge-${r.turno}">${r.turno === 'matutino' ? '\u2600' : '\uD83C\uDF19'} ${r.turno}</span></td>
+            <td><span class="badge-turno badge-${r.turno}">${r.turno === 'matutino' ? '☀️' : '🌙'} ${r.turno}</span></td>
             <td>${r.fecha}</td>
             <td>
                 ${r.turno_asistido ?
@@ -625,7 +682,7 @@ async function limpiarRegistros() {
 
         await cargarRegistros();
         await cargarEstadisticas();
-        alert('\u2705 Registros eliminados');
+        alert('✅ Registros eliminados');
 
     } catch (e) {
         console.error('Error detallado:', e);
@@ -638,418 +695,13 @@ async function limpiarRegistros() {
 // ===================================
 
 async function agregarAlumnoIndividual() {
-    const emailInput = document.getElementById('nuevoCorreo');
-    const nombreInput = document.getElementById('nuevoNombre');
-    const turnoSelect = document.getElementById('nuevoTurno');
-
-    const email = emailInput.value.toLowerCase().trim();
-    const nombre = nombreInput.value.trim();
-    const turno = turnoSelect.value;
-
-    if (!email || !email.includes('@')) {
-        alert('Ingresa un correo válido');
-        return;
-    }
-
-    try {
-        const { error } = await asistenciaSupabase
-            .from('correos_autorizados')
-            .insert({
-                email: email,
-                nombre_alumno: nombre || null,
-                turno: turno
-            });
-
-        if (error) {
-            if (error.code === '23505') {
-                alert('Este correo ya está registrado');
-            } else {
-                throw error;
-            }
-            return;
-        }
-
-        emailInput.value = '';
-        nombreInput.value = '';
-        await cargarCorreosAutorizados();
-        alert('\u2705 Alumno agregado');
-
-    } catch (e) {
-        console.error('Error:', e);
-        alert('Error al agregar alumno');
-    }
+    alert("⛔ La gestión de alumnos ahora es automática desde la base de datos central (PREMED). No puedes agregar alumnos manualmente aquí.");
 }
 
 async function importarListas() {
-    const listaMatutino = document.getElementById('listaMatutino').value;
-    const listaVespertino = document.getElementById('listaVespertino').value;
-
-    // Procesar correos
-    const procesarLista = (texto) => {
-        return texto
-            .split(/[\n,;]+/)
-            .map(e => e.trim().toLowerCase())
-            .filter(e => e.length > 3 && e.includes('@'));
-    };
-
-    const correosMatutino = procesarLista(listaMatutino);
-    const correosVespertino = procesarLista(listaVespertino);
-
-    if (correosMatutino.length === 0 && correosVespertino.length === 0) {
-        alert('No hay correos válidos para importar');
-        return;
-    }
-
-    try {
-        // \uD83D\uDD0D VERIFICAR SI YA HAY CORREOS REGISTRADOS
-        const { data: existentes } = await asistenciaSupabase
-            .from('correos_autorizados')
-            .select('*');
-
-        const totalExistentes = existentes ? existentes.length : 0;
-
-        // \u26A0 SI YA HAY CORREOS, MOSTRAR ADVERTENCIA
-        if (totalExistentes > 0) {
-            const matutinosActuales = existentes.filter(e => e.turno === 'matutino').length;
-            const vespertinosActuales = existentes.filter(e => e.turno === 'vespertino').length;
-
-            const confirmarReemplazo = confirm(
-                `\u26A0 ADVERTENCIA: Ya tienes correos registrados\n\n` +
-                `\uD83D\uDCCA Correos actuales:\n` +
-                `   - Matutino: ${matutinosActuales}\n` +
-                `   - Vespertino: ${vespertinosActuales}\n` +
-                `   - Total: ${totalExistentes}\n\n` +
-                `\uD83D\uDD04 Nuevos correos a importar:\n` +
-                `   - Matutino: ${correosMatutino.length}\n` +
-                `   - Vespertino: ${correosVespertino.length}\n\n` +
-                `\u26A0 ESTO ELIMINARÁ TODOS LOS CORREOS ACTUALES\n` +
-                `y los reemplazará con los nuevos.\n\n` +
-                `¿Estás SEGURO de continuar?`
-            );
-
-            if (!confirmarReemplazo) {
-                alert('\u274C Importación cancelada. Los correos actuales no fueron modificados.');
-                return;
-            }
-
-            // Segunda confirmación de seguridad
-            const confirmacionFinal = confirm(
-                `\uD83D\uDEA8 ÚLTIMA CONFIRMACIÓN\n\n` +
-                `Se eliminarán ${totalExistentes} correos existentes.\n\n` +
-                `¿Proceder con el reemplazo?`
-            );
-
-            if (!confirmacionFinal) {
-                alert('\u274C Importación cancelada.');
-                return;
-            }
-        } else {
-            // Primera importación - confirmación simple
-            if (!confirm(`Se importarán:\n- Matutino: ${correosMatutino.length} correos\n- Vespertino: ${correosVespertino.length} correos\n\n¿Continuar?`)) {
-                return;
-            }
-        }
-
-        // Eliminar correos existentes
-        await asistenciaSupabase.from('correos_autorizados').delete().neq('id', 0);
-
-        // Insertar matutino
-        if (correosMatutino.length > 0) {
-            const dataMat = correosMatutino.map(email => ({
-                email: email,
-                turno: 'matutino'
-            }));
-            await asistenciaSupabase.from('correos_autorizados').insert(dataMat);
-        }
-
-        // Insertar vespertino
-        if (correosVespertino.length > 0) {
-            const dataVesp = correosVespertino.map(email => ({
-                email: email,
-                turno: 'vespertino'
-            }));
-            await asistenciaSupabase.from('correos_autorizados').insert(dataVesp);
-        }
-
-        await cargarCorreosAutorizados();
-        alert(`\u2705 Listas actualizadas exitosamente!\n\nMatutino: ${correosMatutino.length}\nVespertino: ${correosVespertino.length}\nTotal: ${correosMatutino.length + correosVespertino.length}`);
-
-    } catch (e) {
-        console.error('Error:', e);
-        alert('\u274C Error al importar listas. Revisa la consola para más detalles.');
-    }
+    alert("⛔ La gestión de alumnos ahora es automática desde la base de datos central (PREMED). No puedes importar listas aquí.");
 }
 
 async function eliminarAlumno(email) {
-    if (!confirm(`¿Eliminar a ${email}?`)) return;
-
-    try {
-        await asistenciaSupabase
-            .from('correos_autorizados')
-            .delete()
-            .eq('email', email);
-
-        await cargarCorreosAutorizados();
-
-    } catch (e) {
-        console.error('Error:', e);
-        alert('Error al eliminar');
-    }
+    alert("⛔ No puedes eliminar alumnos desde este módulo. Debes hacerlo en el sistema central de alumnos.");
 }
-
-// ===================================
-// CONFIGURACIÓN
-// ===================================
-
-async function guardarConfiguracion() {
-    const nombre = document.getElementById('configNombre').value.trim();
-    const scriptUrl = document.getElementById('configScript').value.trim();
-
-    try {
-        // Actualizar o insertar
-        const { data: existing } = await asistenciaSupabase
-            .from('configuracion')
-            .select('id')
-            .limit(1)
-            .single();
-
-        if (existing) {
-            await asistenciaSupabase
-                .from('configuracion')
-                .update({
-                    nombre_sesion: nombre,
-                    script_url: scriptUrl,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', existing.id);
-        } else {
-            await asistenciaSupabase
-                .from('configuracion')
-                .insert({
-                    nombre_sesion: nombre,
-                    script_url: scriptUrl
-                });
-        }
-
-        configuracion.nombre_sesion = nombre;
-        configuracion.script_url = scriptUrl;
-        document.getElementById('nombreSesion').textContent = nombre;
-
-        alert('\u2705 Configuración guardada');
-
-    } catch (e) {
-        console.error('Error:', e);
-        alert('Error al guardar configuración');
-    }
-}
-
-function copiarEnlaceAlumno() {
-    const linkInput = document.getElementById('linkAlumno');
-    if (!linkInput) return;
-
-    // Seleccionar y copiar
-    linkInput.select();
-    linkInput.setSelectionRange(0, 99999); // Para móviles
-
-    try {
-        navigator.clipboard.writeText(linkInput.value).then(() => {
-            alert('\u2705 ¡Enlace copiado al portapapeles!');
-        }).catch(err => {
-            // Fallback antiguo
-            document.execCommand('copy');
-            alert('\u2705 ¡Enlace copiado!');
-        });
-    } catch (err) {
-        console.error('Error al copiar:', err);
-        alert('No se pudo copiar automáticamente. Por favor selecciónalo manual.');
-    }
-}
-
-// Inicializar el valor del enlace de alumnos
-document.addEventListener('DOMContentLoaded', () => {
-    const linkInput = document.getElementById('linkAlumno');
-    if (linkInput) {
-        // Construir URL absoluta basada en la ubicación actual
-        const currentUrl = window.location.href;
-        const rootUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
-        linkInput.value = `${rootUrl}/registro.html`;
-    }
-});
-
-// ===================================
-// EXPORTAR A EXCEL Y PDF
-// ===================================
-
-function exportarExcel() {
-    if (!registrosHoy || registrosHoy.length === 0) {
-        alert('No hay datos para exportar.');
-        return;
-    }
-
-    try {
-        // Preparar datos
-        const datosExportar = registrosHoy.map(r => ({
-            Fecha: r.fecha,
-            Hora: formatearHora(r.timestamp),
-            Correo: r.email,
-            Turno: r.turno.charAt(0).toUpperCase() + r.turno.slice(1)
-        }));
-
-        // Crear Libro y Hoja usando SheetJS
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.json_to_sheet(datosExportar);
-
-        // Ajustar ancho de columnas
-        const wscols = [
-            { wch: 12 }, // Fecha
-            { wch: 10 }, // Hora
-            { wch: 35 }, // Correo
-            { wch: 12 }  // Turno
-        ];
-        ws['!cols'] = wscols;
-
-        XLSX.utils.book_append_sheet(wb, ws, "Asistencia");
-
-        // Guardar archivo
-        const fileName = `Asistencia_${fechaSeleccionada}.xlsx`;
-        XLSX.writeFile(wb, fileName);
-
-        console.log('✅ Excel exportado correctamente');
-
-    } catch (error) {
-        console.error('Error exportando a Excel:', error);
-        alert('Hubo un error al generar el Excel. Revisa si la librería XLSX cargó correctamente.');
-    }
-}
-
-function exportarPDF() {
-    if (!registrosHoy || registrosHoy.length === 0) {
-        alert('No hay datos para exportar.');
-        return;
-    }
-
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        // Título del PDF
-        doc.setFontSize(18);
-        doc.setTextColor(27, 58, 107); // Navy
-        doc.text("Reporte de Asistencia", 14, 22);
-
-        // Subtítulo con fecha
-        doc.setFontSize(11);
-        doc.setTextColor(100);
-        doc.text(`Fecha: ${fechaSeleccionada}`, 14, 30);
-
-        // Información de Sesión
-        const nombreSesion = configuracion.nombre_sesion || 'Clase General';
-        doc.text(`Sesión: ${nombreSesion}`, 14, 36);
-
-        // Resumen
-        const total = registrosHoy.length;
-        const matutino = registrosHoy.filter(r => r.turno === 'matutino').length;
-        const vespertino = registrosHoy.filter(r => r.turno === 'vespertino').length;
-        doc.text(`Total: ${total} | Matutino: ${matutino} | Vespertino: ${vespertino}`, 14, 42);
-
-        // Tabla
-        const tableColumn = ["Hora", "Correo", "Turno"];
-        const tableRows = [];
-
-        registrosHoy.forEach(r => {
-            const registroData = [
-                formatearHora(r.timestamp),
-                r.email,
-                r.turno.charAt(0).toUpperCase() + r.turno.slice(1)
-            ];
-            tableRows.push(registroData);
-        });
-
-        doc.autoTable({
-            head: [tableColumn],
-            body: tableRows,
-            startY: 50,
-            theme: 'grid',
-            headStyles: { fillColor: [27, 58, 107] }, // Navy Header
-            alternateRowStyles: { fillColor: [240, 240, 240] },
-            margin: { top: 50 }
-        });
-
-        // Guardar PDF
-        doc.save(`Asistencia_${fechaSeleccionada}.pdf`);
-        console.log('✅ PDF exportado correctamente');
-
-    } catch (error) {
-        console.error('Error exportando a PDF:', error);
-        alert('Hubo un error al generar el PDF. Asegúrate de que las librerías se cargaron correctamente.');
-    }
-}
-
-// ===================================
-// RESPONSIVE SIDEBAR & UI ACTIONS
-// ===================================
-
-async function refrescarTablaManual() {
-    const icon = document.getElementById('iconRefrescar');
-    if (icon) icon.classList.add('spin-anim');
-
-    try {
-        await cargarRegistros();
-        await cargarEstadisticas();
-    } catch (e) {
-        console.error(e);
-    } finally {
-        // Mantener animación al menos 500ms para feedback visual
-        setTimeout(() => {
-            if (icon) icon.classList.remove('spin-anim');
-        }, 800);
-    }
-}
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('mobileOverlay');
-
-    if (sidebar) sidebar.classList.toggle('active');
-    if (overlay) overlay.classList.toggle('active');
-}
-
-async function eliminarRegistroIndividual(id) {
-    if (!confirm('¿Estás seguro de eliminar este registro?')) return;
-
-    try {
-        const { error } = await asistenciaSupabase
-            .from('registros')
-            .delete()
-            .eq('id', id);
-
-        if (error) throw error;
-
-        // Eliminar localmente para feedback inmediato
-        registrosHoy = registrosHoy.filter(r => r.id !== id);
-        filtrarLista(); // Actualiza tabla
-        cargarEstadisticas(); // Actualiza contadores
-
-    } catch (e) {
-        console.error('Error eliminando registro:', e);
-        alert('Error al eliminar el registro.');
-    }
-}
-
-window.cambiarTab = cambiarTab;
-window.cambiarSubtab = cambiarSubtab;
-window.seleccionarTurno = seleccionarTurno;
-window.marcarAsistencia = marcarAsistencia;
-window.filtrarLista = filtrarLista;
-window.exportarCSV = exportarCSV;
-window.exportarExcel = exportarExcel;
-window.exportarPDF = exportarPDF;
-window.limpiarRegistros = limpiarRegistros;
-window.agregarAlumnoIndividual = agregarAlumnoIndividual;
-window.importarListas = importarListas;
-window.eliminarAlumno = eliminarAlumno;
-window.eliminarRegistroIndividual = eliminarRegistroIndividual; // Nueva función expuesta
-window.guardarConfiguracion = guardarConfiguracion;
-window.copiarEnlaceAlumno = copiarEnlaceAlumno;
-window.toggleSidebar = toggleSidebar;
-window.refrescarTablaManual = refrescarTablaManual;
