@@ -8,15 +8,15 @@
 // =====================================================
 // Configuración de Supabase
 // =====================================================
-const SUPABASE_URL = 'https://supabase.cursospremed.com';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogImFub24iLAogICJpc3MiOiAic3VwYWJhc2UiLAogICJpYXQiOiAxNzMzMTkzNjAwLAogICJleHAiOiAxODkwOTYwMDAwCn0.XVtuEWPNVJidIBMWdQjQJH1O1HAXWKG4_mnElncdOns';
+const SUPABASE_URL = 'https://api.premed.mx';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
 
 // Cliente para esquema 'soporte' (historial de asistencia)
 const supabaseSoporte = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     db: { schema: 'soporte' }
 });
 
-// Cliente para esquema 'premed' (datos de alumnos)
+// Cliente para esquema 'premed' (datos de alumnos) - Solo para referencia futura
 const supabasePremed = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     db: { schema: 'premed' }
 });
