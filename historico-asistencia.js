@@ -1,8 +1,5 @@
 /**
- * Histórico General de Asistencia - JavaScript
- * 
- * Lógica para consultar y mostrar listas completas de asistencia
- * por turno y semana específica.
+ * Histórico General de Asistencia - JavaScript (Versión Interactiva)
  */
 
 // =====================================================
@@ -18,41 +15,69 @@ const supabaseSoporte = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 // Variables de estado
 let currentData = [];
 let availableWeeks = [];
+let selectedTurno = 'matutino'; // Valor defecto
+let selectedSemana = null;
 
 // =====================================================
 // Inicialización
 // =====================================================
 document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
-    loadAvailableWeeks(); // Cargar semanas disponibles al iniciar
+    // Cargar semanas del turno por defecto al iniciar
+    loadAvailableWeeks();
 });
 
 function initEventListeners() {
-    document.getElementById('btnConsultar').addEventListener('click', loadAsistenciaData);
+    // El botón consultar ya no existe, es automático
+    // document.getElementById('btnConsultar').addEventListener('click', loadAsistenciaData);
     document.getElementById('btnExportExcelGeneral').addEventListener('click', exportToExcel);
-
-    // Recargar semanas si cambia el turno (opcional, por si las semanas difieren entre turnos)
-    document.getElementById('turnoSelect').addEventListener('change', loadAvailableWeeks);
 }
 
 // =====================================================
-// Lógica de Semanas
+// Lógica de Interacción (Turnos y Semanas)
+// =====================================================
+
+// Seleccionar turno (Click en botón grande)
+window.selectTurno = function (turno) {
+    selectedTurno = turno;
+    selectedSemana = null; // Resetear semana seleccionada
+
+    // Actualizar UI Botones
+    document.querySelectorAll('.btn-turno').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.turno === turno) btn.classList.add('active');
+    });
+
+    // Ocultar resultados previos
+    document.getElementById('resultsArea').classList.add('hidden');
+    document.getElementById('weeksContainer').innerHTML = '<div class="weeks-empty">Cargando semanas...</div>';
+
+    // Cargar nuevas semanas
+    loadAvailableWeeks();
+}
+
+// Seleccionar semana (Click en "píldora")
+window.selectSemana = function (fechaInicio, elemento) {
+    selectedSemana = fechaInicio;
+
+    // Actualizar UI Píldoras
+    document.querySelectorAll('.week-card').forEach(card => card.classList.remove('active'));
+    elemento.classList.add('active');
+
+    // Cargar datos AUTOMÁTICAMENTE
+    loadAsistenciaData();
+}
+
+// =====================================================
+// Lógica de Carga de Semanas
 // =====================================================
 async function loadAvailableWeeks() {
-    const turno = document.getElementById('turnoSelect').value;
-    const semanaSelect = document.getElementById('semanaSelect');
-
-    // Determinar tabla según turno
-    const tableName = (turno === 'en_linea')
+    const tableName = (selectedTurno === 'en_linea')
         ? 'historico_asistencia_en_linea'
         : 'historico_asistencia_presencial';
 
-    semanaSelect.innerHTML = '<option>Cargando...</option>';
-    semanaSelect.disabled = true;
-
     try {
-        // Consultar fechas únicas de inicio de semana
-        // RPC sería ideal, pero usaremos select distinct simulado obteniendo rango fechas
+        // Consultar rango de semanas
         const { data, error } = await supabaseSoporte
             .from(tableName)
             .select('fecha_inicio_semana, fecha_fin_semana')
@@ -60,7 +85,7 @@ async function loadAvailableWeeks() {
 
         if (error) throw error;
 
-        // Filtrar únicos manualmente (Set)
+        // Filtrar únicos
         const uniqueWeeks = [];
         const seenDates = new Set();
 
@@ -72,55 +97,74 @@ async function loadAvailableWeeks() {
         });
 
         availableWeeks = uniqueWeeks;
-        renderWeekOptions();
+        renderWeekChips();
 
     } catch (err) {
         console.error('Error cargando semanas:', err);
-        semanaSelect.innerHTML = '<option value="">Error al cargar semanas</option>';
-    } finally {
-        semanaSelect.disabled = false;
+        document.getElementById('weeksContainer').innerHTML = '<div class="weeks-empty">Error al cargar semanas</div>';
     }
 }
 
-function renderWeekOptions() {
-    const select = document.getElementById('semanaSelect');
-    select.innerHTML = '';
+function renderWeekChips() {
+    const container = document.getElementById('weeksContainer');
+    container.innerHTML = '';
 
     if (availableWeeks.length === 0) {
-        select.innerHTML = '<option value="">No hay registros disponibles</option>';
+        container.innerHTML = '<div class="weeks-empty">No hay semanas registradas para este turno</div>';
         return;
     }
 
-    availableWeeks.forEach((week, index) => {
-        const option = document.createElement('option');
-        option.value = week.fecha_inicio_semana;
+    availableWeeks.forEach(week => {
+        // Formato Chip: "13-17 oct"
+        const label = formatChipLabel(week.fecha_inicio_semana, week.fecha_fin_semana);
 
-        // Formato: "Del 08 al 12 de Diciembre (2025)"
-        const label = formatWeekLabel(week.fecha_inicio_semana, week.fecha_fin_semana);
-        option.textContent = label;
+        const chip = document.createElement('div');
+        chip.className = 'week-card';
+        chip.textContent = label;
+        chip.onclick = () => window.selectSemana(week.fecha_inicio_semana, chip);
 
-        // Seleccionar la primera por defecto
-        if (index === 0) option.selected = true;
-
-        select.appendChild(option);
+        container.appendChild(chip);
     });
 }
 
+// Formato compacto: "09-12 dic"
+function formatChipLabel(start, end) {
+    if (!start || !end) return 'S/F';
+
+    // Parsear fechas asumiendo YYYY-MM-DD
+    const startDate = new Date(start + 'T00:00:00');
+    const endDate = new Date(end + 'T00:00:00');
+
+    const dayStart = startDate.getDate().toString().padStart(2, '0');
+    const dayEnd = endDate.getDate().toString().padStart(2, '0');
+
+    // Obtener mes corto (ej. "dic")
+    const monthName = startDate.toLocaleDateString('es-MX', { month: 'short' }).replace('.', '');
+
+    return `${dayStart}-${dayEnd} ${monthName}`;
+}
+
+// Formato Largo para el resumen: "Del 09 al 12 de Diciembre (2025)"
+function formatFullLabel(start) {
+    const week = availableWeeks.find(w => w.fecha_inicio_semana === start);
+    if (!week) return start;
+
+    const startDate = new Date(week.fecha_inicio_semana + 'T00:00:00');
+    const endDate = new Date(week.fecha_fin_semana + 'T00:00:00');
+
+    const options = { day: 'numeric', month: 'long' };
+    return `Del ${startDate.toLocaleDateString('es-MX', options)} al ${endDate.toLocaleDateString('es-MX', options)} (${startDate.getFullYear()})`;
+}
+
 // =====================================================
-// Carga de Datos
+// Carga de Datos (Tabla)
 // =====================================================
 async function loadAsistenciaData() {
-    const turno = document.getElementById('turnoSelect').value;
-    const fechaInicio = document.getElementById('semanaSelect').value;
-
-    if (!fechaInicio) {
-        alert('Por favor selecciona una semana válida.');
-        return;
-    }
+    if (!selectedSemana) return;
 
     showLoading(true);
 
-    const tableName = (turno === 'en_linea')
+    const tableName = (selectedTurno === 'en_linea')
         ? 'historico_asistencia_en_linea'
         : 'historico_asistencia_presencial';
 
@@ -128,11 +172,10 @@ async function loadAsistenciaData() {
         let query = supabaseSoporte
             .from(tableName)
             .select('*')
-            .eq('fecha_inicio_semana', fechaInicio);
+            .eq('fecha_inicio_semana', selectedSemana);
 
-        // Filtro adicional por turno si es presencial (Matutino vs Vespertino)
-        if (turno !== 'en_linea') {
-            const turnoLabel = turno === 'matutino' ? 'MATUTINO' : 'VESPERTINO';
+        if (selectedTurno !== 'en_linea') {
+            const turnoLabel = selectedTurno === 'matutino' ? 'MATUTINO' : 'VESPERTINO';
             query = query.eq('turno', turnoLabel);
         }
 
@@ -144,42 +187,37 @@ async function loadAsistenciaData() {
         renderTable();
         updateSummary();
 
-        // Mostrar resultados
-        document.getElementById('initialState').classList.add('hidden');
         document.getElementById('resultsArea').classList.remove('hidden');
 
     } catch (err) {
         console.error('Error consultando datos:', err);
-        alert('Error al cargar la lista de asistencia.');
+        alert('Error al cargar la lista.');
     } finally {
         showLoading(false);
     }
 }
 
 // =====================================================
-// Renderizado
+// Renderizado Tabla
 // =====================================================
 function renderTable() {
     const tbody = document.getElementById('listaAsistenciaBody');
     tbody.innerHTML = '';
 
     if (currentData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">No se encontraron registros para este criterio.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; color: #666;">No se encontraron alumnos para esta semana.</td></tr>';
         return;
     }
 
     currentData.forEach(alumno => {
         const row = document.createElement('tr');
-
-        // Calcular porcentaje individual
         const porcentaje = calculateIndividualPercent(alumno);
         const percentClass = getPercentColor(porcentaje);
         const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
 
-        // Construir celdas de días
         const cellsDias = dias.map(dia => {
-            const val = alumno[dia]; // Valor original de BD
-            const displayVal = val || ''; // Si es null, mostrar vacío
+            const val = alumno[dia];
+            const displayVal = val || '';
             const colorClass = getStatusColor(displayVal);
             return `<td style="text-align:center; font-size: 0.85rem;" class="${colorClass}">${displayVal}</td>`;
         }).join('');
@@ -196,10 +234,8 @@ function renderTable() {
 }
 
 function updateSummary() {
-    // Total Alumnos
     document.getElementById('statsTotalAlumnos').textContent = currentData.length;
 
-    // Promedio General
     if (currentData.length > 0) {
         const totalPercent = currentData.reduce((acc, curr) => acc + calculateIndividualPercent(curr), 0);
         const avg = Math.round(totalPercent / currentData.length);
@@ -208,28 +244,19 @@ function updateSummary() {
         document.getElementById('statsAsistenciaPromedio').textContent = '0%';
     }
 
-    // Etiqueta Semana
-    const semanaText = document.getElementById('semanaSelect').options[document.getElementById('semanaSelect').selectedIndex]?.text;
-    document.getElementById('statsSemanaLabel').textContent = semanaText || '--';
+    document.getElementById('statsSemanaLabel').textContent = formatFullLabel(selectedSemana);
 }
 
 // =====================================================
-// Utilidades y Cálculos
+// Utilidades (Colores y Cálculos)
 // =====================================================
 function getStatusColor(status) {
     if (!status) return '';
     const s = status.toUpperCase();
 
-    // Presencial
-    if (s === 'ASISTIÓ') return 'bg-presente-soft'; // Verde suave
-    if (s === 'NO ASISTIÓ') return 'bg-ausente-soft'; // Rojo suave
-    if (s.includes('RETARDO')) return 'bg-retardo-soft'; // Amarillo suave
-
-    // En línea
-    if (s === 'ASISTENCIA COMPLETA') return 'bg-presente-soft';
-    if (s === 'ASISTENCIA INCOMPLETA') return 'bg-ausente-soft';
-    if (s === 'ASISTENCIA PARCIAL') return 'bg-retardo-soft';
-
+    if (s === 'ASISTIÓ' || s === 'ASISTENCIA COMPLETA') return 'bg-presente-soft';
+    if (s === 'NO ASISTIÓ' || s === 'ASISTENCIA INCOMPLETA') return 'bg-ausente-soft';
+    if (s.includes('RETARDO') || s === 'ASISTENCIA PARCIAL') return 'bg-retardo-soft';
     return '';
 }
 
@@ -237,63 +264,34 @@ function calculateIndividualPercent(alumno) {
     const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
     let totalPuntos = 0;
 
-    // Reglas de negocio: 5 días = 100% (20% por día)
-    // Asistió/Completa: 100% del día
-    // Parcial/Retardo: 50% del día (Ajustable)
-    // No/Incompleta: 0%
-
-    // Nota: Si quieres que coincida con lógica anterior (30/70/100):
-    // Asistencia Parcial = 70, Incompleta = 30
-
     dias.forEach(dia => {
         const val = alumno[dia];
         if (!val) return;
-
         const s = val.toUpperCase();
 
         if (s === 'ASISTIÓ' || s === 'ASISTENCIA COMPLETA') totalPuntos += 20;
-        else if (s === 'ASISTENCIA PARCIAL') totalPuntos += 14; // 70% de 20
-        else if (s === 'ASISTENCIA INCOMPLETA') totalPuntos += 6; // 30% de 20
-        // No asistió suma 0
+        else if (s === 'ASISTENCIA PARCIAL') totalPuntos += 14;
+        else if (s === 'ASISTENCIA INCOMPLETA') totalPuntos += 6;
+        else if (s.includes('RETARDO')) totalPuntos += 16; // Retardo vale un poco menos que asistencia
     });
 
     return Math.min(Math.round(totalPuntos), 100);
 }
 
 function getPercentColor(percent) {
-    if (percent >= 80) return '#15803d'; // Verde
-    if (percent >= 50) return '#d97706'; // Naranja
-    return '#dc2626'; // Rojo
-}
-
-function formatWeekLabel(start, end) {
-    if (!start || !end) return 'Semana desconocida';
-    const startDate = new Date(start + 'T00:00:00');
-    const endDate = new Date(end + 'T00:00:00');
-
-    const options = { day: 'numeric', month: 'long' };
-    const s = startDate.toLocaleDateString('es-MX', options);
-    const e = endDate.toLocaleDateString('es-MX', options);
-
-    return `Del ${s} al ${e} (${startDate.getFullYear()})`;
+    if (percent >= 80) return '#15803d';
+    if (percent >= 50) return '#d97706';
+    return '#dc2626';
 }
 
 function showLoading(show) {
     const loadingState = document.getElementById('loadingState');
-    const resultsArea = document.getElementById('resultsArea');
-    const initialState = document.getElementById('initialState');
-
-    if (show) {
-        loadingState.classList.remove('hidden');
-        resultsArea.classList.add('hidden');
-        initialState.classList.add('hidden');
-    } else {
-        loadingState.classList.add('hidden');
-    }
+    if (show) loadingState.classList.remove('hidden');
+    else loadingState.classList.add('hidden');
 }
 
 // =====================================================
-// Exportación
+// Exportación Excel
 // =====================================================
 function exportToExcel() {
     if (currentData.length === 0) {
@@ -304,8 +302,8 @@ function exportToExcel() {
     const wb = XLSX.utils.book_new();
     const wsData = [
         ['Histórico de Asistencia General'],
-        ['Turno:', document.getElementById('turnoSelect').value.toUpperCase()],
-        ['Semana:', document.getElementById('semanaSelect').options[document.getElementById('semanaSelect').selectedIndex].text],
+        ['Turno:', selectedTurno.toUpperCase()],
+        ['Semana:', formatFullLabel(selectedSemana)],
         ['Generado:', new Date().toLocaleString()],
         [''],
         ['ID', 'Nombre', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', '% Asistencia']
@@ -326,12 +324,10 @@ function exportToExcel() {
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Asistencia");
-    XLSX.writeFile(wb, `Reporte_General_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.writeFile(wb, `Reporte_${selectedTurno}_${selectedSemana}.xlsx`);
 }
 
-// =====================================================
-// Estilos Dinámicos (Clases de Color)
-// =====================================================
+// Estilos Dinámicos
 const style = document.createElement('style');
 style.textContent = `
     .bg-presente-soft { background-color: #f0fdf4; color: #166534; }

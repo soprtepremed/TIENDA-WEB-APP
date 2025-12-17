@@ -15,123 +15,147 @@
         /* Estilos específicos para este módulo */
         .filters-container {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
             margin-bottom: 24px;
-            display: flex;
-            gap: 20px;
-            align-items: flex-end;
-            flex-wrap: wrap;
         }
 
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .filter-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--color-text);
-        }
-
-        .filter-select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-
-        .btn-load {
-            padding: 10px 24px;
-            background: var(--color-primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+        .filter-section-title {
+            font-size: 0.9rem;
             font-weight: 600;
+            color: var(--color-text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Botones de Turno (Segmented Control) */
+        .turnos-wrapper {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-
-        .btn-load:hover {
-            background: var(--color-primary-dark);
-        }
-
-        /* Ajustes para la tabla grande */
-        .table-wrapper {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .general-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .general-table th,
-        .general-table td {
-            padding: 12px 16px;
-            text-align: left;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
             border-bottom: 1px solid var(--color-border);
         }
 
-        .general-table th {
-            background: var(--color-bg-secondary);
-            font-weight: 600;
-            white-space: nowrap;
+        .btn-turno {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid var(--color-border);
+            background: white;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--color-text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
+        .btn-turno:hover {
+            border-color: var(--color-primary-light);
+            background: #f8fafc;
+        }
+
+        .btn-turno.active {
+            border-color: var(--color-primary);
+            background: var(--color-bg-secondary);
+            color: var(--color-primary);
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(27, 58, 107, 0.1);
+        }
+
+        /* Grid de Semanas (Estilo Chips/Píldoras) */
+        .weeks-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .week-card {
+            background: #f3f4f6;
+            /* Gris muy suave por defecto */
+            border: 1px solid transparent;
+            border-radius: 50px;
+            /* Borde completamente redondeado (Píldora) */
+            padding: 10px 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--color-text);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .week-card:hover {
+            background: #e0e7ff;
+            /* Azul muy suave al hover */
+            color: var(--color-primary);
+            transform: translateY(-1px);
+        }
+
+        .week-card.active {
+            background: #e0e7ff;
+            /* Color lila/azul suave como la referencia */
+            border: 1px solid #c7d2fe;
+            color: var(--color-primary);
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Texto dentro de la tarjeta (si usamos estructura compleja, pero para chips simples basta el texto directo) */
+        .week-dates {
+            pointer-events: none;
+            /* Asegurar que el clic vaya al contenedor */
+        }
+
+        /* Estado vacío */
+        .weeks-empty {
+            width: 100%;
+            text-align: center;
+            padding: 30px;
+            color: var(--color-text-muted);
+            border: 2px dashed var(--color-border);
+            border-radius: 12px;
+        }
+
+        /* Ajustes tabla */
         .general-table th:nth-child(1),
         .general-table td:nth-child(1) {
             position: sticky;
             left: 0;
-            background: white;
-            /* Fallback */
+            background: inherit;
             z-index: 10;
         }
 
+        /* Asegurar fondo blanco en columna sticky para que no sea transparente al scrollear */
+        .general-table td:nth-child(1) {
+            background-color: white;
+        }
+
         .general-table th:nth-child(1) {
-            background: var(--color-bg-secondary);
+            background-color: var(--color-bg-secondary);
             z-index: 20;
         }
 
-        .asistencia-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 1.2rem;
+        /* Ajuste de ID sticky */
+        .general-table th:first-child,
+        .general-table td:first-child {
+            min-width: 80px;
         }
 
-        .bg-presente {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .bg-ausente {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .bg-retardo {
-            background: #fef9c3;
-            color: #a16207;
-        }
-
+        /* Estilos Summary */
         .summary-bar {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             background: var(--color-primary);
             color: white;
             padding: 16px 24px;
@@ -144,13 +168,13 @@
         }
 
         .summary-value {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             display: block;
         }
 
         .summary-label {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             opacity: 0.9;
         }
     </style>
@@ -210,34 +234,36 @@
                         <p class="section-subtitle">Consulta listas completas por turno y semana</p>
                     </div>
 
-                    <!-- Filters -->
+                    <!-- Panel de Filtros Moderno -->
                     <div class="filters-container">
-                        <div class="filter-group">
-                            <label class="filter-label">1. Selecciona Turno</label>
-                            <select id="turnoSelect" class="filter-select">
-                                <option value="matutino">Matutino (Presencial)</option>
-                                <option value="vespertino">Vespertino (Presencial)</option>
-                                <option value="en_linea">En Línea</option>
-                            </select>
+
+                        <!-- 1. Selección de Turno -->
+                        <div class="filter-section-title">1. Selecciona el Turno</div>
+                        <div class="turnos-wrapper">
+                            <button class="btn-turno active" data-turno="matutino" onclick="selectTurno('matutino')">
+                                ☀️ Matutino (Presencial)
+                            </button>
+                            <button class="btn-turno" data-turno="vespertino" onclick="selectTurno('vespertino')">
+                                🌆 Vespertino (Presencial)
+                            </button>
+                            <button class="btn-turno" data-turno="en_linea" onclick="selectTurno('en_linea')">
+                                💻 En Línea
+                            </button>
                         </div>
 
-                        <div class="filter-group">
-                            <label class="filter-label">2. Busca Semana (Fecha Inicio)</label>
-                            <!-- Este select se llenará dinámicamente -->
-                            <select id="semanaSelect" class="filter-select">
-                                <option value="">Cargando semanas...</option>
-                            </select>
+                        <!-- 2. Selección de Semana -->
+                        <div class="filter-section-title">2. Selecciona la Semana Disponible</div>
+                        <div id="weeksContainer" class="weeks-grid">
+                            <!-- Aquí se inyectarán las tarjetas de semana -->
+                            <div class="weeks-empty">Cargando semanas disponibles...</div>
                         </div>
 
-                        <button id="btnConsultar" class="btn-load">
-                            <span>🔍</span> Consultar Lista
-                        </button>
                     </div>
 
                     <!-- Loading State -->
                     <div id="loadingState" class="loading-state hidden" style="margin: 40px 0;">
                         <div class="loading-spinner"></div>
-                        <p>Generando reporte general...</p>
+                        <p>Consultando registros...</p>
                     </div>
 
                     <!-- Results Area -->
@@ -247,15 +273,16 @@
                         <div class="summary-bar">
                             <div class="summary-item">
                                 <span class="summary-value" id="statsTotalAlumnos">0</span>
-                                <span class="summary-label">Alumnos en Lista</span>
+                                <span class="summary-label">Alumnos</span>
                             </div>
                             <div class="summary-item">
                                 <span class="summary-value" id="statsAsistenciaPromedio">0%</span>
-                                <span class="summary-label">Asistencia Promedio</span>
+                                <span class="summary-label">Promedio Grupal</span>
                             </div>
                             <div class="summary-item">
-                                <span class="summary-value" id="statsSemanaLabel">--</span>
-                                <span class="summary-label">Semana Seleccionada</span>
+                                <span class="summary-label" style="text-align: right; display: block;">Periodo</span>
+                                <span class="summary-value" id="statsSemanaLabel"
+                                    style="font-size: 1rem; font-weight: 500;">--</span>
                             </div>
                         </div>
 
