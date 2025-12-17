@@ -143,6 +143,10 @@ async function handleSearch() {
  * Carga los datos de asistencia buscando directamente por tipo de búsqueda
  */
 async function loadAsistenciaDataBySearch(searchType, searchValue) {
+    console.log('=== INICIO BÚSQUEDA ===');
+    console.log('Tipo de búsqueda:', searchType);
+    console.log('Valor de búsqueda:', searchValue);
+
     try {
         let filterColumn = '';
         let filterOperator = 'eq';
@@ -164,7 +168,11 @@ async function loadAsistenciaDataBySearch(searchType, searchValue) {
                 filterColumn = 'id_alumno';
         }
 
+        console.log('Columna de filtro:', filterColumn);
+        console.log('Operador:', filterOperator);
+
         // Consultar tabla de asistencia EN LÍNEA
+        console.log('Consultando historico_asistencia_en_linea...');
         let queryEnLinea = supabaseSoporte
             .from('historico_asistencia_en_linea')
             .select('*');
@@ -178,11 +186,14 @@ async function loadAsistenciaDataBySearch(searchType, searchValue) {
         const { data: dataEnLinea, error: errorEnLinea } = await queryEnLinea
             .order('fecha_inicio_semana', { ascending: false });
 
+        console.log('Resultado en_linea:', { data: dataEnLinea, error: errorEnLinea });
+
         if (errorEnLinea) {
             console.error('Error cargando asistencia en línea:', errorEnLinea);
         }
 
         // Consultar tabla de asistencia PRESENCIAL
+        console.log('Consultando historico_asistencia_presencial...');
         let queryPresencial = supabaseSoporte
             .from('historico_asistencia_presencial')
             .select('*');
@@ -195,6 +206,8 @@ async function loadAsistenciaDataBySearch(searchType, searchValue) {
 
         const { data: dataPresencial, error: errorPresencial } = await queryPresencial
             .order('fecha_inicio_semana', { ascending: false });
+
+        console.log('Resultado presencial:', { data: dataPresencial, error: errorPresencial });
 
         if (errorPresencial) {
             console.error('Error cargando asistencia presencial:', errorPresencial);
@@ -226,7 +239,8 @@ async function loadAsistenciaDataBySearch(searchType, searchValue) {
                 return fechaB - fechaA;
             });
 
-        console.log(`Asistencia cargada: ${registrosEnLinea.length} en línea, ${registrosPresencial.length} presencial`);
+        console.log(`Total registros: ${asistenciaData.length} (${registrosEnLinea.length} en línea, ${registrosPresencial.length} presencial)`);
+        console.log('=== FIN BÚSQUEDA ===');
 
     } catch (error) {
         console.error('Error cargando asistencia:', error);
