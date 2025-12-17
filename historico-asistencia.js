@@ -84,11 +84,13 @@ async function loadAvailableWeeks() {
 
         // Aplicar filtro de turno si es tabla presencial
         if (selectedTurno !== 'en_linea') {
-            const turnoLabel = selectedTurno === 'matutino' ? 'MATUTINO' : 'VESPERTINO';
+            // CORRECCIÓN: Usar Capitalizado (Matutino/Vespertino) para coincidir con BD real
+            const turnoLabel = selectedTurno === 'matutino' ? 'Matutino' : 'Vespertino';
             query = query.eq('turno', turnoLabel);
         }
 
         const { data, error } = await query.order('fecha_inicio_semana', { ascending: false });
+
 
         if (error) throw error;
 
@@ -182,7 +184,8 @@ async function loadAsistenciaData() {
             .eq('fecha_inicio_semana', selectedSemana);
 
         if (selectedTurno !== 'en_linea') {
-            const turnoLabel = selectedTurno === 'matutino' ? 'MATUTINO' : 'VESPERTINO';
+            // CORRECCIÓN: Usar Capitalizado para coincidir con la vista SQL
+            const turnoLabel = selectedTurno === 'matutino' ? 'Matutino' : 'Vespertino';
             query = query.eq('turno', turnoLabel);
         }
 
