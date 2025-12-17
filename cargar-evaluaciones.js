@@ -293,7 +293,7 @@ async function uploadToSupabase() {
         try {
             const { error } = await supabaseSoporte
                 .from('evaluaciones')
-                .insert(batch);
+                .upsert(batch, { onConflict: 'id,fecha_evaluacion' });
 
             if (error) {
                 console.error('Error insertando batch:', error);
