@@ -287,6 +287,8 @@ async function uploadToSupabase() {
     const batchSize = 10; // Insertar de 10 en 10
     const totalBatches = Math.ceil(validRecords.length / batchSize);
 
+    let lastError = null;
+
     for (let i = 0; i < validRecords.length; i += batchSize) {
         const batch = validRecords.slice(i, i + batchSize);
 
@@ -297,12 +299,14 @@ async function uploadToSupabase() {
 
             if (error) {
                 console.error('Error insertando batch:', error);
+                lastError = error.message || error.details || JSON.stringify(error);
                 errors += batch.length;
             } else {
                 inserted += batch.length;
             }
         } catch (err) {
             console.error('Error:', err);
+            lastError = err.message || String(err);
             errors += batch.length;
         }
 
@@ -314,10 +318,10 @@ async function uploadToSupabase() {
 
     // Mostrar resultado
     document.getElementById('progressSection').classList.remove('visible');
-    showResult(inserted, errors);
+    showResult(inserted, errors, lastError);
 }
 
-function showResult(inserted, errors) {
+function showResult(inserted, errors, errorMessage = null) {
     const resultSection = document.getElementById('resultSection');
     const resultIcon = document.getElementById('resultIcon');
     const resultTitle = document.getElementById('resultTitle');
@@ -334,12 +338,12 @@ function showResult(inserted, errors) {
         resultSection.classList.add('success', 'visible');
         resultIcon.textContent = '⚠️';
         resultTitle.textContent = 'Carga parcial';
-        resultMessage.textContent = `Se importaron ${inserted} registros. ${errors} registros fallaron.`;
+        resultMessage.textContent = `Se importaron ${inserted} registros. ${errors} registros fallaron. ${errorMessage ? '<br><small>Último error: ' + errorMessage + '</small>' : ''}`;
     } else {
         resultSection.classList.add('error', 'visible');
         resultIcon.textContent = '❌';
         resultTitle.textContent = 'Error en la carga';
-        resultMessage.textContent = `No se pudo importar ningún registro. Verifica el formato del archivo.`;
+        resultMessage.innerHTML = `No se pudo importar ningún registro. <br><small>Error técnico: ${errorMessage || 'Desconocido'}</small>`;
     }
 }
 
