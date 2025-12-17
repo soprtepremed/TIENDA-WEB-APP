@@ -237,7 +237,9 @@ function showPreview(skipped) {
     document.getElementById('skippedRecords').textContent = skipped;
 
     // Generar tabla de vista previa (máximo 10 filas)
-    const previewRecords = validRecords.slice(0, 10);
+    // Generar tabla de vista previa (Mostrar TODOS los registros válidos)
+    // Se usa slice solo si son demasiados para el DOM (> 1000 podría ser lento, pero < 1000 está bien)
+    const previewRecords = validRecords;
 
     previewBody.innerHTML = previewRecords.map(record => `
         <tr>
@@ -251,14 +253,9 @@ function showPreview(skipped) {
         </tr>
     `).join('');
 
-    if (validRecords.length > 10) {
-        previewBody.innerHTML += `
-            <tr>
-                <td colspan="7" style="text-align: center; color: var(--color-text-muted);">
-                    ... y ${validRecords.length - 10} registros más
-                </td>
-            </tr>
-        `;
+    // No ocultamos nada, mostramos todo
+    if (validRecords.length === 0) {
+        previewBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay registros válidos</td></tr>';
     }
 
     // Mostrar secciones
