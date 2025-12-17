@@ -531,38 +531,74 @@ function displayEvaluacionesTable() {
     emptyState.classList.add('hidden');
 
     tbody.innerHTML = evaluacionesData.map(item => {
-        // Determinar clase de badge según estado
-        let statusClass = 'badge-absent';
-        let statusLabel = item.estado || '--';
+        // Determinar estado correcto basado en calificación (>=75% = APROBADO)
+        let statusClass = 'badge-warning';
+        let statusLabel = 'NO REALIZÓ';
 
-        if (item.estado === 'APROBADO') {
-            statusClass = 'badge-success';
-        } else if (item.estado === 'NO APROBADO') {
-            statusClass = 'badge-danger';
-        } else if (item.estado === 'NO REALIZÓ') {
-            statusClass = 'badge-warning';
+        if (item.calificacion !== null && item.calificacion !== undefined) {
+            if (item.calificacion >= 75) {
+                statusClass = 'badge-success';
+                statusLabel = 'APROBADO';
+            } else {
+                statusClass = 'badge-danger';
+                statusLabel = 'NO APROBADO';
+            }
         }
 
-        // Formatear rango de semana
-        const rangoSemana = item.fecha_inicio && item.fecha_final
-            ? `${formatDate(item.fecha_inicio)} - ${formatDate(item.fecha_final)}`
-            : '--';
+        // Formatear rango de semana de forma compacta: "08-12 dic"
+        const rangoSemana = formatSemanaCompacta(item.fecha_inicio, item.fecha_final);
 
-        // Formatear calificación
-        const calificacion = item.calificacion !== null ? item.calificacion : '--';
-        const calClass = item.calificacion >= 75 ? 'color: #059669;' :
-            item.calificacion !== null ? 'color: #dc2626;' : '';
+        // Formatear calificación con símbolo %
+        let calificacion = '--';
+        let calClass = '';
+        if (item.calificacion !== null && item.calificacion !== undefined) {
+            calificacion = item.calificacion.toFixed(1) + '%';
+            calClass = item.calificacion >= 75 ? 'color: #059669;' : 'color: #dc2626;';
+        }
 
         return `
             <tr>
-                <td>${formatDate(item.fecha_evaluacion)}</td>
-                <td><small style="color: var(--color-text-muted);">${rangoSemana}</small></td>
-                <td>${item.realizo_examen || '--'}</td>
+                <td style="text-align: center;">${formatDateShort(item.fecha_evaluacion)}</td>
+                <td style="text-align: center;"><span class="semana-badge">${rangoSemana}</span></td>
+                <td style="text-align: center;">${item.realizo_examen === 'SI' ? '✓' : '✗'}</td>
                 <td style="text-align: center;"><strong style="${calClass}">${calificacion}</strong></td>
-                <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+                <td style="text-align: center;"><span class="badge ${statusClass}">${statusLabel}</span></td>
             </tr>
         `;
     }).join('');
+}
+
+/**
+ * Formatea la semana de forma compacta: "08-12 dic"
+ */
+function formatSemanaCompacta(fechaInicio, fechaFinal) {
+    if (!fechaInicio || !fechaFinal) return '--';
+
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+    const inicio = new Date(fechaInicio + 'T00:00:00');
+    const final = new Date(fechaFinal + 'T00:00:00');
+
+    const diaInicio = inicio.getDate().toString().padStart(2, '0');
+    const diaFinal = final.getDate().toString().padStart(2, '0');
+    const mes = meses[final.getMonth()];
+
+    return `${diaInicio}-${diaFinal} ${mes}`;
+}
+
+/**
+ * Formatea fecha corta: "13 dic"
+ */
+function formatDateShort(dateStr) {
+    if (!dateStr) return '--';
+
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const date = new Date(dateStr + 'T00:00:00');
+
+    const dia = date.getDate();
+    const mes = meses[date.getMonth()];
+
+    return `${dia} ${mes}`;
 }
 
 // =====================================================

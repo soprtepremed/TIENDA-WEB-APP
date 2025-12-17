@@ -577,3 +577,18 @@
         print-color-adjust: exact;
     }
 }
+
+/* =====================================================
+   Semana Badge - Formato compacto
+   ===================================================== */
+.semana-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+    color: var(--color-primary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid rgba(79, 70, 229, 0.2);
+}
