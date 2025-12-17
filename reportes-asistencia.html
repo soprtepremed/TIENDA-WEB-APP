@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Asistencia y Evaluaciones - PREMED</title>
+    <meta name="description" content="Reportes de asistencia y evaluaciones de alumnos PREMED">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="reportes-asistencia.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Global Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="reportes-asistencia.html" class="sidebar-logo">
+                    <span>📊</span> Reportes
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Asistencia
+                </a>
+                <a href="videos.html" class="sidebar-link">
+                    <span class="sidebar-icon">🎥</span> Videos
+                </a>
+                <a href="reportes-asistencia.html" class="sidebar-link active">
+                    <span class="sidebar-icon">📊</span> Reportes
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" id="sidebarAvatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebarUserName">Admin</span>
+                        <span class="user-role" id="sidebarUserRole">Administrador</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="btn-logout">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main">
+                <div class="container reportes-container">
+
+                    <!-- Header Section -->
+                    <div class="section-header">
+                        <h1 class="section-title">📊 Reporte de Asistencia y Evaluaciones</h1>
+                        <p class="section-subtitle">Consulta y genera reportes de rendimiento de los alumnos</p>
+                    </div>
+
+                    <!-- Search Section -->
+                    <section class="search-section">
+                        <div class="search-card">
+                            <h2 class="search-title">🔍 Buscar Alumno</h2>
+                            <div class="search-form">
+                                <div class="search-input-group">
+                                    <label for="searchType" class="search-label">Buscar por:</label>
+                                    <select id="searchType" class="search-select">
+                                        <option value="id">ID de Alumno</option>
+                                        <option value="email">Correo Electrónico</option>
+                                        <option value="nombre">Nombre</option>
+                                    </select>
+                                </div>
+                                <div class="search-input-group search-input-main">
+                                    <label for="searchQuery" class="search-label">Valor de búsqueda:</label>
+                                    <input type="text" id="searchQuery" class="search-input"
+                                        placeholder="Ingrese el ID, email o nombre del alumno...">
+                                </div>
+                                <button id="btnBuscar" class="btn btn-primary btn-search">
+                                    <span class="btn-icon">🔍</span> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Results Section -->
+                    <section id="resultsSection" class="results-section hidden">
+
+                        <!-- Student Info Card -->
+                        <div class="student-info-card">
+                            <div class="student-avatar" id="studentAvatar">--</div>
+                            <div class="student-details">
+                                <h2 class="student-name" id="studentName">Nombre del Alumno</h2>
+                                <div class="student-meta">
+                                    <span class="meta-item">
+                                        <span class="meta-icon">🆔</span>
+                                        <span id="studentId">ID: --</span>
+                                    </span>
+                                    <span class="meta-item">
+                                        <span class="meta-icon">📧</span>
+                                        <span id="studentEmail">email@example.com</span>
+                                    </span>
+                                    <span class="meta-item">
+                                        <span class="meta-icon">🕐</span>
+                                        <span id="studentTurno">Turno: --</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Overview -->
+                        <div class="stats-overview">
+                            <div class="stat-card stat-attendance">
+                                <div class="stat-icon">📋</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="statAsistencia">--%</span>
+                                    <span class="stat-label">Asistencia</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-evaluations">
+                                <div class="stat-icon">📝</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="statPromedio">--</span>
+                                    <span class="stat-label">Promedio Eval.</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-weeks">
+                                <div class="stat-icon">📅</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="statSemanas">--</span>
+                                    <span class="stat-label">Semanas</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-total">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="statTotal">--</span>
+                                    <span class="stat-label">Total Evaluaciones</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabs Navigation -->
+                        <div class="tabs-container">
+                            <div class="tabs-nav">
+                                <button class="tab-btn active" data-tab="asistencia">
+                                    📋 Historial de Asistencia
+                                </button>
+                                <button class="tab-btn" data-tab="evaluaciones">
+                                    📝 Historial de Evaluaciones
+                                </button>
+                            </div>
+
+                            <!-- Tab Content: Asistencia -->
+                            <div class="tab-content active" id="tabAsistencia">
+                                <div class="table-wrapper">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Semana</th>
+                                                <th>Tipo</th>
+                                                <th>Lunes</th>
+                                                <th>Martes</th>
+                                                <th>Miércoles</th>
+                                                <th>Jueves</th>
+                                                <th>Viernes</th>
+                                                <th>% Semana</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tablaAsistencia">
+                                            <!-- Filas dinámicas -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="emptyAsistencia" class="empty-state hidden">
+                                    <div class="empty-icon">📋</div>
+                                    <p>No hay registros de asistencia para este alumno</p>
+                                </div>
+                            </div>
+
+                            <!-- Tab Content: Evaluaciones -->
+                            <div class="tab-content" id="tabEvaluaciones">
+                                <div class="table-wrapper">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Tipo</th>
+                                                <th>Descripción</th>
+                                                <th>Calificación</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tablaEvaluaciones">
+                                            <!-- Filas dinámicas -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="emptyEvaluaciones" class="empty-state hidden">
+                                    <div class="empty-icon">📝</div>
+                                    <p>No hay evaluaciones registradas para este alumno</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Export Actions -->
+                        <div class="export-actions">
+                            <button id="btnExportPDF" class="btn btn-secondary">
+                                <span class="btn-icon">📄</span> Exportar PDF
+                            </button>
+                            <button id="btnExportExcel" class="btn btn-secondary">
+                                <span class="btn-icon">📊</span> Exportar Excel
+                            </button>
+                            <button id="btnPrint" class="btn btn-secondary">
+                                <span class="btn-icon">🖨️</span> Imprimir
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Initial State / Empty State -->
+                    <section id="initialState" class="initial-state">
+                        <div class="initial-icon">🔍</div>
+                        <h2 class="initial-title">Busca un alumno para ver su reporte</h2>
+                        <p class="initial-text">
+                            Ingresa el ID, correo electrónico o nombre del alumno en el buscador
+                            para ver su historial de asistencia y evaluaciones.
+                        </p>
+                    </section>
+
+                    <!-- Loading State -->
+                    <section id="loadingState" class="loading-state hidden">
+                        <div class="loading-spinner"></div>
+                        <p>Buscando información del alumno...</p>
+                    </section>
+
+                    <!-- Error State -->
+                    <section id="errorState" class="error-state hidden">
+                        <div class="error-icon">⚠️</div>
+                        <h2 class="error-title" id="errorTitle">Alumno no encontrado</h2>
+                        <p class="error-text" id="errorText">
+                            No se encontró ningún alumno con los datos proporcionados.
+                        </p>
+                        <button class="btn btn-primary" onclick="resetSearch()">
+                            <span class="btn-icon">🔄</span> Intentar de nuevo
+                        </button>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="auth-config.js"></script>
+    <script>protectPage();</script>
+    <script src="reportes-asistencia.js"></script>
+</body>
+
+</html>
