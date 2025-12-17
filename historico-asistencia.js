@@ -345,3 +345,81 @@ style.textContent = `
     .bg-retardo-soft { background-color: #fffbeb; color: #92400e; }
 `;
 document.head.appendChild(style);
+
+
+// =====================================================
+// Funcionalidad: Alumnos en Riesgo (>3 Inasistencias)
+// =====================================================
+
+window.showRiskModal = function () {
+    const riskStudents = [];
+    const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+
+    // 1. Filtrar alumnos con más de 3 faltas
+    currentData.forEach(alumno => {
+        let faltas = 0;
+
+        dias.forEach(dia => {
+            const val = (alumno[dia] || '').toUpperCase();
+
+            // Criterios de "Presencia" (NO cuentan como falta)
+            const isPresent = val === 'ASISTIÓ' || val === 'RETARDO' ||
+                val === 'ASISTENCIA COMPLETA' || val === 'ASISTENCIA PARCIAL';
+
+            // Si NO está presente, es falta (Incluye vacíos/null, 'NO ASISTIÓ', 'NO APROBADO', etc.)
+            if (!isPresent) {
+                faltas++;
+            }
+        });
+
+        // CRITERIO: Más de 3 faltas (es decir, 4 o 5)
+        if (faltas > 3) {
+            riskStudents.push({
+                ...alumno,
+                totalFaltas: faltas,
+                percent: calculateIndividualPercent(alumno)
+            });
+        }
+    });
+
+    // 2. Llenar tabla del modal
+    const tbody = document.getElementById('riskTableBody');
+    tbody.innerHTML = '';
+
+    if (riskStudents.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">🎉 ¡Excelente! No hay alumnos en riesgo crítico esta semana.</td></tr>';
+    } else {
+        // Ordenar por número de faltas (mayor a menor)
+        riskStudents.sort((a, b) => b.totalFaltas - a.totalFaltas);
+
+        riskStudents.forEach(st => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="font-weight:600;">${st.id_alumno || '--'}</td>
+                <td>${st.nombre_alumno}</td>
+                <td style="text-align:center; color:#dc2626; font-weight:bold;">${st.totalFaltas}</td>
+                <td style="text-align:center;">${st.percent}%</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // 3. Mostrar modal
+    const modal = document.getElementById('riskModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+window.closeRiskModal = function () {
+    const modal = document.getElementById('riskModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+// Cerrar modal al hacer clic fuera (Delegate event o attach directo si existe)
+setTimeout(() => {
+    const modal = document.getElementById('riskModal');
+    if (modal) {
+        modal.addEventListener('click', function (e) {
+            if (e.target === this) closeRiskModal();
+        });
+    }
+}, 1000);
