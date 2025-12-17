@@ -746,7 +746,14 @@ function exportToPDF() {
 
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Generado el: ${new Date().toLocaleDateString('es-MX', { dateStyle: 'long', timeStyle: 'short' })}`, pageWidth / 2, 28, { align: 'center' });
+        const fechaGeneracion = new Date().toLocaleString('es-MX', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        doc.text(`Generado el: ${fechaGeneracion}`, pageWidth / 2, 28, { align: 'center' });
 
         // --- Información del Alumno ---
         doc.setFillColor(245, 247, 250);
