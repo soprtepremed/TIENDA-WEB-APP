@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargar Evaluaciones - PREMED</title>
+    <link rel="stylesheet" href="reportes-asistencia.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Estilos específicos para esta página */
+        .upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .upload-zone {
+            border: 3px dashed var(--color-border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            background: var(--color-bg-secondary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--color-primary);
+            background: rgba(27, 58, 107, 0.05);
+        }
+
+        .upload-zone .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .upload-zone h3 {
+            margin: 0 0 8px 0;
+            color: var(--color-text);
+        }
+
+        .upload-zone p {
+            margin: 0;
+            color: var(--color-text-muted);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-info {
+            display: none;
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .file-info.visible {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .file-info .file-icon {
+            font-size: 32px;
+        }
+
+        .file-info .file-details {
+            flex: 1;
+        }
+
+        .file-info .file-name {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .file-info .file-size {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        .file-info .btn-remove {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-muted);
+        }
+
+        .preview-section {
+            display: none;
+            margin-bottom: 24px;
+        }
+
+        .preview-section.visible {
+            display: block;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .preview-header h3 {
+            margin: 0;
+            color: var(--color-text);
+        }
+
+        .preview-stats {
+            display: flex;
+            gap: 16px;
+        }
+
+        .preview-stat {
+            background: var(--color-bg-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .preview-stat strong {
+            color: var(--color-primary);
+        }
+
+        .preview-table {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+        }
+
+        .preview-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .preview-table th {
+            background: var(--color-bg-secondary);
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+        }
+
+        .preview-table tr:hover {
+            background: rgba(27, 58, 107, 0.03);
+        }
+
+        .actions-section {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .actions-section.visible {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .progress-section.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--color-bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 24px;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .result-section.visible {
+            display: block;
+        }
+
+        .result-section.success {
+            background: rgba(5, 150, 105, 0.1);
+            border: 1px solid rgba(5, 150, 105, 0.3);
+        }
+
+        .result-section.error {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .result-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .result-section.success .result-title {
+            color: #059669;
+        }
+
+        .result-section.error .result-title {
+            color: #dc2626;
+        }
+
+        .result-message {
+            color: var(--color-text-muted);
+        }
+
+        .format-help {
+            background: rgba(27, 58, 107, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 32px;
+        }
+
+        .format-help h4 {
+            margin: 0 0 12px 0;
+            color: var(--color-primary);
+        }
+
+        .format-help p {
+            margin: 0 0 12px 0;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        .format-help code {
+            display: block;
+            background: var(--color-bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="reportes-asistencia.html" class="sidebar-logo">
+                    <span class="logo-icon">📚</span> PREMED
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Asistencia
+                </a>
+                <a href="videos.html" class="sidebar-link">
+                    <span class="sidebar-icon">🎥</span> Videos
+                </a>
+                <a href="reportes-asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span> Reportes
+                </a>
+                <a href="cargar-evaluaciones.html" class="sidebar-link active">
+                    <span class="sidebar-icon">📤</span> Cargar Eval.
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="sidebarAvatar">AD</div>
+                    <div class="user-details">
+                        <span class="user-name" id="sidebarUserName">Admin</span>
+                        <span class="user-role" id="sidebarUserRole">Administrador</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>📤 Cargar Evaluaciones</h1>
+                <p>Importa los resultados de evaluaciones desde un archivo CSV</p>
+            </div>
+
+            <div class="upload-container">
+                <!-- Zona de carga -->
+                <div class="upload-zone" id="uploadZone">
+                    <div class="icon">📄</div>
+                    <h3>Arrastra tu archivo CSV aquí</h3>
+                    <p>o haz clic para seleccionar</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".csv">
+                </div>
+
+                <!-- Info del archivo -->
+                <div class="file-info" id="fileInfo">
+                    <span class="file-icon">📊</span>
+                    <div class="file-details">
+                        <div class="file-name" id="fileName">archivo.csv</div>
+                        <div class="file-size" id="fileSize">0 KB</div>
+                    </div>
+                    <button class="btn-remove" id="btnRemove" title="Quitar archivo">✕</button>
+                </div>
+
+                <!-- Vista previa -->
+                <div class="preview-section" id="previewSection">
+                    <div class="preview-header">
+                        <h3>Vista Previa</h3>
+                        <div class="preview-stats">
+                            <div class="preview-stat">
+                                📝 <strong id="totalRecords">0</strong> registros
+                            </div>
+                            <div class="preview-stat">
+                                ✅ <strong id="validRecords">0</strong> válidos
+                            </div>
+                            <div class="preview-stat">
+                                ⚠️ <strong id="skippedRecords">0</strong> omitidos
+                            </div>
+                        </div>
+                    </div>
+                    <div class="preview-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Turno</th>
+                                    <th>Realizó</th>
+                                    <th>Calif. %</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Eval.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="actions-section" id="actionsSection">
+                    <button class="btn btn-secondary" id="btnCancel">Cancelar</button>
+                    <button class="btn btn-primary" id="btnUpload">
+                        📤 Cargar Evaluaciones
+                    </button>
+                </div>
+
+                <!-- Barra de progreso -->
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Cargando...</div>
+                </div>
+
+                <!-- Resultado -->
+                <div class="result-section" id="resultSection">
+                    <div class="result-icon" id="resultIcon">✅</div>
+                    <div class="result-title" id="resultTitle">¡Carga exitosa!</div>
+                    <div class="result-message" id="resultMessage">Se importaron 0 registros.</div>
+                    <button class="btn btn-primary" id="btnNewUpload" style="margin-top: 16px;">
+                        Cargar otro archivo
+                    </button>
+                </div>
+
+                <!-- Ayuda de formato -->
+                <div class="format-help">
+                    <h4>📋 Formato del archivo CSV</h4>
+                    <p>El archivo debe tener las siguientes columnas (el mismo formato que exportas de tu hoja de
+                        cálculo):</p>
+                    <code>ID,NOMBRE,TURNO,MODALIDAD,REALIZO EXAMEN,CALIFICACION,FECHA EVALUACION,fecha de inicio,fecha final,ESTADO</code>
+                    <p style="margin-top: 12px;">
+                        <strong>Nota:</strong> Las calificaciones en formato "79/90" se convertirán automáticamente a
+                        porcentaje (87.78%).
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="auth-config.js"></script>
+    <script src="cargar-evaluaciones.js"></script>
+</body>
+
+</html>
