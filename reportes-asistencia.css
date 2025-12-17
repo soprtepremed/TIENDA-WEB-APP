@@ -245,6 +245,31 @@
     letter-spacing: 0.5px;
 }
 
+/* =========================================
+   Estilos específicos para Cargar Evaluaciones
+   ========================================= */
+.preview-container {
+    max-width: 95vw;
+    /* Casi todo el ancho de la pantalla */
+    margin: 2rem auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.preview-table-wrapper {
+    overflow-x: auto;
+    padding: 1rem;
+}
+
+.result-card.success,
+.result-card.error {
+    max-width: 800px;
+    /* Mantener mensaje de resultado centrado y legible */
+    margin: 2rem auto;
+}
+
 /* =====================================================
    Tabs
    ===================================================== */
