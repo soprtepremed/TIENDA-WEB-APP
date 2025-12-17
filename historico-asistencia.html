@@ -484,6 +484,37 @@
         </main>
     </div>
 
+    <!-- Modal de Riesgo -->
+    <div id="riskModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚠️ Alumnos con Múltiples Inasistencias (>3)</h3>
+                <button onclick="closeRiskModal()" class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Listado de alumnos con 4 o más faltas en la semana seleccionada.</p>
+                <div class="table-scroll-container" style="max-height: 400px;">
+                    <table class="general-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th style="text-align: center;">Faltas</th>
+                                <th style="text-align: center;">% Asist.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riskTableBody">
+                            <!-- Ingesta dinámica -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeRiskModal()" class="btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
