@@ -723,17 +723,254 @@ function showNotification(message, type = 'info') {
 /**
  * Exporta el reporte a PDF (placeholder)
  */
+/**
+ * Exporta el reporte a PDF
+ */
 function exportToPDF() {
-    showNotification('Generando PDF... (Funcionalidad en desarrollo)', 'info');
-    // TODO: Implementar con jsPDF u otra librería
+    if (!currentStudent) {
+        showNotification('No hay datos para exportar', 'warning');
+        return;
+    }
+
+    showNotification('Generando PDF...', 'info');
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.width;
+
+        // --- Encabezado ---
+        doc.setFontSize(20);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Reporte de Asistencia y Evaluaciones', pageWidth / 2, 20, { align: 'center' });
+
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generado el: ${new Date().toLocaleDateString('es-MX', { dateStyle: 'long', timeStyle: 'short' })}`, pageWidth / 2, 28, { align: 'center' });
+
+        // --- Información del Alumno ---
+        doc.setFillColor(245, 247, 250);
+        doc.rect(14, 35, pageWidth - 28, 35, 'F');
+
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(currentStudent.nombre || 'Sin nombre', 20, 45);
+
+        doc.setFontSize(10);
+        doc.setTextColor(80, 80, 80);
+        doc.text(`ID: ${currentStudent.id_alumno || '--'}`, 20, 55);
+        doc.text(`Correo: ${currentStudent.correo_electronico || '--'}`, 20, 62);
+        doc.text(`Turno: ${currentStudent.turno || '--'}`, 120, 55);
+
+        // --- Estadísticas ---
+        const asistenciaPercent = document.getElementById('statAsistencia').textContent;
+        const promedioEval = document.getElementById('statPromedio').textContent;
+
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Asistencia Global: ${asistenciaPercent}`, 20, 85);
+        doc.text(`Promedio Evaluaciones: ${promedioEval}`, 120, 85);
+
+        let finalY = 90;
+
+        // --- Tabla de Asistencia ---
+        if (asistenciaData.length > 0) {
+            doc.setFontSize(14);
+            doc.setTextColor(79, 70, 229); // Color primario
+            doc.text('Historial de Asistencia', 14, finalY + 10);
+
+            const tableColumn = ["Semana", "Tipo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "%"];
+            const tableRows = asistenciaData.map(semana => [
+                formatSemanaCompacta(semana.fecha_inicio_semana, semana.fecha_fin_semana),
+                semana.tipo_asistencia || 'En Línea',
+                cleanAsistenciaValue(semana.lunes),
+                cleanAsistenciaValue(semana.martes),
+                cleanAsistenciaValue(semana.miercoles),
+                cleanAsistenciaValue(semana.jueves),
+                cleanAsistenciaValue(semana.viernes),
+                calculateWeekPercent(semana) + '%'
+            ]);
+
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: finalY + 15,
+                theme: 'grid',
+                headStyles: { fillColor: [79, 70, 229] },
+                styles: { fontSize: 8, cellPadding: 2 },
+                columnStyles: {
+                    0: { cellWidth: 25 }, // Semana
+                    7: { halign: 'center' } // Porcentaje
+                }
+            });
+
+            finalY = doc.lastAutoTable.finalY + 15;
+        }
+
+        // --- Tabla de Evaluaciones ---
+        if (evaluacionesData.length > 0) {
+            // Verificar si cabe en la página actual
+            if (finalY > 250) {
+                doc.addPage();
+                finalY = 20;
+            }
+
+            doc.setFontSize(14);
+            doc.setTextColor(79, 70, 229);
+            doc.text('Historial de Evaluaciones', 14, finalY);
+
+            const evalColumn = ["Fecha", "Semana", "Realizó", "Calif.", "Estado"];
+            const evalRows = evaluacionesData.map(item => {
+                let status = 'NO REALIZÓ';
+                if (item.calificacion !== null && item.calificacion !== undefined) {
+                    status = item.calificacion >= 75 ? 'APROBADO' : 'NO APROBADO';
+                } else if (item.realizo_examen === 'NO') {
+                    status = 'NO REALIZÓ';
+                }
+
+                return [
+                    formatDate(item.fecha_evaluacion),
+                    formatSemanaCompacta(item.fecha_inicio, item.fecha_final),
+                    item.realizo_examen || '--',
+                    item.calificacion !== null ? item.calificacion.toFixed(1) + '%' : '--',
+                    status
+                ];
+            });
+
+            doc.autoTable({
+                head: [evalColumn],
+                body: evalRows,
+                startY: finalY + 5,
+                theme: 'striped',
+                headStyles: { fillColor: [16, 185, 129] }, // Color verde para evaluaciones
+                styles: { fontSize: 9 },
+                columnStyles: {
+                    3: { halign: 'center', fontStyle: 'bold' },
+                    4: { halign: 'center' }
+                },
+                didParseCell: function (data) {
+                    // Colorear calificación
+                    if (data.section === 'body' && data.column.index === 3) {
+                        const val = parseFloat(data.cell.raw);
+                        if (!isNaN(val)) {
+                            if (val < 75) data.cell.styles.textColor = [220, 38, 38]; // Rojo
+                            else data.cell.styles.textColor = [5, 150, 105]; // Verde
+                        }
+                    }
+                }
+            });
+        }
+
+        // Guardar PDF
+        const fileName = `Reporte_${currentStudent.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
+        doc.save(fileName);
+        showNotification('PDF descargado correctamente', 'success');
+
+    } catch (error) {
+        console.error('Error generando PDF:', error);
+        showNotification('Error al generar el PDF', 'error');
+    }
 }
 
 /**
- * Exporta el reporte a Excel (placeholder)
+ * Helper para limpiar valores de asistencia para exportación
+ */
+function cleanAsistenciaValue(val) {
+    if (!val) return '--';
+    if (val === 'Asistencia Completa' || val === 'ASISTIÓ') return 'Presente';
+    if (val === 'NO ASISTIÓ') return 'Ausente';
+    if (val === 'Asistencia Parcial') return 'Parcial';
+    return val;
+}
+
+/**
+ * Exporta el reporte a Excel
  */
 function exportToExcel() {
-    showNotification('Generando Excel... (Funcionalidad en desarrollo)', 'info');
-    // TODO: Implementar con SheetJS u otra librería
+    if (!currentStudent) {
+        showNotification('No hay datos para exportar', 'warning');
+        return;
+    }
+
+    showNotification('Generando Excel...', 'info');
+
+    try {
+        const wb = XLSX.utils.book_new();
+
+        // --- Hoja 1: Información General y Asistencia ---
+        const wsData = [
+            ['Reporte de Alumno - PREMED'],
+            ['Fecha Generación:', new Date().toLocaleString()],
+            [''],
+            ['ID Alumno:', currentStudent.id_alumno],
+            ['Nombre:', currentStudent.nombre],
+            ['Correo:', currentStudent.correo_electronico],
+            ['Turno:', currentStudent.turno],
+            [''],
+            ['ESTADÍSTICAS'],
+            ['Asistencia Global:', document.getElementById('statAsistencia').textContent],
+            ['Promedio Eval:', document.getElementById('statPromedio').textContent],
+            [''],
+            ['HISTORIAL DE ASISTENCIA'],
+            ['Semana', 'Tipo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', '% Semana']
+        ];
+
+        // Agregar datos de asistencia
+        asistenciaData.forEach(semana => {
+            wsData.push([
+                formatSemanaCompacta(semana.fecha_inicio_semana, semana.fecha_fin_semana),
+                semana.tipo_asistencia || 'En Línea',
+                cleanAsistenciaValue(semana.lunes),
+                cleanAsistenciaValue(semana.martes),
+                cleanAsistenciaValue(semana.miercoles),
+                cleanAsistenciaValue(semana.jueves),
+                cleanAsistenciaValue(semana.viernes),
+                calculateWeekPercent(semana) / 100 // Formato número para Excel
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Formato para columna de porcentaje
+        // Nota: SheetJS versión gratuita tiene limitaciones de estilo, pero el formato numérico se puede sugerir
+
+        XLSX.utils.book_append_sheet(wb, ws, "Resumen y Asistencia");
+
+        // --- Hoja 2: Evaluaciones ---
+        if (evaluacionesData.length > 0) {
+            const evalData = [
+                ['HISTORIAL DE EVALUACIONES'],
+                ['Fecha', 'Semana', 'Realizó Examen', 'Calificación', 'Estado']
+            ];
+
+            evaluacionesData.forEach(item => {
+                let status = 'NO REALIZÓ';
+                if (item.calificacion !== null && item.calificacion !== undefined) {
+                    status = item.calificacion >= 75 ? 'APROBADO' : 'NO APROBADO';
+                }
+
+                evalData.push([
+                    formatDate(item.fecha_evaluacion),
+                    formatSemanaCompacta(item.fecha_inicio, item.fecha_final),
+                    item.realizo_examen || '--',
+                    item.calificacion !== null ? item.calificacion : '--',
+                    status
+                ]);
+            });
+
+            const wsEval = XLSX.utils.aoa_to_sheet(evalData);
+            XLSX.utils.book_append_sheet(wb, wsEval, "Evaluaciones");
+        }
+
+        const fileName = `Reporte_${currentStudent.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+
+        showNotification('Excel descargado correctamente', 'success');
+
+    } catch (error) {
+        console.error('Error generando Excel:', error);
+        showNotification('Error al generar el Excel', 'error');
+    }
 }
 
 /**
