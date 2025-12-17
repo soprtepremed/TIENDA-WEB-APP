@@ -70,7 +70,7 @@
             box-shadow: 0 2px 4px rgba(27, 58, 107, 0.1);
         }
 
-        /* Grid de Semanas (Estilo Chips/Píldoras) */
+        /* Grid de Semanas (Estilo Chips) */
         .weeks-grid {
             display: flex;
             flex-wrap: wrap;
@@ -80,10 +80,8 @@
 
         .week-card {
             background: #f3f4f6;
-            /* Gris muy suave por defecto */
             border: 1px solid transparent;
             border-radius: 50px;
-            /* Borde completamente redondeado (Píldora) */
             padding: 10px 24px;
             cursor: pointer;
             transition: all 0.2s;
@@ -95,25 +93,22 @@
         }
 
         .week-card:hover {
-            background: #e0e7ff;
-            /* Azul muy suave al hover */
-            color: var(--color-primary);
+            background: #e5e7eb;
             transform: translateY(-1px);
         }
 
         .week-card.active {
-            background: #e0e7ff;
-            /* Color lila/azul suave como la referencia */
-            border: 1px solid #c7d2fe;
-            color: var(--color-primary);
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: #fbbf24;
+            /* Dorado Vibrante */
+            border: 1px solid #d97706;
+            color: #1e293b;
+            /* Texto casi negro para contraste */
+            font-weight: 700;
+            box-shadow: 0 4px 6px rgba(251, 191, 36, 0.2);
         }
 
-        /* Texto dentro de la tarjeta (si usamos estructura compleja, pero para chips simples basta el texto directo) */
         .week-dates {
             pointer-events: none;
-            /* Asegurar que el clic vaya al contenedor */
         }
 
         /* Estado vacío */
@@ -126,41 +121,78 @@
             border-radius: 12px;
         }
 
-        /* Ajustes tabla */
+        /* Ajustes tabla con SCROLL */
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+        }
+
+        .table-scroll-container {
+            max-height: 600px;
+            /* Aquí está el scroll vertical */
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .general-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .general-table th,
+        .general-table td {
+            padding: 14px 16px;
+            /* Un poco más de aire */
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Sticky Headers */
+        .general-table thead th {
+            position: sticky;
+            top: 0;
+            background: #f1f5f9;
+            /* Color gris suave para header */
+            color: #334155;
+            z-index: 30;
+            /* Arriba de todo */
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        /* Sticky ID y Nombre */
         .general-table th:nth-child(1),
         .general-table td:nth-child(1) {
             position: sticky;
             left: 0;
-            background: inherit;
-            z-index: 10;
-        }
-
-        /* Asegurar fondo blanco en columna sticky para que no sea transparente al scrollear */
-        .general-table td:nth-child(1) {
-            background-color: white;
-        }
-
-        .general-table th:nth-child(1) {
-            background-color: var(--color-bg-secondary);
+            background: white;
             z-index: 20;
+            border-right: 2px solid #f1f5f9;
+            /* Separador visual */
         }
 
-        /* Ajuste de ID sticky */
-        .general-table th:first-child,
-        .general-table td:first-child {
-            min-width: 80px;
+        /* Corrección z-index para la esquina superior izquierda */
+        .general-table thead th:nth-child(1) {
+            z-index: 40;
+            background: #f1f5f9;
         }
 
-        /* Estilos Summary */
+        /* Ajuste Summary Bar (Texto Negro) */
         .summary-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--color-primary);
-            color: white;
-            padding: 16px 24px;
+            background: white;
+            /* Cambio a blanco */
+            color: var(--color-text);
+            padding: 20px 30px;
             border-radius: 12px;
             margin-bottom: 24px;
+            border: 1px solid var(--color-border);
+            /* Borde sutil */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
         .summary-item {
@@ -168,14 +200,17 @@
         }
 
         .summary-value {
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 800;
             display: block;
+            color: var(--color-primary);
         }
 
         .summary-label {
-            font-size: 0.8rem;
-            opacity: 0.9;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 4px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -288,7 +323,7 @@
 
                         <!-- Table -->
                         <div class="table-wrapper">
-                            <div style="overflow-x: auto;">
+                            <div class="table-scroll-container">
                                 <table class="general-table">
                                     <thead>
                                         <tr>

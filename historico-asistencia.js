@@ -77,11 +77,18 @@ async function loadAvailableWeeks() {
         : 'historico_asistencia_presencial';
 
     try {
-        // Consultar rango de semanas
-        const { data, error } = await supabaseSoporte
+        // Consultar rango de semanas FILTRANDO POR TURNO
+        let query = supabaseSoporte
             .from(tableName)
-            .select('fecha_inicio_semana, fecha_fin_semana')
-            .order('fecha_inicio_semana', { ascending: false });
+            .select('fecha_inicio_semana, fecha_fin_semana');
+
+        // Aplicar filtro de turno si es tabla presencial
+        if (selectedTurno !== 'en_linea') {
+            const turnoLabel = selectedTurno === 'matutino' ? 'MATUTINO' : 'VESPERTINO';
+            query = query.eq('turno', turnoLabel);
+        }
+
+        const { data, error } = await query.order('fecha_inicio_semana', { ascending: false });
 
         if (error) throw error;
 
