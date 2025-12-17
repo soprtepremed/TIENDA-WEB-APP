@@ -98,78 +98,99 @@
         .preview-section {
             display: none;
             margin-top: 24px;
-            /* Modificación para ancho completo */
-            width: 95vw;
-            margin-left: calc(-47.5vw + 50%);
-            /* Truco para centrar full-width dentro de contenedor limitado */
-            position: relative;
-            left: 0;
+            width: 100%;
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .preview-section.visible {
             display: block;
-        }
-
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .preview-header h3 {
-            margin: 0;
-            color: var(--color-text);
+            animation: fadeIn 0.3s ease;
         }
 
         .preview-stats {
             display: flex;
-            gap: 16px;
+            gap: 24px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--color-border);
         }
 
         .preview-stat {
-            background: var(--color-bg-secondary);
-            padding: 8px 16px;
-            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-text-muted);
             font-size: 0.875rem;
         }
 
         .preview-stat strong {
-            color: var(--color-primary);
+            color: var(--color-text);
+            font-size: 1rem;
         }
 
         .preview-table {
-            max-height: 300px;
+            margin-top: 16px;
+            overflow-x: auto;
+            /* Scroll horizontal */
             overflow-y: auto;
-            border-radius: 12px;
+            /* Scroll vertical */
+            max-height: 500px;
+            /* Altura máxima para activar scroll vertical */
             border: 1px solid var(--color-border);
+            border-radius: 8px;
         }
 
         .preview-table table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
+            border-collapse: separate;
+            /* Necesario para sticky header */
+            border-spacing: 0;
+            min-width: 900px;
+            /* Asegura que aparezca scroll horizontal en pantallas chicas */
         }
 
         .preview-table th,
         .preview-table td {
-            padding: 10px 12px;
+            padding: 12px 16px;
             text-align: left;
             border-bottom: 1px solid var(--color-border);
+            white-space: nowrap;
+            /* Evita saltos de línea generales */
         }
 
         .preview-table th {
             background: var(--color-bg-secondary);
             position: sticky;
             top: 0;
+            z-index: 10;
             font-weight: 600;
+            color: var(--color-text);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
-        .preview-table tr:hover {
+        /* Columna Nombre: permite salto de línea y ancho mínimo */
+        .preview-table td:nth-child(2),
+        .preview-table th:nth-child(2) {
+            min-width: 250px;
+            white-space: normal;
+            position: sticky;
+            left: 0;
+            background: white;
+            /* Sticky column background */
+            z-index: 5;
+        }
+
+        /* Asegurar que el header de la columna sticky tenga fondo correcto */
+        .preview-table th:nth-child(2) {
+            background: var(--color-bg-secondary);
+            z-index: 15;
+            /* Mayor que el contenido sticky */
+        }
+
+        .preview-table tr:hover td {
             background: rgba(27, 58, 107, 0.03);
         }
 
