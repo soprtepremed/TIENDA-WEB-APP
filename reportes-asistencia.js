@@ -486,12 +486,13 @@ function formatAsistencia(valor, tiempo) {
             break;
     }
 
-    let html = `<span class="badge ${badgeClass}">${label}</span>`;
+    let html = `<div style="text-align: center;"><span class="badge ${badgeClass}">${label}</span>`;
 
     if (tiempo && tiempo !== '' && tiempo !== null) {
-        html += `<br><small style="color: var(--color-text-muted);">${tiempo}</small>`;
+        html += `<br><small style="color: var(--color-text-muted);">🕐 ${tiempo}</small>`;
     }
 
+    html += '</div>';
     return html;
 }
 
