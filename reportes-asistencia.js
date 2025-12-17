@@ -411,16 +411,15 @@ function displayAsistenciaTable() {
         const tipoAsistencia = semana.tipo_asistencia || 'En Línea';
         const tipoBadgeClass = tipoAsistencia === 'Presencial' ? 'badge-presencial' : 'badge-enlinea';
 
+        // Formatear rango de semana compacto
+        const rangoSemana = formatSemanaCompacta(semana.fecha_inicio_semana, semana.fecha_fin_semana);
+
         return `
             <tr>
-                <td>
-                    <strong>${formatDate(semana.fecha_inicio_semana)}</strong>
-                    <br>
-                    <small style="color: var(--color-text-muted);">
-                        al ${formatDate(semana.fecha_fin_semana)}
-                    </small>
+                <td style="text-align: center;">
+                    <span class="semana-badge">${rangoSemana}</span>
                 </td>
-                <td>
+                <td style="text-align: center;">
                     <span class="badge ${tipoBadgeClass}">${tipoAsistencia === 'Presencial' ? '🏫 Presencial' : '💻 En Línea'}</span>
                 </td>
                 <td>${formatAsistencia(semana.lunes, semana.tiempo_lunes)}</td>
@@ -428,7 +427,7 @@ function displayAsistenciaTable() {
                 <td>${formatAsistencia(semana.miercoles, semana.tiempo_miercoles)}</td>
                 <td>${formatAsistencia(semana.jueves, semana.tiempo_jueves)}</td>
                 <td>${formatAsistencia(semana.viernes, semana.tiempo_viernes)}</td>
-                <td>
+                <td style="text-align: center;">
                     <span class="week-percentage ${percentClass}">${weekPercent}%</span>
                 </td>
             </tr>
