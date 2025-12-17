@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico General de Asistencia - PREMED</title>
+    <meta name="description" content="Reporte general histórico de asistencia por turnos y semanas">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="reportes-asistencia.css">
+    <style>
+        /* Estilos específicos para este módulo */
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .btn-load {
+            padding: 10px 24px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-load:hover {
+            background: var(--color-primary-dark);
+        }
+
+        /* Ajustes para la tabla grande */
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .general-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .general-table th,
+        .general-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .general-table th {
+            background: var(--color-bg-secondary);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .general-table th:nth-child(1),
+        .general-table td:nth-child(1) {
+            position: sticky;
+            left: 0;
+            background: white;
+            /* Fallback */
+            z-index: 10;
+        }
+
+        .general-table th:nth-child(1) {
+            background: var(--color-bg-secondary);
+            z-index: 20;
+        }
+
+        .asistencia-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+        }
+
+        .bg-presente {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .bg-ausente {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .bg-retardo {
+            background: #fef9c3;
+            color: #a16207;
+        }
+
+        .summary-bar {
+            display: flex;
+            justify-content: space-between;
+            background: var(--color-primary);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .summary-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar se inyectará o copiará aquí con la nueva opción -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="reportes-asistencia.html" class="sidebar-logo">
+                    <span class="logo-icon">📚</span> PREMED
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Asistencia
+                </a>
+                <a href="reportes-asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span> Reportes
+                </a>
+                <a href="historico-asistencia.html" class="sidebar-link active">
+                    <span class="sidebar-icon">📅</span> Histórico
+                </a>
+                <a href="cargar-evaluaciones.html" class="sidebar-link">
+                    <span class="sidebar-icon">📤</span> Cargar Eval.
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" id="sidebarAvatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebarUserName">Admin</span>
+                        <span class="user-role" id="sidebarUserRole">Administrador</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="btn-logout">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="main">
+                <div class="container reportes-container">
+
+                    <!-- Header -->
+                    <div class="section-header">
+                        <h1 class="section-title">📅 Histórico General de Asistencia</h1>
+                        <p class="section-subtitle">Consulta listas completas por turno y semana</p>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label class="filter-label">1. Selecciona Turno</label>
+                            <select id="turnoSelect" class="filter-select">
+                                <option value="matutino">Matutino (Presencial)</option>
+                                <option value="vespertino">Vespertino (Presencial)</option>
+                                <option value="en_linea">En Línea</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label">2. Busca Semana (Fecha Inicio)</label>
+                            <!-- Este select se llenará dinámicamente -->
+                            <select id="semanaSelect" class="filter-select">
+                                <option value="">Cargando semanas...</option>
+                            </select>
+                        </div>
+
+                        <button id="btnConsultar" class="btn-load">
+                            <span>🔍</span> Consultar Lista
+                        </button>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loadingState" class="loading-state hidden" style="margin: 40px 0;">
+                        <div class="loading-spinner"></div>
+                        <p>Generando reporte general...</p>
+                    </div>
+
+                    <!-- Results Area -->
+                    <div id="resultsArea" class="hidden">
+
+                        <!-- Summary -->
+                        <div class="summary-bar">
+                            <div class="summary-item">
+                                <span class="summary-value" id="statsTotalAlumnos">0</span>
+                                <span class="summary-label">Alumnos en Lista</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-value" id="statsAsistenciaPromedio">0%</span>
+                                <span class="summary-label">Asistencia Promedio</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-value" id="statsSemanaLabel">--</span>
+                                <span class="summary-label">Semana Seleccionada</span>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="table-wrapper">
+                            <div style="overflow-x: auto;">
+                                <table class="general-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nombre</th>
+                                            <th style="text-align:center">Lun</th>
+                                            <th style="text-align:center">Mar</th>
+                                            <th style="text-align:center">Mié</th>
+                                            <th style="text-align:center">Jue</th>
+                                            <th style="text-align:center">Vie</th>
+                                            <th style="text-align:center">% Asistencia</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="listaAsistenciaBody">
+                                        <!-- Filas dinámicas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Export Buttons -->
+                        <div class="export-actions" style="justify-content: flex-end; margin-top: 20px;">
+                            <button id="btnExportExcelGeneral" class="btn btn-secondary">
+                                <span class="btn-icon">📊</span> Descargar Excel
+                            </button>
+                        </div>
+
+                    </div> <!-- End Results -->
+
+                    <!-- Empty State for filters -->
+                    <div id="initialState" class="initial-state">
+                        <div class="initial-icon">👆</div>
+                        <h2 class="initial-title">Selecciona Un Turno y Semana</h2>
+                        <p class="initial-text">
+                            El sistema cargará el histórico completo de asistencias para el periodo seleccionado.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="auth-config.js"></script>
+    <script>protectPage();</script>
+    <script src="historico-asistencia.js"></script>
+</body>
+
+</html>
