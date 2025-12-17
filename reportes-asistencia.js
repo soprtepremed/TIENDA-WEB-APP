@@ -253,15 +253,29 @@ async function loadAsistenciaDataBySearch(searchType, searchValue) {
  * TODO: Implementar cuando exista la tabla de evaluaciones
  */
 async function loadEvaluacionesData(student) {
-    // Por ahora, datos de ejemplo hasta que se cree la tabla de evaluaciones
-    evaluacionesData = [];
+    console.log('Cargando evaluaciones para:', student.id_alumno);
 
-    // Cuando exista la tabla, usar algo como:
-    // const { data, error } = await supabaseSoporte
-    //     .from('evaluaciones')
-    //     .select('*')
-    //     .eq('correo_electronico', student.correo_electronico)
-    //     .order('fecha', { ascending: false });
+    try {
+        // Consultar tabla de evaluaciones
+        const { data, error } = await supabaseSoporte
+            .from('evaluaciones')
+            .select('*')
+            .eq('id', student.id_alumno)
+            .order('fecha_evaluacion', { ascending: false });
+
+        if (error) {
+            console.error('Error cargando evaluaciones:', error);
+            evaluacionesData = [];
+            return;
+        }
+
+        evaluacionesData = data || [];
+        console.log(`Evaluaciones cargadas: ${evaluacionesData.length}`);
+
+    } catch (error) {
+        console.error('Error cargando evaluaciones:', error);
+        evaluacionesData = [];
+    }
 }
 
 // =====================================================
@@ -360,13 +374,18 @@ function calculateAsistenciaPercent() {
 }
 
 /**
- * Calcula el promedio de evaluaciones
+ * Calcula el promedio de evaluaciones (solo las realizadas)
  */
 function calculatePromedioEvaluaciones() {
-    if (evaluacionesData.length === 0) return 0;
+    // Filtrar solo evaluaciones que fueron realizadas y tienen calificación
+    const realizadas = evaluacionesData.filter(
+        item => item.realizo_examen === 'SI' && item.calificacion !== null
+    );
 
-    const total = evaluacionesData.reduce((sum, item) => sum + (item.calificacion || 0), 0);
-    return total / evaluacionesData.length;
+    if (realizadas.length === 0) return 0;
+
+    const total = realizadas.reduce((sum, item) => sum + (item.calificacion || 0), 0);
+    return Math.round(total / realizadas.length);
 }
 
 /**
@@ -512,16 +531,34 @@ function displayEvaluacionesTable() {
     emptyState.classList.add('hidden');
 
     tbody.innerHTML = evaluacionesData.map(item => {
-        const statusClass = item.calificacion >= 8 ? 'badge-success' :
-            item.calificacion >= 6 ? 'badge-warning' : 'badge-danger';
-        const statusLabel = item.calificacion >= 6 ? 'Aprobado' : 'Reprobado';
+        // Determinar clase de badge según estado
+        let statusClass = 'badge-absent';
+        let statusLabel = item.estado || '--';
+
+        if (item.estado === 'APROBADO') {
+            statusClass = 'badge-success';
+        } else if (item.estado === 'NO APROBADO') {
+            statusClass = 'badge-danger';
+        } else if (item.estado === 'NO REALIZÓ') {
+            statusClass = 'badge-warning';
+        }
+
+        // Formatear rango de semana
+        const rangoSemana = item.fecha_inicio && item.fecha_final
+            ? `${formatDate(item.fecha_inicio)} - ${formatDate(item.fecha_final)}`
+            : '--';
+
+        // Formatear calificación
+        const calificacion = item.calificacion !== null ? item.calificacion : '--';
+        const calClass = item.calificacion >= 75 ? 'color: #059669;' :
+            item.calificacion !== null ? 'color: #dc2626;' : '';
 
         return `
             <tr>
-                <td>${formatDate(item.fecha)}</td>
-                <td>${item.tipo || '--'}</td>
-                <td>${item.descripcion || '--'}</td>
-                <td><strong>${item.calificacion || '--'}</strong></td>
+                <td>${formatDate(item.fecha_evaluacion)}</td>
+                <td><small style="color: var(--color-text-muted);">${rangoSemana}</small></td>
+                <td>${item.realizo_examen || '--'}</td>
+                <td style="text-align: center;"><strong style="${calClass}">${calificacion}</strong></td>
                 <td><span class="badge ${statusClass}">${statusLabel}</span></td>
             </tr>
         `;
