@@ -32,16 +32,20 @@ lines.forEach((line, index) => {
     const modalidad = parts[3] ? parts[3].trim() : null;
     const realizoExamen = parts[4] ? parts[4].trim() : null;
 
-    // Procesar calificación (formato "79/90" -> extraer el número)
+    // Procesar calificación (formato "79/90" -> calcular porcentaje)
     let calificacion = null;
     if (parts[5] && parts[5].trim()) {
         const calStr = parts[5].trim();
         if (calStr.includes('/')) {
-            calificacion = parseFloat(calStr.split('/')[0]);
+            const [obtenidos, total] = calStr.split('/').map(n => parseFloat(n));
+            if (!isNaN(obtenidos) && !isNaN(total) && total > 0) {
+                // Calcular porcentaje: (puntos obtenidos / total) * 100
+                calificacion = Math.round((obtenidos / total) * 100 * 100) / 100; // 2 decimales
+            }
         } else {
             calificacion = parseFloat(calStr);
+            if (isNaN(calificacion)) calificacion = null;
         }
-        if (isNaN(calificacion)) calificacion = null;
     }
 
     // Procesar fechas (formato DD/MM/YYYY -> YYYY-MM-DD)
