@@ -387,32 +387,24 @@ async function cargarConfiguracion() {
 
 async function cargarCorreosAutorizados() {
     try {
-        console.log('🔄 Intentando cargar alumnos desde Soporte...');
+        console.log('🔄 Cargando alumnos...');
 
-        // Asegurar cliente
         const supabaseClient = initAsistenciaSupabase();
-        if (!supabaseClient) {
-            console.error('❌ Cliente Supabase no disponible en cargarCorreosAutorizados');
-            return;
-        }
+        if (!supabaseClient) return;
 
-        // Consultar SIN filtros complejos primero para asegurar que llegue algo
+        // Consultar alumnos autorizados (Tabla pública Soporte)
         const { data, error } = await supabaseClient
             .from('correos_autorizados')
             .select('*');
 
         if (error) {
-            console.error('❌ Error Supabase al cargar correos:', error);
+            console.error('Error cargando correos:', error);
             return;
-        }
-
-        if (!data || data.length === 0) {
-            console.warn('⚠️ La consulta a correos_autorizados devolvió 0 registros. ¿La tabla está vacía?');
         }
 
         correosAutorizados = { matutino: [], vespertino: [] };
 
-        // Filtrar activos en memoria para ser más robustos
+        // Filtrar activos
         const alumnosActivos = (data || []).filter(d => d.activo === true);
 
         alumnosActivos.forEach(item => {
@@ -426,13 +418,13 @@ async function cargarCorreosAutorizados() {
             }
         });
 
-        // Actualizar UI
+        // Actualizar contadores UI
         const countMatElem = document.getElementById('countMatutino');
         const countVespElem = document.getElementById('countVespertino');
         if (countMatElem) countMatElem.textContent = correosAutorizados.matutino.length;
         if (countVespElem) countVespElem.textContent = correosAutorizados.vespertino.length;
 
-        // Mapear para renderizado
+        // Renderizar lista visual
         const alumnosMapeados = alumnosActivos.map(d => ({
             ...d,
             nombre: d.nombre_alumno || 'Sin Nombre',
@@ -441,10 +433,10 @@ async function cargarCorreosAutorizados() {
 
         renderizarListaAlumnos(alumnosMapeados);
 
-        console.log(`✅ Carga completada: ${alumnosActivos.length} alumnos encontrados.`);
+        console.log(`✅ Alumnos cargados: ${alumnosActivos.length}`);
 
     } catch (e) {
-        console.error('💥 Excepción en cargarCorreosAutorizados:', e);
+        console.error('Error en carga de alumnos:', e);
     }
 }
 
