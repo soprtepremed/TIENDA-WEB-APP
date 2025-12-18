@@ -387,14 +387,13 @@ async function cargarConfiguracion() {
 
 async function cargarCorreosAutorizados() {
     try {
-        console.log('🔄 Cargando alumnos desde esquema PREMED...');
+        console.log('🔄 Cargando alumnos desde tabla original (Soporte)...');
 
-        // AHORA: Consultamos 'premed.alumnos'
-        // Incluimos 'modalidad' para filtrar
-        const { data } = await premedSupabase
-            .from('alumnos')
-            .select('email, turno, nombre, modalidad')
-            .eq('activo', true); // Solo activos
+        // REVERTIDO: Consultamos 'soporte.correos_autorizados' porque 'premed.alumnos' tiene bloqueo RLS
+        const { data } = await asistenciaSupabase
+            .from('correos_autorizados')
+            .select('email, turno, nombre_alumno, activo')
+            .eq('activo', true);
 
         correosAutorizados = { matutino: [], vespertino: [] };
 
@@ -406,45 +405,37 @@ async function cargarCorreosAutorizados() {
                 if (item.turno === 'matutino') {
                     correosAutorizados.matutino.push(email);
                 } else if (item.turno === 'vespertino') {
-                    // CONDICIÓN: Solo considerar alumnos PRESENCIALES en vespertino
-                    // (Ignorar alumnos 'en_linea' para este turno)
-                    if (item.modalidad === 'presencial') {
-                        correosAutorizados.vespertino.push(email);
-                    }
+                    // En la tabla antigua no distinguimos modalidad, asumimos todos autorizados
+                    correosAutorizados.vespertino.push(email);
                 }
             });
         }
 
-        // Actualizar UI - Solo si existen los elementos
+        // Actualizar UI
         const countMatElem = document.getElementById('countMatutino');
         const countVespElem = document.getElementById('countVespertino');
         if (countMatElem) countMatElem.textContent = correosAutorizados.matutino.length;
         if (countVespElem) countVespElem.textContent = correosAutorizados.vespertino.length;
 
-        // Llenar textareas - Solo si existen (aunque ahora ya no se usan para importar)
         const listaMatElem = document.getElementById('listaMatutino');
         const listaVespElem = document.getElementById('listaVespertino');
         if (listaMatElem) listaMatElem.value = correosAutorizados.matutino.join('\n');
         if (listaVespElem) listaVespElem.value = correosAutorizados.vespertino.join('\n');
 
-        // Renderizar lista - Función interna verifica si existe el contenedor
-        // Nota: Pasamos 'registrados' filtrados locales, no la data cruda, OJO
-        // La función renderizarListaAlumnos espera el array original de objetos para pintar badges.
-        // Vamos a filtrar 'data' para pasarle solo lo que aprobamos.
+        // Mapear al formato esperado por renderizarListaAlumnos
+        // La tabla vieja usa 'nombre_alumno', la nueva usaba 'nombre'
+        const alumnosMapeados = (data || []).map(d => ({
+            ...d,
+            nombre: d.nombre_alumno || 'Sin Nombre',
+            modalidad: 'presencial' // Default visual
+        }));
 
-        const alumnosFiltrados = data.filter(item => {
-            if (!item.email) return false;
-            if (item.turno === 'matutino') return true;
-            if (item.turno === 'vespertino' && item.modalidad === 'presencial') return true;
-            return false;
-        });
+        renderizarListaAlumnos(alumnosMapeados);
 
-        renderizarListaAlumnos(alumnosFiltrados || []);
-
-        console.log(`📧 Alumnos cargados: Mat=${correosAutorizados.matutino.length}, Vesp=${correosAutorizados.vespertino.length}`);
+        console.log(`📧 Alumnos cargados (Soporte): Mat=${correosAutorizados.matutino.length}, Vesp=${correosAutorizados.vespertino.length}`);
 
     } catch (e) {
-        console.error('Error cargando alumnos de PREMED:', e);
+        console.error('Error cargando alumnos de Correos Autorizados:', e);
     }
 }
 
