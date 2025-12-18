@@ -1,0 +1,399 @@
+/* Estilo TABLA IDÉNTICA A REFERENCIA (Compacta y Fija) + CREATOR MODERNO */
+
+:root {
+    --header-group-bg: #1B1E3D;
+    --header-group-text: #FFFFFF;
+
+    --col-header-bg: #FFFFFF;
+    --col-header-text: #000000;
+
+    --materia-bg: #D6EAF8;
+    --profesor-bg: #FFC107;
+    --border-color: #000000;
+
+    /* Variables Minimalistas Panel */
+    --panel-bg: #FFFFFF;
+    --input-bg: #F9FAFB;
+    --input-border: #E5E7EB;
+    --accent-color: #111827;
+    /* Negro/Azul muy oscuro */
+}
+
+body {
+    background-color: #F3F4F6;
+    color: #000;
+    font-family: 'Inter', sans-serif;
+}
+
+.main-content {
+    background-image: none;
+    padding: 30px;
+    display: block;
+}
+
+/* --- TÍTULO Y BOTONES SUPERIORES (Estilo Premium) --- */
+.top-bar {
+    width: 100%;
+    max-width: 1400px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto 30px auto;
+}
+
+.page-title {
+    font-size: 2rem;
+    /* Más grande e imponente */
+    font-weight: 900;
+    color: #111827;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+}
+
+/* Botones Modernos Restaurados */
+.btn-primary,
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    /* Redondeado suave */
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Guardar: Azul Brillante */
+.btn-primary {
+    background-color: #2563EB;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #1D4ED8;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+/* Imprimir: Blanco Limpio */
+.btn-secondary {
+    background-color: white;
+    color: #374151;
+    border: 1px solid #D1D5DB;
+}
+
+.btn-secondary:hover {
+    background-color: #F9FAFB;
+    border-color: #9CA3AF;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+
+/* --- LAYOUT DIVIDIDO --- */
+.horarios-layout {
+    display: flex;
+    gap: 30px;
+    /* Más aire entre paneles */
+    max-width: 1450px;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+/* 1. Panel Izquierdo (Creator Minimalista) */
+.creator-panel {
+    width: 280px;
+    background: var(--panel-bg);
+    padding: 24px;
+    border-radius: 16px;
+    /* Bordes suaves */
+    position: sticky;
+    top: 20px;
+
+    /* Sombra elegante "Card" */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.creator-panel h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #F3F4F6;
+    padding-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #4B5563;
+    margin-bottom: 8px;
+}
+
+/* Inputs Modernos */
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #111827;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    background-color: white;
+    border-color: #2563EB;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Botón Agregar: Negro minimalista */
+.btn-add {
+    width: 100%;
+    background-color: #111827;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+
+.btn-add:hover {
+    background-color: #000000;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.divider {
+    height: 1px;
+    background: #F3F4F6;
+    margin: 25px 0;
+}
+
+.creator-panel h4 {
+    margin: 0 0 12px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+.instruction-text {
+    font-size: 0.8rem;
+    color: #6B7280;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+/* Banco de Materias */
+.banco-materias-container {
+    min-height: 120px;
+    background: #F9FAFB;
+    border: 2px dashed #D1D5DB;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: background-color 0.2s;
+}
+
+.banco-materias-container:hover {
+    background: #F3F4F6;
+    border-color: #9CA3AF;
+}
+
+.banco-materias-container .materia-card {
+    height: 60px;
+    border: 1px solid #000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    /* Sombra suave para las cards en espera */
+}
+
+
+/* 2. Panel Derecho (Visor Horarios) */
+.horarios-view {
+    flex: 1;
+    max-width: 1100px;
+}
+
+/* --- SECCIONES (Tablas) - ESTILO EXCEL INTACTO --- */
+.turno-section {
+    margin-bottom: 30px;
+    background: white;
+    border: 1px solid var(--border-color);
+}
+
+.turno-header {
+    background-color: var(--header-group-bg);
+    color: var(--header-group-text);
+    padding: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: capitalize;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* --- TABLA --- */
+.horario-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.horario-table th,
+.horario-table td {
+    border: 1px solid var(--border-color);
+    text-align: center;
+    vertical-align: middle;
+    padding: 0;
+}
+
+.horario-table thead th {
+    background-color: var(--col-header-bg);
+    color: var(--col-header-text);
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 8px;
+    text-transform: capitalize;
+}
+
+.col-hora {
+    background-color: #fff;
+    font-weight: bold;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    width: 130px;
+    padding: 4px !important;
+}
+
+/* --- CELDAS LLENAS (Dropzone) --- */
+.dropzone {
+    height: 70px;
+    background: #fff;
+    position: relative;
+}
+
+.dropzone.drag-over {
+    background-color: #ffffcc;
+    border: 2px dashed #000;
+}
+
+/* --- TARJETAS --- */
+.materia-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    cursor: grab;
+    background: white;
+}
+
+.card-asignatura {
+    background-color: var(--materia-bg);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.85rem;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card-profesor {
+    background-color: var(--profesor-bg);
+    color: #000;
+    font-weight: 500;
+    font-size: 0.7rem;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: text;
+    padding: 0 4px;
+}
+
+.card-profesor::before {
+    content: "🧑‍🏫";
+    margin-right: 4px;
+    font-size: 0.8rem;
+    user-select: none;
+    pointer-events: none;
+}
+
+.card-profesor:hover {
+    background-color: #FFD54F;
+}
+
+.edit-profesor-input {
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-weight: bold;
+    flex: 1;
+    font-size: 0.7rem;
+    font-family: inherit;
+    outline: none;
+    min-width: 0;
+}
+
+/* Historial */
+.historial-cambios-section {
+    margin-top: 30px;
+    border: 1px solid #000;
+    background: #fff;
+}
+
+.historial-cambios-section h3 {
+    margin: 0;
+    padding: 10px;
+    background: #eee;
+    border-bottom: 1px solid #000;
+    font-size: 0.9rem;
+}
+
+.historial-cambios-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.historial-cambios-section th {
+    background: #1B1E3D;
+    color: white;
+    padding: 5px;
+    font-size: 0.8rem;
+}
+
+.historial-cambios-section td {
+    padding: 5px;
+    border: 1px solid #000;
+    font-size: 0.75rem;
+}

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horarios - Soporte Plataforma</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="horarios.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="auth-config.js"></script>
+    <script src="horarios.js" defer></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Global -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="horarios.html" class="sidebar-logo">
+                    <span>⏰</span> Horarios
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <span class="sidebar-icon">☕</span> Cafetería
+                </a>
+                <a href="soporte.html" class="sidebar-link">
+                    <span class="sidebar-icon">🛠️</span> Soporte
+                </a>
+                <a href="asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Asistencia
+                </a>
+                <a href="horarios.html" class="sidebar-link active">
+                    <span class="sidebar-icon">⏰</span> Horarios
+                </a>
+                <a href="reportes-asistencia.html" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span> Reportes
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <div class="top-bar">
+                <h1 class="page-title">HORARIO DE CURSOS</h1>
+                <div class="actions">
+                    <button id="btnGuardar" class="btn-primary">💾 Guardar</button>
+                    <button id="btnImprimir" class="btn-secondary">🖨️ Imprimir</button>
+                </div>
+            </div>
+
+            <!-- LAYOUT DIVIDIDO: Izquierda (Creador) | Derecha (Tablas) -->
+            <div class="horarios-layout">
+
+                <!-- 1. PANEL IZQUIERDO: CREADOR -->
+                <aside class="creator-panel">
+                    <h3>Registrar Nueva Materia</h3>
+
+                    <div class="form-group">
+                        <label>Materia</label>
+                        <input type="text" id="inputMateria" placeholder="Ej. Geografía">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Docente</label>
+                        <input type="text" id="inputDocente" placeholder="Ej. Lic. Pérez">
+                    </div>
+
+                    <button id="btnAgregarMateria" class="btn-add">Agregar Materia</button>
+
+                    <div class="divider"></div>
+
+                    <h4>Materias Disponibles</h4>
+                    <p class="instruction-text">Arrastra estas tarjetas al horario:</p>
+
+                    <!-- Aquí aparecerán las nuevas tarjetas -->
+                    <div id="bancoMaterias" class="banco-materias-container">
+                        <!-- Ejemplo inicial (puedes borrarlo si quieres que empiece vacío) -->
+                        <!-- <div class="materia-card" draggable="true">...</div> -->
+                    </div>
+                </aside>
+
+
+                <!-- 2. PANEL DERECHO: HORARIOS (Existente) -->
+                <div class="horarios-view">
+
+                    <!-- TABLA 1: MATUTINO -->
+                    <div class="turno-section">
+                        <div class="turno-header">Grupo Presencial Matutino</div>
+                        <table class="horario-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-hora">Horario</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 9 to 10 AM -->
+                                <tr>
+                                    <td class="col-hora">9:00 am a 10:00 am</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 10 to 11 AM -->
+                                <tr>
+                                    <td class="col-hora">10:00 am a 11:00 am</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 11 to 12 PM -->
+                                <tr>
+                                    <td class="col-hora">11:00 am a 12:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra. Valeria Flores</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra. Valeria Flores</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra. Valeria Flores</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra. Valeria Flores</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra. Valeria Flores</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 12 to 1 PM -->
+                                <tr>
+                                    <td class="col-hora">12:00 pm a 1:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Español</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Química</div>
+                                            <div class="card-profesor">Dr. Gabriel Gutiérrez</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Literatura</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Química</div>
+                                            <div class="card-profesor">Dr. Gabriel Gutiérrez</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Español</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- TABLA 2: VESPERTINO -->
+                    <div class="turno-section">
+                        <div class="turno-header">Grupo Presencial Vespertino</div>
+                        <table class="horario-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-hora">Horario</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 4-5 PM -->
+                                <tr>
+                                    <td class="col-hora">4:00 pm a 5:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 5-6 PM -->
+                                <tr>
+                                    <td class="col-hora">5:00 pm a 6:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Química</div>
+                                            <div class="card-profesor">Dr. Gabriel Gutiérrez</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Química</div>
+                                            <div class="card-profesor">Dr. Gabriel Gutiérrez</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Español</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 6-7 PM -->
+                                <tr>
+                                    <td class="col-hora">6:00 pm a 7:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 7-8 PM -->
+                                <tr>
+                                    <td class="col-hora">7:00 pm a 8:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Español</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Literatura</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- TABLA 3: EN LÍNEA -->
+                    <div class="turno-section">
+                        <div class="turno-header">Grupo En Línea</div>
+                        <table class="horario-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-hora">Horario</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 3-4 PM -->
+                                <tr>
+                                    <td class="col-hora">3:00 pm a 4:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Física</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 4-5 PM -->
+                                <tr>
+                                    <td class="col-hora">4:00 pm a 5:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Química</div>
+                                            <div class="card-profesor">Dr. Gabriel Gutiérrez</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Química</div>
+                                            <div class="card-profesor">Dr. Gabriel Gutiérrez</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 5-6 PM -->
+                                <tr>
+                                    <td class="col-hora">5:00 pm a 6:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Matemáticas</div>
+                                            <div class="card-profesor">Mtra. Erika Perera</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 6-7 PM -->
+                                <tr>
+                                    <td class="col-hora">6:00 pm a 7:00 pm</td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Español</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Literatura</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Biología</div>
+                                            <div class="card-profesor">Dra.Margarita del Carmen</div>
+                                        </div>
+                                    </td>
+                                    <td class="dropzone">
+                                        <div class="materia-card" draggable="true">
+                                            <div class="card-asignatura">Español</div>
+                                            <div class="card-profesor">Lic.Jose Antonio</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Historial -->
+                    <div class="historial-cambios-section">
+                        <h3>📜 Historial de Movimientos</h3>
+                        <table class="horario-table" style="margin:0;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15%">Hora</th>
+                                    <th style="width: 25%">Detalle</th>
+                                    <th style="width: 20%">Grupo</th>
+                                    <th style="width: 20%">Origen</th>
+                                    <th style="width: 20%">Destino</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaHistorial"></tbody>
+                        </table>
+                    </div>
+
+                </div> <!-- Fin horarios-view -->
+
+            </div> <!-- Fin horarios-layout -->
+        </main>
+    </div>
+</body>
+
+</html>
