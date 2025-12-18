@@ -710,3 +710,56 @@ async function importarListas() {
 async function eliminarAlumno(email) {
     alert("⛔ No puedes eliminar alumnos desde este módulo. Debes hacerlo en el sistema central de alumnos.");
 }
+
+// ===================================
+// FUNCIONES DE UTILIDAD (Restauradas)
+// ===================================
+
+async function eliminarRegistroIndividual(id) {
+    if (!confirm('¿Estás seguro de eliminar este registro?')) return;
+
+    try {
+        const { error } = await asistenciaSupabase
+            .from('registros')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        // Actualizar localmente para inmediatez
+        registrosHoy = registrosHoy.filter(r => r.id !== id);
+        filtrarLista();
+        cargarEstadisticas();
+
+        mostrarMensaje('success', '🗑️ Registro eliminado');
+
+    } catch (e) {
+        console.error('Error al eliminar registro:', e);
+        alert('Error al eliminar el registro');
+    }
+}
+
+async function refrescarTablaManual() {
+    const btn = document.getElementById('btnRefrescar');
+    const icon = document.getElementById('iconRefrescar');
+
+    // Animación
+    if (btn) btn.disabled = true;
+    if (icon) {
+        icon.style.transition = 'transform 1s';
+        icon.style.transform = 'rotate(360deg)';
+    }
+
+    await cargarRegistros();
+    await cargarEstadisticas();
+
+    // Reset animación
+    setTimeout(() => {
+        if (btn) btn.disabled = false;
+        if (icon) {
+            icon.style.transition = 'none';
+            icon.style.transform = 'rotate(0deg)';
+        }
+        mostrarMensaje('success', '🔄 Datos actualizados');
+    }, 500);
+}
