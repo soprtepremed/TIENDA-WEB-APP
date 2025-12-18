@@ -1,55 +1,77 @@
 
 // ==========================================
-// Módulo de Horarios Interactivos
+// Módulo de Horarios Interactivos v2.0
 // ==========================================
 
 const SUPABASE_URL = 'https://api.premed.mx';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE'; // (Misma key anon que usas en otros archivos)
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     db: { schema: 'soporte' }
 });
 
-let currentTurno = 'matutino'; // Default
+let currentTurno = 'matutino';
 
-// Inicialización
+// Configuración de Horas Exactas por Turno
+const CONFIG_HORARIOS = {
+    matutino: { start: 9, end: 13 },            // 9 a 13
+    vespertino_presencial: { start: 16, end: 20 }, // 16 a 20
+    vespertino_linea: { start: 15, end: 19 }    // 15 a 19
+};
+
 document.addEventListener('DOMContentLoaded', () => {
-    initGrid();
-    setupDragAndDropTools();
-    changeTurno('matutino'); // Iniciar en turno por defecto
-    setupTrashZone();
+    setupDragAndDropTools(); // Configurar eventos de las materias disponibles
+    setupTrashZone();        // Configurar papelera
+    changeTurno('matutino'); // Iniciar
 });
 
 // ==========================================
-// 1. Configuración del Grid (Horas)
+// 1. Construcción del Grid Dinámico
 // ==========================================
-function initGrid() {
+function initGrid(turno) {
     const grid = document.getElementById('scheduleGrid');
+    grid.innerHTML = ''; // Limpiar todo (incluyendo headers)
 
-    // Rango de horas: 7:00 AM a 9:00 PM (21:00)
-    const startHour = 7;
-    const endHour = 21;
+    // 1. Recrear Headers
+    const headers = ['Hora', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    headers.forEach(text => {
+        const div = document.createElement('div');
+        div.className = 'grid-header';
+        div.textContent = text;
+        grid.appendChild(div);
+    });
+
+    // 2. Definir rango de horas
+    const config = CONFIG_HORARIOS[turno] || { start: 8, end: 18 };
+    const startHour = config.start;
+    const endHour = config.end;
     const days = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
 
+    // 3. Generar Filas
     for (let h = startHour; h < endHour; h++) {
-        // Formato Hora (ej: 08:00)
-        const hourLabel = `${h.toString().padStart(2, '0')}:00`;
-        const hourDisplay = `${h > 12 ? h - 12 : h}:00 ${h >= 12 ? 'PM' : 'AM'}`;
+        // Rango de la clase (Ej: 09:00 - 10:00)
+        const horaInicio = `${h.toString().padStart(2, '0')}:00`;
+        const horaFin = `${(h + 1).toString().padStart(2, '0')}:00`;
 
-        // Celda de Hora (Columna 1)
+        // Formato AM/PM para mostrar
+        const displayStart = formatHour(h);
+        const displayEnd = formatHour(h + 1);
+        const label = `${displayStart} - ${displayEnd}`;
+
+        // Columna Hora
         const timeDiv = document.createElement('div');
         timeDiv.className = 'time-cell';
-        timeDiv.textContent = hourDisplay;
+        timeDiv.textContent = label;
         grid.appendChild(timeDiv);
 
-        // Celdas de Días (Columnas 2-6)
+        // Columnas Días
         days.forEach(day => {
             const cell = document.createElement('div');
             cell.className = 'grid-cell';
             cell.dataset.dia = day;
-            cell.dataset.hora = hourLabel;
+            cell.dataset.hora = horaInicio; // Guardamos solo la hora de inicio como ID
 
-            // Eventos de Drop
+            // IMPORTANTE: Conectar eventos de Drop aquí mismo
             cell.addEventListener('dragover', handleDragOver);
             cell.addEventListener('dragleave', handleDragLeave);
             cell.addEventListener('drop', handleDrop);
@@ -59,28 +81,44 @@ function initGrid() {
     }
 }
 
+function formatHour(h) {
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h > 12 ? h - 12 : h;
+    return `${hour12}:00 ${ampm}`;
+}
+
+
 // ==========================================
-// 2. Lógica Drag & Drop (Toolbox)
+// 2. Lógica Drag & Drop
 // ==========================================
 
 function setupDragAndDropTools() {
-    const draggables = document.querySelectorAll('.subject-card[draggable="true"]');
+    const draggables = document.querySelectorAll('.subject-card'); // Quitamos [draggable="true"] del selector para ser más generosos, pero aseguramos en HTML
+
     draggables.forEach(drag => {
+        // Asegurar atributo
+        drag.setAttribute('draggable', 'true');
+
         drag.addEventListener('dragstart', (e) => {
-            // Guardamos los datos de la materia que estamos arrastrando
             e.dataTransfer.setData('text/plain', JSON.stringify({
                 materia: drag.dataset.materia,
                 color: drag.dataset.color,
-                docente: '', // Nuevo: vacío al arrastrar del toolbox
-                type: 'new'
+                type: 'new',
+                docente: ''
             }));
             e.dataTransfer.effectAllowed = 'copy';
+            drag.style.opacity = '0.5';
+        });
+
+        drag.addEventListener('dragend', (e) => {
+            drag.style.opacity = '1';
         });
     });
 }
 
 function handleDragOver(e) {
-    e.preventDefault();
+    e.preventDefault(); // OBLIGATORIO para permitir drop
+    e.dataTransfer.dropEffect = 'copy';
     this.classList.add('drag-over');
 }
 
@@ -94,36 +132,29 @@ async function handleDrop(e) {
 
     const dataRaw = e.dataTransfer.getData('text/plain');
     if (!dataRaw) return;
-    const data = JSON.parse(dataRaw);
 
-    // Validar destino
+    const data = JSON.parse(dataRaw);
     const destDia = this.dataset.dia;
     const destHora = this.dataset.hora;
 
-    // Si es MOVER y el destino es el mismo
-    if (data.type === 'move' && data.originDia === destDia && data.originHora === destHora) {
-        return;
-    }
+    // Validación Básica: Mismo lugar
+    if (data.type === 'move' && data.originDia === destDia && data.originHora === destHora) return;
 
     let docenteFinal = data.docente;
 
-    // Si es NUEVA materia, preguntar Docente
+    // Si es NUEVA, pedir docente
     if (data.type === 'new') {
-        const inputDocente = prompt(`Asignar docente para ${data.materia}:`, "Sin Asignar");
-        if (inputDocente === null) return; // Cancelar
-        docenteFinal = inputDocente || "Sin Asignar";
+        docenteFinal = prompt(`Profesor para ${data.materia}:`, "") || "Sin Asignar";
     }
 
-    // 1. Guardar en Destino (Intentar guardar primero valida conflictos)
-    const guardadoExitoso = await saveSlotToDb(destDia, destHora, data.materia, data.color, docenteFinal);
+    // 1. Guardar en BD (Validando duplicados docentes)
+    const success = await saveSlotToDb(destDia, destHora, data.materia, data.color, docenteFinal);
+    if (!success) return; // Si hay conflicto, abortar
 
-    // Si falló (por conflicto), no hacemos nada más
-    if (!guardadoExitoso) return;
-
-    // Si tuvo éxito, actualizar visualmente
+    // 2. Renderizar
     renderSlot(this, data.materia, data.color, docenteFinal);
 
-    // 2. Si es MOVER, Borrar del Origen
+    // 3. Borrar origen si es movimiento
     if (data.type === 'move') {
         const originCell = document.querySelector(`.grid-cell[data-dia="${data.originDia}"][data-hora="${data.originHora}"]`);
         if (originCell) originCell.innerHTML = '';
@@ -131,104 +162,67 @@ async function handleDrop(e) {
     }
 }
 
-// Helper para pintar una celda
-function renderSlot(cellElement, materia, colorClass, docente) {
-    cellElement.innerHTML = '';
-    const docenteText = docente || 'Sin Docente';
+function renderSlot(cell, materia, color, docente) {
+    cell.innerHTML = ''; // Limpiar
 
-    const slot = document.createElement('div');
-    slot.className = `scheduled-class ${colorClass}`;
+    const div = document.createElement('div');
+    div.className = `scheduled-class ${color}`;
+    div.draggable = true;
 
-    // Layout interno con nombre de profe
-    slot.innerHTML = `
-        <div style="display:flex; flex-direction:column; align-items:center; line-height:1.2;">
-            <span style="font-size:0.9rem;">${materia}</span>
-            <span style="font-size:0.75rem; opacity:0.9; font-weight:400; margin-top:2px;">👨‍🏫 ${docenteText}</span>
+    // Contenido
+    div.innerHTML = `
+        <div class="class-content">
+            <span class="materia-name">${materia}</span>
+            <span class="docente-name">👨‍🏫 ${docente}</span>
         </div>
-        <div class="remove-class">✕</div>
+        <div class="remove-btn">✕</div>
     `;
 
-    slot.draggable = true;
-
-    // Drag start para MOVER
-    slot.addEventListener('dragstart', (e) => {
+    // Eventos del Elemento Agendado (Para moverlo después)
+    div.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData('text/plain', JSON.stringify({
             materia: materia,
-            color: colorClass,
-            docente: docenteText,
+            color: color,
+            docente: docente,
             type: 'move',
-            originDia: cellElement.dataset.dia,
-            originHora: cellElement.dataset.hora
+            originDia: cell.dataset.dia,
+            originHora: cell.dataset.hora
         }));
+        e.dataTransfer.effectAllowed = 'move';
+        div.style.opacity = '0.5';
     });
 
-    // Click en la X para borrar rápido
-    slot.querySelector('.remove-class').addEventListener('click', async (e) => {
-        e.stopPropagation();
-        if (confirm(`¿Eliminar ${materia} del horario?`)) {
-            cellElement.innerHTML = '';
-            await deleteSlotFromDb(cellElement.dataset.dia, cellElement.dataset.hora);
-            showToast('🗑️ Eliminado');
+    div.addEventListener('dragend', () => div.style.opacity = '1');
+
+    // Botón Eliminar
+    div.querySelector('.remove-btn').addEventListener('click', async (e) => {
+        e.stopPropagation(); // No activar drag del padre
+        if (confirm('¿Eliminar esta clase?')) {
+            cell.innerHTML = '';
+            await deleteSlotFromDb(cell.dataset.dia, cell.dataset.hora);
         }
     });
 
-    cellElement.appendChild(slot);
+    cell.appendChild(div);
 }
 
 // ==========================================
-// 3. Papelera (Eliminar)
-// ==========================================
-function setupTrashZone() {
-    const trash = document.getElementById('trashZone');
-
-    trash.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        trash.style.backgroundColor = '#fef2f2';
-    });
-
-    trash.addEventListener('dragleave', () => {
-        trash.style.backgroundColor = '';
-    });
-
-    trash.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        trash.style.backgroundColor = '';
-
-        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-
-        // Solo eliminar si viene de una celda existente ('move')
-        if (data.type === 'move') {
-            await deleteSlotFromDb(data.originDia, data.originHora);
-
-            // Borrar visualmente del origen
-            const originCell = document.querySelector(`.grid-cell[data-dia="${data.originDia}"][data-hora="${data.originHora}"]`);
-            if (originCell) originCell.innerHTML = '';
-
-            showToast('🗑️ Clase eliminada');
-        }
-    });
-}
-
-
-// ==========================================
-// 4. Base de Datos (Supabase)
+// 3. Gestión de Datos y Validación
 // ==========================================
 
 async function loadHorario(turno) {
-    // Limpiar Grid
-    document.querySelectorAll('.grid-cell').forEach(c => c.innerHTML = '');
+    // Las celdas ya están limpias porque initGrid las recreó.
+    // Solo fetching y pintar.
 
     const { data, error } = await supabase
         .from('horarios')
         .select('*')
         .eq('turno', turno);
 
-    if (error) {
-        console.error('Error cargando horario:', error);
-        return;
-    }
+    if (error) { console.error(error); return; }
 
     data.forEach(item => {
+        // Encontrar celda correspondiente
         const cell = document.querySelector(`.grid-cell[data-dia="${item.dia}"][data-hora="${item.hora_inicio}"]`);
         if (cell) {
             renderSlot(cell, item.materia, item.color, item.docente);
@@ -237,8 +231,8 @@ async function loadHorario(turno) {
 }
 
 async function saveSlotToDb(dia, hora, materia, color, docente) {
-
-    // 1. Validar conflictos (Docente)
+    // 1. Validar Choque de Docente
+    const startCheck = performance.now();
     const libre = await checkDocenteAvailability(dia, hora, docente);
     if (!libre) return false;
 
@@ -255,7 +249,8 @@ async function saveSlotToDb(dia, hora, materia, color, docente) {
         }, { onConflict: 'turno,dia,hora_inicio' });
 
     if (error) {
-        console.error('Error guardando:', error);
+        console.error('Error DB:', error);
+        alert('Error guardando en base de datos.');
         return false;
     }
 
@@ -264,66 +259,83 @@ async function saveSlotToDb(dia, hora, materia, color, docente) {
 }
 
 async function deleteSlotFromDb(dia, hora) {
-    const { error } = await supabase
-        .from('horarios')
-        .delete()
-        .match({ turno: currentTurno, dia: dia, hora_inicio: hora });
-
-    if (error) console.error('Error eliminando:', error);
+    const { error } = await supabase.from('horarios').delete().match({
+        turno: currentTurno, dia: dia, hora_inicio: hora
+    });
 }
-
-// ==========================================
-// 5. Interfaz y Lógica de Turnos
-// ==========================================
-
-function changeTurno(turno) {
-    currentTurno = turno;
-
-    // Update Buttons
-    document.querySelectorAll('.btn-turno').forEach(btn => btn.classList.remove('active'));
-
-    if (turno === 'matutino') document.getElementById('btnMatutino').classList.add('active');
-    else if (turno === 'vespertino_presencial') document.getElementById('btnVespPresencial').classList.add('active');
-    else if (turno === 'vespertino_linea') document.getElementById('btnVespLinea').classList.add('active');
-
-    // Recargar datos
-    loadHorario(turno);
-}
-
-// ==========================================
-// 6. Validación de Conflictos (Docente)
-// ==========================================
 
 async function checkDocenteAvailability(dia, hora, docente) {
-    if (!docente || docente === 'Sin Asignar') return true; // No validar genéricos
+    if (!docente || docente === 'Sin Asignar') return true;
 
-    // Verificar si el docente está ocupado en OTRO turno
-    const { data, error } = await supabase
+    // Buscar conflictos en OTROS turnos para ese docente
+    const { data } = await supabase
         .from('horarios')
         .select('turno, materia')
         .eq('dia', dia)
         .eq('hora_inicio', hora)
         .eq('docente', docente);
 
-    if (error) {
-        console.error('Error validando:', error);
-        return true;
+    if (data && data.length > 0) {
+        // Si encuentro registros, verificar que NO sean el turno actual
+        // (Aunque el upsert maneja el borrado lógico del mismo slot, aquí protegemos clonación entre turnos)
+        const choque = data.find(d => d.turno !== currentTurno);
+        if (choque) {
+            alert(`⚠️ CONFLICTO:\nEl docente ${docente} ya tiene clase de "${choque.materia}" en el turno ${choque.turno.toUpperCase()}.\n\nNo puede asignarse aquí.`);
+            return false;
+        }
     }
-
-    // Buscamos si hay ALGÚN registro que no sea el turno actual
-    const choque = data.find(r => r.turno !== currentTurno);
-
-    if (choque) {
-        alert(`🚫 CONFLICTO DE HORARIO:\n\nEl docente "${docente}" ya está impartiendo "${choque.materia}" en el turno "${choque.turno.toUpperCase()}" a esta hora.`);
-        return false;
-    }
-
     return true;
 }
 
-function showToast(msg = '💾 Guardado exitosamente') {
+// ==========================================
+// 4. Utilidades UI
+// ==========================================
+
+function changeTurno(turno) {
+    currentTurno = turno;
+
+    // UI Botones
+    document.querySelectorAll('.btn-turno').forEach(btn => btn.classList.remove('active'));
+
+    if (turno === 'matutino') document.getElementById('btnMatutino').classList.add('active');
+    else if (turno === 'vespertino_presencial') document.getElementById('btnVespPresencial').classList.add('active');
+    else if (turno === 'vespertino_linea') document.getElementById('btnVespLinea').classList.add('active');
+
+    // 1. Reconstruir Grid (Horas correctas)
+    initGrid(turno);
+
+    // 2. Cargar Datos
+    loadHorario(turno);
+}
+
+function setupTrashZone() {
+    const trash = document.getElementById('trashZone');
+    trash.addEventListener('dragover', e => {
+        e.preventDefault();
+        trash.style.borderColor = '#ef4444';
+        trash.style.backgroundColor = '#fef2f2';
+    });
+    trash.addEventListener('dragleave', () => {
+        trash.style.borderColor = '#e2e8f0';
+        trash.style.backgroundColor = 'white';
+    });
+    trash.addEventListener('drop', async e => {
+        e.preventDefault();
+        trash.style.borderColor = '#e2e8f0';
+        trash.style.backgroundColor = 'white';
+
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        if (data.type === 'move') {
+            await deleteSlotFromDb(data.originDia, data.originHora);
+            loadHorario(currentTurno); // Refrescar para asegurar limpieza
+            showToast('🗑️ Eliminado');
+        }
+    });
+}
+
+function showToast(text = 'Guardado') {
     const t = document.getElementById('saveIndicator');
-    t.textContent = msg;
+    t.innerText = text;
     t.classList.add('visible');
     setTimeout(() => t.classList.remove('visible'), 2000);
 }
