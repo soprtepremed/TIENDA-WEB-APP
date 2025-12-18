@@ -7,7 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Iniciar BD
     initHorariosDB();
     cargarHorarios();
+    initHorariosDB();
+    cargarHorarios();
     initGlobalButtons();
+    initCardMenu(); // Inicializar sistema de menú y clicks
 });
 
 function initCreator() {
@@ -56,22 +59,19 @@ function initGlobalButtons() {
     const btnImprimir = document.getElementById('btnImprimir');
 
     if (btnGuardar) {
-        btnGuardar.addEventListener('click', () => {
-            // Feedback visual para tranquilidad del usuario
-            // (El sistema ya guarda automáticamente cada movimiento)
+        btnGuardar.addEventListener('click', async () => {
             const originalText = btnGuardar.innerText;
             btnGuardar.innerText = '⏳ Guardando...';
             btnGuardar.disabled = true;
-            // Opcional: cambiar color
-            // btnGuardar.style.backgroundColor = '#4CAF50'; 
 
+            // Guardar TODO el tablero explícitamente
+            await guardarTodoElTablero();
+
+            btnGuardar.innerText = '✅ Guardado';
             setTimeout(() => {
-                btnGuardar.innerText = '✅ Guardado';
-                setTimeout(() => {
-                    btnGuardar.innerText = originalText;
-                    btnGuardar.disabled = false;
-                }, 1500);
-            }, 800);
+                btnGuardar.innerText = originalText;
+                btnGuardar.disabled = false;
+            }, 1500);
         });
     }
 
@@ -194,15 +194,36 @@ function dragDrop(e) {
     const infoOrigen = obtenerContextoZona(sourceZone);
     const infoDestino = obtenerContextoZona(targetZone);
 
-    // Movimiento / Swap
+    // Movimiento / Swap / Clonacion (desde banco)
+    const isFromBank = sourceZone.id === 'bancoMaterias' || sourceZone.classList.contains('banco-materias-container');
+    let cardToPlace = draggedCard;
+
+    if (isFromBank) {
+        // CLONAR
+        cardToPlace = draggedCard.cloneNode(true);
+        cardToPlace.style.opacity = '1';
+        cardToPlace.addEventListener('dragstart', dragStart);
+        cardToPlace.addEventListener('dragend', dragEnd);
+        // La edición se maneja con delegación (dblclick on document) así que no hay que agregarlo
+    }
+
     if (targetZone.children.length > 0) {
-        // Si hay una carta, hacer SWAP (la de destino va al origen)
+        // Hay carta existente
         const existingCard = targetZone.children[0];
-        sourceZone.appendChild(existingCard);
-        targetZone.appendChild(draggedCard);
+
+        if (isFromBank) {
+            // Si viene del banco, sobreescribimos (borramos la anterior)
+            // O podríamos mandarla al banco? Mejor sobreescribir para limpiar.
+            existingCard.remove();
+            targetZone.appendChild(cardToPlace);
+        } else {
+            // SWAP normal entre casillas
+            sourceZone.appendChild(existingCard);
+            targetZone.appendChild(cardToPlace);
+        }
     } else {
-        // Si está vacío, solo mover
-        targetZone.appendChild(draggedCard);
+        // Si está vacío
+        targetZone.appendChild(cardToPlace);
     }
 
 
@@ -213,8 +234,8 @@ function dragDrop(e) {
     // 1. Destino siempre cambia
     guardarHorarioDB(infoDestino, materiaInfo);
 
-    // 2. Si hubo swap, el origen ahora tiene la 'existingCard'
-    if (sourceZone && sourceZone.classList.contains('dropzone')) {
+    // 2. Si hubo swap, el origen ahora tiene la 'existingCard', pero SOLO si NO venimos del banco
+    if (!isFromBank && sourceZone && sourceZone.classList.contains('dropzone')) {
         if (sourceZone.children.length > 0) {
             const swappedCard = sourceZone.children[0];
             const infoSwapped = obtenerTextoMateria(swappedCard);
@@ -223,10 +244,6 @@ function dragDrop(e) {
             // Origen quedó vacío -> Borrar/Null en BD
             guardarHorarioDB(infoOrigen, null);
         }
-    } else if (infoOrigen.grupo !== 'Creador') {
-        // Estaba en un slot y se movió a otro lugar (aunque no sea swap, si se movió)
-        // pero sourceZone ya se cubrió arriba.
-        // Si sourceZone NO es dropzone (ej banco), no hacemos nada
     }
 
     // Persistir historial
@@ -451,4 +468,201 @@ function encontrarZonaDOM(grupo, dia, hora) {
         return filaEncontrada.children[colIndex];
     }
     return null;
+}
+
+async function guardarTodoElTablero() {
+    if (!horariosSupabase) return;
+
+    const dropzones = document.querySelectorAll('.dropzone');
+    const promesas = [];
+
+    // Iterar todas las celdas (dropzones) de las tablas
+    dropzones.forEach(zone => {
+        // Ignorar banco de materias
+        if (zone.id === 'bancoMaterias' || zone.closest('#bancoMaterias')) return;
+
+        const ctx = obtenerContextoZona(zone);
+        if (ctx.grupo === '?' || ctx.dia === '?') return; // Zona inválida
+
+        let mInfo = null;
+        if (zone.children.length > 0) {
+            const card = zone.children[0];
+            mInfo = obtenerTextoMateria(card);
+        } else {
+            // Si está vacío, enviamos null para limpiar en BD si existía,
+            // (En upsert, si materia es null, se guarda null, lo cual es correcto para "vaciar" el slot)
+            // mInfo será null
+        }
+
+        // Agregar promesa de guardado
+        promesas.push(guardarHorarioDB(ctx, mInfo));
+    });
+
+    // Esperar a que terminen todas
+    await Promise.all(promesas);
+    console.log("✅ Tablero guardado manualmente.");
+
+    // Registrar evento en historial
+    registrarHistorialDB("Guardado Manual", "Se guardó el estado completo del tablero");
+}
+
+// ==========================================
+// MENÚ FLOTANTE Y COPY/PASTE
+// ==========================================
+
+let clipboardCard = null; // Almacena datos para clonar
+let activeCardMenu = null; // Menu actual DOM reference
+
+function initCardMenu() {
+    // Cerrar menú si clic afuera
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.materia-card') && !e.target.closest('.card-menu') && !e.target.closest('.card-menu-btn')) {
+            closeCardMenu();
+        }
+
+        // Lógica de PEGADO (si hay clipboard activo y clic en dropzone vacía)
+        if (clipboardCard && e.target.closest('.dropzone')) {
+            const zone = e.target.closest('.dropzone');
+            if (zone.children.length === 0) { // Solo si está vacío
+                pasteCard(zone);
+            }
+        }
+    });
+
+    // Delegación para abrir menú (Click simple en card)
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.materia-card');
+
+        // Ignorar banco de materias
+        if (card && (card.closest('#bancoMaterias') || card.closest('.banco-materias-container'))) return;
+
+        // Ignorar si estamos editando (input) o si el clic vino del menú
+        if (card && !e.target.closest('input') && !e.target.closest('.card-menu')) {
+
+            // Si ya estamos en modo pegado, NO abrir menú, simplemente no hacer nada (o dejar que el usuario pegue en otro lado)
+            if (clipboardCard) {
+                // Si hace click en una card llena mientras pega, tal vez quiera cancelar? No, mejor no intervenir.
+                return;
+            }
+
+            showCardMenu(card);
+            e.stopPropagation();
+        }
+    });
+}
+
+function showCardMenu(card) {
+    closeCardMenu(); // Cerrar anterior
+
+    // Marcar visualmente
+    card.classList.add('selected');
+
+    // Crear menú HTML
+    const menu = document.createElement('div');
+    menu.className = 'card-menu';
+    // Botones con onclick globales
+    menu.innerHTML = `
+        <button class="card-menu-btn delete" onclick="event.stopPropagation(); deleteSelectedCard()">🗑️ Eliminar</button>
+        <button class="card-menu-btn copy" onclick="event.stopPropagation(); copySelectedCard()">📋 Copiar</button>
+    `;
+
+    card.appendChild(menu);
+    activeCardMenu = { card: card, menu: menu };
+}
+
+function closeCardMenu() {
+    if (activeCardMenu) {
+        if (activeCardMenu.card) activeCardMenu.card.classList.remove('selected');
+        if (activeCardMenu.menu) activeCardMenu.menu.remove();
+        activeCardMenu = null;
+    }
+}
+
+// Global functions called by HTML onclick
+window.deleteSelectedCard = function () {
+    if (!activeCardMenu) return;
+    const card = activeCardMenu.card;
+    const zona = card.parentNode;
+
+    // Borrar de BD
+    if (zona && (zona.classList.contains('dropzone') || zona.closest('.dropzone'))) {
+        const ctx = obtenerContextoZona(zona);
+        // Borrar visualmente
+        card.remove();
+        // Borrar data
+        guardarHorarioDB(ctx, null);
+        registrarHistorialDB("Eliminación", `Se eliminó materia de ${ctx.dia} ${ctx.hora}`);
+    } else {
+        card.remove(); // Fallback
+    }
+    closeCardMenu();
+};
+
+window.copySelectedCard = function () {
+    if (!activeCardMenu) return;
+    const card = activeCardMenu.card;
+
+    // Guardar datos en clipboard
+    clipboardCard = obtenerTextoMateria(card);
+
+    // Feedback visual UI
+    showPasteModeIndicator(clipboardCard.asignatura);
+
+    closeCardMenu();
+};
+
+function showPasteModeIndicator(nombreMateria) {
+    let indicator = document.getElementById('pasteIndicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'pasteIndicator';
+        indicator.className = 'paste-mode-indicator';
+        document.body.appendChild(indicator);
+    }
+
+    indicator.innerHTML = `
+        <span>📋 Pegando: <strong>${nombreMateria}</strong></span>
+        <button onclick="cancelPasteMode()">✖</button>
+    `;
+    indicator.style.display = 'flex';
+
+    // Agregar cursor de copy a dropzones vacias
+    document.querySelectorAll('.dropzone').forEach(zone => {
+        if (zone.children.length === 0) zone.classList.add('cursor-copy');
+    });
+}
+
+window.cancelPasteMode = function () {
+    clipboardCard = null;
+    const indicator = document.getElementById('pasteIndicator');
+    if (indicator) indicator.style.display = 'none';
+
+    document.querySelectorAll('.dropzone').forEach(zone => zone.classList.remove('cursor-copy'));
+};
+
+function pasteCard(zone) {
+    if (!clipboardCard) return;
+
+    // Crear nueva card con datos
+    const newCard = document.createElement('div');
+    newCard.classList.add('materia-card');
+    newCard.setAttribute('draggable', 'true');
+    newCard.innerHTML = `
+        <div class="card-asignatura">${clipboardCard.asignatura}</div>
+        <div class="card-profesor">${clipboardCard.profesor || "Sin Asignar"}</div>
+    `;
+
+    // Eventos
+    newCard.addEventListener('dragstart', dragStart);
+    newCard.addEventListener('dragend', dragEnd);
+
+    zone.appendChild(newCard);
+
+    // Guardar en BD
+    const ctx = obtenerContextoZona(zone);
+    guardarHorarioDB(ctx, clipboardCard);
+    registrarHistorialDB("Duplicado", `Se duplicó ${clipboardCard.asignatura} en ${ctx.dia} ${ctx.hora}`);
+
+    destelloExito(zone);
+    // Seguimos en modo pegado
 }
