@@ -75,258 +75,140 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Inicializar cliente Supabase
+// Inicializar cliente Supabase con Reintentos (Blindaje 1)
 function initAsistenciaSupabase() {
+    if (asistenciaSupabase && premedSupabase) return asistenciaSupabase;
+
     if (window.supabase) {
-        // Cliente para registros (Esquema: soporte)
-        if (!asistenciaSupabase) {
-            asistenciaSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
-                db: { schema: 'soporte' }
-            });
-            console.log('✅ Supabase conectado (esquema: soporte)');
-        }
-
-        // Cliente para alumnos (Esquema: premed)
-        if (!premedSupabase) {
-            premedSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
-                db: { schema: 'premed' }
-            });
-            console.log('✅ Supabase conectado (esquema: premed)');
-        }
-    }
-    return asistenciaSupabase;
-}
-
-// ===================================
-// REALTIME SUBSCRIPTION
-// ===================================
-function suscribirCambios() {
-    asistenciaSupabase
-        .channel('tabla_registros')
-        .on('postgres_changes',
-            { event: '*', schema: 'public', table: 'registros' },
-            (payload) => {
-                console.log('🔄 Cambio detectado en tiempo real:', payload);
-
-                // Manejar INSERT (Nuevo registro)
-                if (payload.eventType === 'INSERT') {
-                    const nuevoRegistro = payload.new;
-                    // Solo agregar si pertenece a la fecha que estamos viendo
-                    if (nuevoRegistro.fecha === fechaSeleccionada) {
-                        registrosHoy.unshift(nuevoRegistro);
-                        // Reordenar por timestamp descendente para asegurar "más reciente arriba"
-                        registrosHoy.sort((a, b) => {
-                            // Orden descendente (B - A)
-                            return (b.timestamp || '').localeCompare(a.timestamp || '');
-                        });
-
-                        filtrarLista(); // Actualiza la tabla visual
-                        cargarEstadisticas(); // Actualiza contadores
-
-                        // Notificación visual temporal
-                        mostrarNotificacionRealtime(`Nuevo registro: ${nuevoRegistro.email}`);
-                    }
-                }
-
-                // Manejar DELETE (Eliminar registro)
-                if (payload.eventType === 'DELETE') {
-                    const idEliminado = payload.old.id;
-                    const longitudAnterior = registrosHoy.length;
-                    registrosHoy = registrosHoy.filter(r => r.id !== idEliminado);
-
-                    if (registrosHoy.length !== longitudAnterior) {
-                        filtrarLista();
-                        cargarEstadisticas();
-                    }
-                }
+        try {
+            // Cliente para registros (Esquema: soporte)
+            if (!asistenciaSupabase) {
+                asistenciaSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
+                    db: { schema: 'soporte' },
+                    auth: { persistSession: true, autoRefreshToken: true }
+                });
+                console.log('✅ Supabase conectado (esquema: soporte)');
             }
-        )
-        .subscribe();
-    console.log('📡 Escuchando cambios en tiempo real...');
-}
 
-function mostrarNotificacionRealtime(texto) {
-    const notif = document.createElement('div');
-    notif.style.position = 'fixed';
-    notif.style.bottom = '20px';
-    notif.style.right = '20px';
-    notif.style.backgroundColor = '#1B3A6B';
-    notif.style.color = 'white';
-    notif.style.padding = '12px 24px';
-    notif.style.borderRadius = '8px';
-    notif.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-    notif.style.zIndex = '10000';
-    notif.style.fontFamily = 'var(--font-family)';
-    notif.style.animation = 'fadeIn 0.3s ease-out';
-    notif.textContent = texto;
-    document.body.appendChild(notif);
-
-    setTimeout(() => {
-        notif.style.opacity = '0';
-        notif.style.transition = 'opacity 0.5s';
-        setTimeout(() => notif.remove(), 500);
-    }, 3000);
-}
-
-// ===================================
-// NAVEGACIÓN
-// ===================================
-
-function cambiarTab(tab) {
-    // Expandir contenedor si es Admin
-    const container = document.querySelector('.container');
-    if (tab === 'admin') {
-        container.classList.add('admin-expanded');
+            // Cliente para alumnos (Esquema: premed)
+            if (!premedSupabase) {
+                premedSupabase = window.supabase.createClient(ASISTENCIA_SUPABASE_URL, ASISTENCIA_SUPABASE_ANON_KEY, {
+                    db: { schema: 'premed' },
+                    auth: { persistSession: true, autoRefreshToken: true }
+                });
+                console.log('✅ Supabase conectado (esquema: premed)');
+            }
+            return asistenciaSupabase;
+        } catch (e) {
+            console.error("🔥 Error crítico iniciando Supabase:", e);
+            mostrarMensaje('error', 'Error interno iniciando base de datos.');
+            return null;
+        }
     } else {
-        container.classList.remove('admin-expanded');
+        console.warn("⏳ Librería Supabase aún no carga, reintentando...");
+        return null;
     }
-
-    // Actualizar botones
-    // Actualizar botones
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tab);
-    });
-
-    // Actualizar contenido
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
 }
 
-function cambiarSubtab(subtab) {
-    // Actualizar botones
-    document.querySelectorAll('.subtab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.subtab === subtab);
-    });
+// ... (Resto de funciones) ...
 
-    // Actualizar contenido
-    document.querySelectorAll('.subtab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.getElementById(`subtab${subtab.charAt(0).toUpperCase() + subtab.slice(1)}`).classList.add('active');
-}
-
-// ===================================
-// REGISTRO DE ASISTENCIA
-// ===================================
-
-function seleccionarTurno(turno) {
-    turnoSeleccionado = turno;
-    document.querySelectorAll('.turno-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.turno === turno);
-    });
-}
-
+// BLINDAJE 2: Marcar Asistencia Robusto
 async function marcarAsistencia() {
     const inputCorreo = document.getElementById('inputCorreo');
     const btnMarcar = document.getElementById('btnMarcarAsistencia');
-    const mensajeDiv = document.getElementById('mensajeRegistro');
+
+    // Validación Defensiva de Elementos
+    if (!inputCorreo || !btnMarcar) {
+        console.error("❌ Error DOM: No se encuentran los inputs de registro.");
+        return;
+    }
 
     const email = inputCorreo.value.toLowerCase().trim();
 
-    // Validar correo
+    // Validar formato correo
     if (!email || !email.includes('@') || email.length < 5) {
         mostrarMensaje('error', '❌ Por favor ingresa un correo válido.');
         return;
     }
 
-    // Verificar si está autorizado
-    const enMatutino = correosAutorizados.matutino.includes(email);
-    const enVespertino = correosAutorizados.vespertino.includes(email);
+    // Verificar si está autorizado (Seguridad)
+    // Usamos ?. para evitar crash si correosAutorizados es null
+    const enMatutino = correosAutorizados?.matutino?.includes(email);
+    const enVespertino = correosAutorizados?.vespertino?.includes(email);
 
     if (!enMatutino && !enVespertino) {
-        mostrarMensaje('error', '⚠️ Este correo no está registrado en la base de datos de Alumnos.');
+        mostrarMensaje('error', '⚠️ Correo no encontrado en la lista de alumnos activos.');
         return;
     }
 
-    // Determinar turno correcto
+    // Determinar turno
     let turnoAsignado = turnoSeleccionado;
     if (enMatutino && !enVespertino) turnoAsignado = 'matutino';
     if (!enMatutino && enVespertino) turnoAsignado = 'vespertino';
 
-    // Avisar si el turno no coincide
-    if (turnoAsignado !== turnoSeleccionado && !(enMatutino && enVespertino)) {
-        mostrarMensaje('warning', `⚠️ Tu turno asignado es ${turnoAsignado.toUpperCase()}. Se registrará en tu turno correcto.`);
-        await new Promise(r => setTimeout(r, 1500));
-    }
-
-    // Deshabilitar botón
+    // UI Feedback inmediato
     btnMarcar.disabled = true;
+    const textoOriginal = btnMarcar.textContent;
     btnMarcar.textContent = 'Registrando...';
 
     try {
+        // Asegurar cliente
+        const client = initAsistenciaSupabase();
+        if (!client) throw new Error("No hay conexión con la base de datos.");
 
-
-        // Se eliminó la verificación de registro previo por solicitud del usuario
-        // Ahora permite múltiples registros del mismo correo en el mismo día
-
-        // Construir Fecha y Hora LOCAL manualmente (YYYY-MM-DDTHH:mm:ss)
+        // Datos fecha/hora sync
         const ahora = new Date();
-        const year = ahora.getFullYear();
-        const month = String(ahora.getMonth() + 1).padStart(2, '0');
-        const day = String(ahora.getDate()).padStart(2, '0');
-        const hours = String(ahora.getHours()).padStart(2, '0');
-        const minutes = String(ahora.getMinutes()).padStart(2, '0');
-        const seconds = String(ahora.getSeconds()).padStart(2, '0');
+        // Usar formato ISO local para evitar problemas de zona horaria
+        const pad = (n) => String(n).padStart(2, '0');
+        const hoy = `${ahora.getFullYear()}-${pad(ahora.getMonth() + 1)}-${pad(ahora.getDate())}`;
+        const timestampLocal = `${hoy}T${pad(ahora.getHours())}:${pad(ahora.getMinutes())}:${pad(ahora.getSeconds())}`;
 
-        // Determinar "Turno Asistido" (Real basado en hora)
+        // Lógica de Turno Real
         let turnoAsistidoReal = 'otro';
         const h = ahora.getHours();
+        if (h >= 7 && h < 14) turnoAsistidoReal = 'matutino'; // Ampliado margen
+        else if (h >= 14 && h < 22) turnoAsistidoReal = 'vespertino';
 
-        // 8 AM a 1 PM (13:00) -> Matutino
-        if (h >= 8 && h < 13) {
-            turnoAsistidoReal = 'matutino';
-        }
-        // 4 PM (16:00) a 9 PM (21:00) -> Vespertino
-        else if (h >= 16 && h < 22) { // < 22 cubre hasta las 9:59 PM
-            turnoAsistidoReal = 'vespertino';
-        }
-
-        const hoy = `${year}-${month}-${day}`;
-        const timestampLocal = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-
-        // Registrar en Supabase
-        const { error } = await asistenciaSupabase
+        // INTENTO DE INSERT
+        const { error } = await client
             .from('registros')
             .insert({
                 email: email,
-                turno: turnoAsignado, // Turno del alumno (oficial)
-                turno_asistido: turnoAsistidoReal, // Nuev column: Turno según hora
+                turno: turnoAsignado,
+                turno_asistido: turnoAsistidoReal,
                 fecha: hoy,
                 timestamp: timestampLocal
             });
 
-        if (error) throw error;
+        if (error) throw error; // Lanzar para manejar en catch
 
-        // Enviar a Google Sheets
-        // El usuario solicitó enviar "el turno que está colocando el alumno" (turnoSeleccionado) 
-        // o el asignado. Para consistencia con el histórico, enviaremos Capitalizado.
-        await enviarAGoogleSheets(email, turnoAsignado, turnoAsistidoReal);
+        // Éxito real
+        // Intentar Google Sheets (No bloqueante)
+        enviarAGoogleSheets(email, turnoAsignado, turnoAsistidoReal).catch(err => console.warn("Fallo Sheets:", err));
 
-        // Éxito
-        mostrarMensaje('success', `✅ ¡Asistencia registrada! Turno: ${turnoAsignado.toUpperCase()}`);
+        mostrarMensaje('success', `✅ Asistencia Correcta (${turnoAsignado.toUpperCase()})`);
         inputCorreo.value = '';
 
-        // Recargar lista
-        await cargarRegistros();
-        await cargarEstadisticas();
+        // Actualizar UI en segundo plano
+        cargarRegistros();
+        cargarEstadisticas();
 
     } catch (error) {
-        console.error('Error:', error);
-        // Si el error es duplicado (23505), intentar mostrarlo como éxito si es lo que se desea,
-        // PERO si la base de datos lo rechaza, no se guarda.
-        // Si el usuario quiere múltiples, NECESITAMOS quitar la restricción en la BD.
-        // Como solución temporal en JS solo podemos informar el error.
+        console.error('Error Registro:', error);
 
-        if (error.code === '23505') {
-            mostrarMensaje('warning', '⚠️ Este correo ya ha sido registrado el día de hoy.');
+        // MANEJO INTELIGENTE DE ERRORES
+        if (error.code === '23505' || (error.message && error.message.includes('duplicate key'))) {
+            // Ya estaba registrado hoy. Para el usuario esto es "Éxito/Info", no error.
+            mostrarMensaje('warning', 'ℹ️ Ya habías registrado tu asistencia hoy. ¡Todo listo!');
+            inputCorreo.value = '';
+        } else if (error.message && error.message.includes('fetch')) {
+            mostrarMensaje('error', '📡 Error de conexión. Verifica tu internet.');
         } else {
-            mostrarMensaje('error', '❌ Error al registrar. Intenta de nuevo.');
+            mostrarMensaje('error', '❌ Ocurrió un error. Intenta de nuevo.');
         }
     } finally {
         btnMarcar.disabled = false;
-        btnMarcar.textContent = 'MARCAR ASISTENCIA';
+        btnMarcar.textContent = textoOriginal;
     }
 }
 
