@@ -404,25 +404,34 @@ async function cargarConfiguracion() {
 
 async function cargarCorreosAutorizados() {
     try {
-        console.log('🔄 Cargando alumnos...');
+        console.log('🔄 Cargando alumnos desde PREMED (Central)...');
 
-        const supabaseClient = initAsistenciaSupabase();
-        if (!supabaseClient) return;
+        // Asegurar inicialización
+        initAsistenciaSupabase();
 
-        // Consultar alumnos autorizados (Tabla pública Soporte)
-        const { data, error } = await supabaseClient
-            .from('correos_autorizados')
-            .select('*');
+        // Usar cliente PREMED
+        if (!premedSupabase) {
+            console.error("❌ Cliente Premed no inicializado.");
+            return;
+        }
+
+        // Consultar alumnos centralizados
+        const { data, error } = await premedSupabase
+            .from('alumnos')
+            .select('*')
+            .eq('activo', true); // Solo alumnos activos
 
         if (error) {
-            console.error('Error cargando correos:', error);
+            console.error('Error cargando alumnos PREMED:', error);
+            // Fallback visual
+            mostrarMensaje('error', 'Error accediendo a base de datos de alumnos.');
             return;
         }
 
         correosAutorizados = { matutino: [], vespertino: [] };
 
-        // Filtrar activos
-        const alumnosActivos = (data || []).filter(d => d.activo === true);
+        // Procesar datos
+        const alumnosActivos = data || [];
 
         alumnosActivos.forEach(item => {
             const email = item.email ? item.email.toLowerCase() : '';
@@ -442,15 +451,17 @@ async function cargarCorreosAutorizados() {
         if (countVespElem) countVespElem.textContent = correosAutorizados.vespertino.length;
 
         // Renderizar lista visual
+        // Mapeamos para mantener compatibilidad con la función de renderizado
         const alumnosMapeados = alumnosActivos.map(d => ({
             ...d,
-            nombre: d.nombre_alumno || 'Sin Nombre',
-            modalidad: 'presencial'
+            nombre: d.nombre || d.nombre_alumno || 'Alumno',
+            // La tabla premed.alumnos SÍ tiene modalidad, la usamos
+            modalidad: d.modalidad || 'presencial'
         }));
 
         renderizarListaAlumnos(alumnosMapeados);
 
-        console.log(`✅ Alumnos cargados: ${alumnosActivos.length}`);
+        console.log(`✅ Alumnos cargados desde PREMED: ${alumnosActivos.length}`);
 
     } catch (e) {
         console.error('Error en carga de alumnos:', e);
