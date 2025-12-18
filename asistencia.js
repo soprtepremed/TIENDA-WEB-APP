@@ -110,7 +110,129 @@ function initAsistenciaSupabase() {
     }
 }
 
-// ... (Resto de funciones) ...
+// ===================================
+// REALTIME SUBSCRIPTION
+// ===================================
+function suscribirCambios() {
+    if (!asistenciaSupabase) return;
+
+    asistenciaSupabase
+        .channel('tabla_registros')
+        .on('postgres_changes',
+            { event: '*', schema: 'public', table: 'registros' },
+            (payload) => {
+                console.log('🔄 Cambio detectado en tiempo real:', payload);
+
+                // Manejar INSERT (Nuevo registro)
+                if (payload.eventType === 'INSERT') {
+                    const nuevoRegistro = payload.new;
+                    // Solo agregar si pertenece a la fecha que estamos viendo
+                    if (nuevoRegistro.fecha === fechaSeleccionada) {
+                        registrosHoy.unshift(nuevoRegistro);
+                        // Reordenar por timestamp descendente para asegurar "más reciente arriba"
+                        registrosHoy.sort((a, b) => {
+                            // Orden descendente (B - A)
+                            return (b.timestamp || '').localeCompare(a.timestamp || '');
+                        });
+
+                        filtrarLista(); // Actualiza la tabla visual
+                        cargarEstadisticas(); // Actualiza contadores
+
+                        // Notificación visual temporal
+                        mostrarNotificacionRealtime(`Nuevo registro: ${nuevoRegistro.email}`);
+                    }
+                }
+
+                // Manejar DELETE (Eliminar registro)
+                if (payload.eventType === 'DELETE') {
+                    const idEliminado = payload.old.id;
+                    const longitudAnterior = registrosHoy.length;
+                    registrosHoy = registrosHoy.filter(r => r.id !== idEliminado);
+
+                    if (registrosHoy.length !== longitudAnterior) {
+                        filtrarLista();
+                        cargarEstadisticas();
+                    }
+                }
+            }
+        )
+        .subscribe();
+    console.log('📡 Escuchando cambios en tiempo real...');
+}
+
+function mostrarNotificacionRealtime(texto) {
+    const notif = document.createElement('div');
+    notif.style.position = 'fixed';
+    notif.style.bottom = '20px';
+    notif.style.right = '20px';
+    notif.style.backgroundColor = '#1B3A6B';
+    notif.style.color = 'white';
+    notif.style.padding = '12px 24px';
+    notif.style.borderRadius = '8px';
+    notif.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+    notif.style.zIndex = '10000';
+    notif.style.fontFamily = 'var(--font-family)';
+    notif.style.animation = 'fadeIn 0.3s ease-out';
+    notif.textContent = texto;
+    document.body.appendChild(notif);
+
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transition = 'opacity 0.5s';
+        setTimeout(() => notif.remove(), 500);
+    }, 3000);
+}
+
+// ===================================
+// NAVEGACIÓN
+// ===================================
+
+function cambiarTab(tab) {
+    // Expandir contenedor si es Admin
+    const container = document.querySelector('.container');
+    if (tab === 'admin') {
+        container?.classList.add('admin-expanded');
+    } else {
+        container?.classList.remove('admin-expanded');
+    }
+
+    // Actualizar botones
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+
+    // Actualizar contenido
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    const targetTab = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+    if (targetTab) targetTab.classList.add('active');
+}
+
+function cambiarSubtab(subtab) {
+    // Actualizar botones
+    document.querySelectorAll('.subtab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.subtab === subtab);
+    });
+
+    // Actualizar contenido
+    document.querySelectorAll('.subtab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    const targetSubtab = document.getElementById(`subtab${subtab.charAt(0).toUpperCase() + subtab.slice(1)}`);
+    if (targetSubtab) targetSubtab.classList.add('active');
+}
+
+// ===================================
+// REGISTRO DE ASISTENCIA
+// ===================================
+
+function seleccionarTurno(turno) {
+    turnoSeleccionado = turno;
+    document.querySelectorAll('.turno-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.turno === turno);
+    });
+}
 
 // BLINDAJE 2: Marcar Asistencia Robusto
 async function marcarAsistencia() {
