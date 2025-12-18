@@ -60,6 +60,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { console.error('Error en carga inicial de datos:', e); }
 
     console.log('✅ Módulo de Asistencia listo (o en modo fallback)');
+
+    // Inicializar enlace de alumno
+    const linkAlumnoInput = document.getElementById('linkAlumno');
+    if (linkAlumnoInput) {
+        // Generar enlace basado en la URL actual, reemplazando asistencia.html por registro.html
+        // O si estamos en root, adjuntar registro.html
+        const currentUrl = window.location.href;
+        const registroUrl = currentUrl.includes('asistencia.html')
+            ? currentUrl.replace('asistencia.html', 'registro.html')
+            : currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1) + 'registro.html';
+
+        linkAlumnoInput.value = registroUrl;
+    }
 });
 
 // Inicializar cliente Supabase
