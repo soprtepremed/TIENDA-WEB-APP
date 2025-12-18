@@ -387,29 +387,44 @@ async function cargarConfiguracion() {
 
 async function cargarCorreosAutorizados() {
     try {
-        console.log('🔄 Cargando alumnos desde tabla original (Soporte)...');
+        console.log('🔄 Intentando cargar alumnos desde Soporte...');
 
-        // REVERTIDO: Consultamos 'soporte.correos_autorizados' porque 'premed.alumnos' tiene bloqueo RLS
-        const { data } = await asistenciaSupabase
+        // Asegurar cliente
+        const supabaseClient = initAsistenciaSupabase();
+        if (!supabaseClient) {
+            console.error('❌ Cliente Supabase no disponible en cargarCorreosAutorizados');
+            return;
+        }
+
+        // Consultar SIN filtros complejos primero para asegurar que llegue algo
+        const { data, error } = await supabaseClient
             .from('correos_autorizados')
-            .select('email, turno, nombre_alumno, activo')
-            .eq('activo', true);
+            .select('*');
+
+        if (error) {
+            console.error('❌ Error Supabase al cargar correos:', error);
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            console.warn('⚠️ La consulta a correos_autorizados devolvió 0 registros. ¿La tabla está vacía?');
+        }
 
         correosAutorizados = { matutino: [], vespertino: [] };
 
-        if (data) {
-            data.forEach(item => {
-                const email = item.email ? item.email.toLowerCase() : '';
-                if (!email) return;
+        // Filtrar activos en memoria para ser más robustos
+        const alumnosActivos = (data || []).filter(d => d.activo === true);
 
-                if (item.turno === 'matutino') {
-                    correosAutorizados.matutino.push(email);
-                } else if (item.turno === 'vespertino') {
-                    // En la tabla antigua no distinguimos modalidad, asumimos todos autorizados
-                    correosAutorizados.vespertino.push(email);
-                }
-            });
-        }
+        alumnosActivos.forEach(item => {
+            const email = item.email ? item.email.toLowerCase() : '';
+            if (!email) return;
+
+            if (item.turno === 'matutino') {
+                correosAutorizados.matutino.push(email);
+            } else if (item.turno === 'vespertino') {
+                correosAutorizados.vespertino.push(email);
+            }
+        });
 
         // Actualizar UI
         const countMatElem = document.getElementById('countMatutino');
@@ -417,25 +432,19 @@ async function cargarCorreosAutorizados() {
         if (countMatElem) countMatElem.textContent = correosAutorizados.matutino.length;
         if (countVespElem) countVespElem.textContent = correosAutorizados.vespertino.length;
 
-        const listaMatElem = document.getElementById('listaMatutino');
-        const listaVespElem = document.getElementById('listaVespertino');
-        if (listaMatElem) listaMatElem.value = correosAutorizados.matutino.join('\n');
-        if (listaVespElem) listaVespElem.value = correosAutorizados.vespertino.join('\n');
-
-        // Mapear al formato esperado por renderizarListaAlumnos
-        // La tabla vieja usa 'nombre_alumno', la nueva usaba 'nombre'
-        const alumnosMapeados = (data || []).map(d => ({
+        // Mapear para renderizado
+        const alumnosMapeados = alumnosActivos.map(d => ({
             ...d,
             nombre: d.nombre_alumno || 'Sin Nombre',
-            modalidad: 'presencial' // Default visual
+            modalidad: 'presencial'
         }));
 
         renderizarListaAlumnos(alumnosMapeados);
 
-        console.log(`📧 Alumnos cargados (Soporte): Mat=${correosAutorizados.matutino.length}, Vesp=${correosAutorizados.vespertino.length}`);
+        console.log(`✅ Carga completada: ${alumnosActivos.length} alumnos encontrados.`);
 
     } catch (e) {
-        console.error('Error cargando alumnos de Correos Autorizados:', e);
+        console.error('💥 Excepción en cargarCorreosAutorizados:', e);
     }
 }
 
