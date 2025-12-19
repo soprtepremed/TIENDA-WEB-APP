@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const linkInput = document.getElementById('linkAlumno');
     if (linkInput) {
         const baseUrl = window.location.href.replace('pase-lista.html', '');
-        linkInput.value = baseUrl + 'registro-lista.html';
+        linkInput.value = baseUrl + 'pase-registro.html';
     }
 
     await cargarCorreosAutorizados();
