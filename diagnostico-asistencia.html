@@ -88,7 +88,7 @@
 </head>
 
 <body>
-    <h1>🔬 Diagnóstico de Sistema de Asistencia</h1>
+    <h1>&#128300; Diagnóstico de Sistema de Asistencia</h1>
     <p>Herramienta de diagnóstico para identificar problemas de conexión y autorización</p>
 
     <div class="test-section">
@@ -158,12 +158,12 @@
         // Test 1: Verificar librerías
         function checkLibraries() {
             if (window.supabase) {
-                showResult('libraryTest', '✅ Librería Supabase cargada correctamente', 'success');
-                log('✅ Librería Supabase disponible', 'success');
+                showResult('libraryTest', '&#9989; Librería Supabase cargada correctamente', 'success');
+                log('&#9989; Librería Supabase disponible', 'success');
                 return true;
             } else {
-                showResult('libraryTest', '❌ Librería Supabase NO está disponible', 'error');
-                log('❌ Librería Supabase NO disponible', 'error');
+                showResult('libraryTest', '&#10060; Librería Supabase NO está disponible', 'error');
+                log('&#10060; Librería Supabase NO disponible', 'error');
                 return false;
             }
         }
@@ -185,14 +185,14 @@
                     }
                 );
 
-                showResult('supabaseInit', `✅ Cliente Supabase inicializado correctamente<br>
-                    📡 URL: ${ASISTENCIA_SUPABASE_URL}<br>
-                    🗂️ Schema: soporte`, 'success');
-                log('✅ Cliente Supabase inicializado (esquema: soporte)', 'success');
+                showResult('supabaseInit', `&#9989; Cliente Supabase inicializado correctamente<br>
+                    &#128225; URL: ${ASISTENCIA_SUPABASE_URL}<br>
+                    &#128450; Schema: soporte`, 'success');
+                log('&#9989; Cliente Supabase inicializado (esquema: soporte)', 'success');
                 return true;
             } catch (error) {
-                showResult('supabaseInit', `❌ Error al inicializar: ${error.message}`, 'error');
-                log(`❌ Error al inicializar Supabase: ${error.message}`, 'error');
+                showResult('supabaseInit', `&#10060; Error al inicializar: ${error.message}`, 'error');
+                log(`&#10060; Error al inicializar Supabase: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -200,8 +200,8 @@
         // Test 3: Probar conexión
         async function testConnection() {
             try {
-                log('🔄 Probando conexión a Supabase...', 'info');
-                showResult('connectionTest', '⏳ Probando conexión...', 'warning');
+                log('&#128260; Probando conexión a Supabase...', 'info');
+                showResult('connectionTest', '&#8987; Probando conexión...', 'warning');
 
                 if (!asistenciaSupabase) {
                     initSupabase();
@@ -214,16 +214,16 @@
 
                 if (error) throw error;
 
-                showResult('connectionTest', `✅ Conexión exitosa<br>
-                    📋 Configuración encontrada: ${data.nombre_sesion || 'Sin nombre'}<br>
-                    🔗 Script URL: ${data.script_url ? 'Configurado' : 'No configurado'}`, 'success');
-                log('✅ Conexión a Supabase exitosa', 'success');
+                showResult('connectionTest', `&#9989; Conexión exitosa<br>
+                    &#128203; Configuración encontrada: ${data.nombre_sesion || 'Sin nombre'}<br>
+                    &#128279; Script URL: ${data.script_url ? 'Configurado' : 'No configurado'}`, 'success');
+                log('&#9989; Conexión a Supabase exitosa', 'success');
                 return true;
             } catch (error) {
-                showResult('connectionTest', `❌ Error de conexión: ${error.message}<br>
+                showResult('connectionTest', `&#10060; Error de conexión: ${error.message}<br>
                     Código: ${error.code || 'N/A'}<br>
                     Detalles: ${error.details || 'N/A'}`, 'error');
-                log(`❌ Error de conexión: ${error.message}`, 'error');
+                log(`&#10060; Error de conexión: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -231,8 +231,8 @@
         // Test 4: Cargar correos autorizados
         async function loadAuthorizedEmails() {
             try {
-                log('🔄 Cargando correos autorizados...', 'info');
-                showResult('emailTest', '⏳ Cargando correos...', 'warning');
+                log('&#128260; Cargando correos autorizados...', 'info');
+                showResult('emailTest', '&#8987; Cargando correos...', 'warning');
 
                 if (!asistenciaSupabase) {
                     initSupabase();
@@ -244,7 +244,7 @@
 
                 if (error) throw error;
 
-                log(`📊 Datos recibidos: ${data ? data.length : 0} registros`, 'info');
+                log(`&#128202; Datos recibidos: ${data ? data.length : 0} registros`, 'info');
 
                 // Filtrar activos
                 const alumnosActivos = (data || []).filter(d => d.activo === true);
@@ -265,13 +265,13 @@
                 const totalMatutino = correosAutorizados.matutino.length;
                 const totalVespertino = correosAutorizados.vespertino.length;
 
-                showResult('emailTest', `✅ Correos cargados exitosamente<br>
-                    📊 Total en BD: ${data.length}<br>
-                    ✅ Activos: ${alumnosActivos.length}<br>
-                    ☀️ Matutino: ${totalMatutino}<br>
-                    🌙 Vespertino: ${totalVespertino}`, 'success');
+                showResult('emailTest', `&#9989; Correos cargados exitosamente<br>
+                    &#128202; Total en BD: ${data.length}<br>
+                    &#9989; Activos: ${alumnosActivos.length}<br>
+                    &#9728;&#65039; Matutino: ${totalMatutino}<br>
+                    &#127750; Vespertino: ${totalVespertino}`, 'success');
 
-                log(`✅ Correos cargados: ${totalMatutino} matutino, ${totalVespertino} vespertino`, 'success');
+                log(`&#9989; Correos cargados: ${totalMatutino} matutino, ${totalVespertino} vespertino`, 'success');
 
                 // Mostrar algunos ejemplos
                 if (totalMatutino > 0) {
@@ -283,9 +283,9 @@
 
                 return true;
             } catch (error) {
-                showResult('emailTest', `❌ Error al cargar correos: ${error.message}<br>
+                showResult('emailTest', `&#10060; Error al cargar correos: ${error.message}<br>
                     Código: ${error.code || 'N/A'}`, 'error');
-                log(`❌ Error al cargar correos: ${error.message}`, 'error');
+                log(`&#10060; Error al cargar correos: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -296,43 +296,43 @@
             const email = emailInput.value.toLowerCase().trim();
 
             if (!email || !email.includes('@')) {
-                showResult('emailCheckResult', '❌ Por favor ingresa un email válido', 'error');
+                showResult('emailCheckResult', '&#10060; Por favor ingresa un email válido', 'error');
                 return;
             }
 
-            log(`🔍 Verificando email: ${email}`, 'info');
+            log(`&#128269; Verificando email: ${email}`, 'info');
 
             const enMatutino = correosAutorizados.matutino.includes(email);
             const enVespertino = correosAutorizados.vespertino.includes(email);
 
             if (!enMatutino && !enVespertino) {
-                showResult('emailCheckResult', `❌ Email NO encontrado en la lista de autorizados<br>
-                    📧 Email buscado: ${email}<br>
-                    ⚠️ Este email NO puede registrar asistencia`, 'error');
-                log(`❌ Email ${email} NO autorizado`, 'error');
+                showResult('emailCheckResult', `&#10060; Email NO encontrado en la lista de autorizados<br>
+                    &#128231; Email buscado: ${email}<br>
+                    &#9888;&#65039; Este email NO puede registrar asistencia`, 'error');
+                log(`&#10060; Email ${email} NO autorizado`, 'error');
 
                 // Buscar coincidencias parciales
                 const similarMatutino = correosAutorizados.matutino.filter(e => e.includes(email.split('@')[0]));
                 const similarVespertino = correosAutorizados.vespertino.filter(e => e.includes(email.split('@')[0]));
 
                 if (similarMatutino.length > 0 || similarVespertino.length > 0) {
-                    log('💡 Correos similares encontrados:', 'info');
+                    log('&#128161; Correos similares encontrados:', 'info');
                     similarMatutino.forEach(e => log(`  - ${e} (matutino)`, 'info'));
                     similarVespertino.forEach(e => log(`  - ${e} (vespertino)`, 'info'));
                 }
             } else {
-                const turno = enMatutino ? 'Matutino ☀️' : 'Vespertino 🌙';
-                showResult('emailCheckResult', `✅ Email ENCONTRADO<br>
-                    📧 Email: ${email}<br>
-                    🎯 Turno: ${turno}<br>
-                    ✅ Este email PUEDE registrar asistencia`, 'success');
-                log(`✅ Email ${email} autorizado (${turno})`, 'success');
+                const turno = enMatutino ? 'Matutino &#9728;&#65039;' : 'Vespertino &#127750;';
+                showResult('emailCheckResult', `&#9989; Email ENCONTRADO<br>
+                    &#128231; Email: ${email}<br>
+                    &#127919; Turno: ${turno}<br>
+                    &#9989; Este email PUEDE registrar asistencia`, 'success');
+                log(`&#9989; Email ${email} autorizado (${turno})`, 'success');
             }
         }
 
         // Auto-ejecutar al cargar
         window.addEventListener('DOMContentLoaded', async () => {
-            log('🚀 Iniciando diagnóstico automático...', 'info');
+            log('&#128640; Iniciando diagnóstico automático...', 'info');
 
             // Test 1
             const hasLibraries = checkLibraries();
@@ -342,8 +342,8 @@
                 initSupabase();
             }
 
-            log('✅ Diagnóstico inicial completado', 'success');
-            log('💡 Haz clic en los botones para ejecutar pruebas específicas', 'info');
+            log('&#9989; Diagnóstico inicial completado', 'success');
+            log('&#128161; Haz clic en los botones para ejecutar pruebas específicas', 'info');
         });
     </script>
 </body>

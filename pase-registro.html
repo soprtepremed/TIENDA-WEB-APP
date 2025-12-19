@@ -221,13 +221,13 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <div class="header-icon">📋</div>
+                <div class="header-icon">&#128203;</div>
                 <h1>Control de Asistencia</h1>
                 <p id="nombreSesion">Registro de Pase de Lista</p>
             </div>
 
             <div class="info-box">
-                <span>🛡️</span>
+                <span>&#128737;&#65039;</span>
                 <span>Ingresa tu correo y confirma tu turno actual.</span>
             </div>
 
@@ -237,12 +237,12 @@
                 <div class="turno-selector">
                     <button type="button" class="turno-btn active" data-turno="matutino"
                         onclick="seleccionarTurno('matutino')">
-                        <span class="turno-icon">☀️</span>
+                        <span class="turno-icon">&#9728;&#65039;</span>
                         <span class="turno-text">Matutino</span>
                     </button>
                     <button type="button" class="turno-btn" data-turno="vespertino"
                         onclick="seleccionarTurno('vespertino')">
-                        <span class="turno-icon">🌙</span>
+                        <span class="turno-icon">&#127750;</span>
                         <span class="turno-text">Vespertino</span>
                     </button>
                 </div>
@@ -252,7 +252,7 @@
             <div class="form-section">
                 <label class="form-label">2. Correo Electrónico</label>
                 <div class="input-wrapper">
-                    <span class="input-icon">👤</span>
+                    <span class="input-icon">&#128100;</span>
                     <input type="email" id="inputCorreo" class="form-input" placeholder="correo@ejemplo.com">
                 </div>
             </div>
@@ -311,7 +311,7 @@
 
             // Validar email
             if (!email || !email.includes('@')) {
-                mostrarMensaje('error', '❌ Ingresa un correo válido');
+                mostrarMensaje('error', '&#10060; Ingresa un correo válido');
                 return;
             }
 
@@ -320,7 +320,7 @@
             const enVesp = correosAutorizados.vespertino.find(c => c.email === email);
 
             if (!enMat && !enVesp) {
-                mostrarMensaje('error', '⚠️ Correo no encontrado en la lista de alumnos');
+                mostrarMensaje('error', '&#9888;&#65039; Correo no encontrado en la lista de alumnos');
                 return;
             }
 
@@ -347,15 +347,15 @@
 
                 if (error) throw error;
 
-                mostrarMensaje('success', `✅ ¡Asistencia registrada! (${turnoOficial})`);
+                mostrarMensaje('success', `&#9989; ¡Asistencia registrada! (${turnoOficial})`);
                 document.getElementById('inputCorreo').value = '';
 
             } catch (e) {
                 console.error('Error:', e);
                 if (e.code === '23505') {
-                    mostrarMensaje('warning', 'ℹ️ Ya registraste tu asistencia hoy');
+                    mostrarMensaje('warning', '&#8505;&#65039; Ya registraste tu asistencia hoy');
                 } else {
-                    mostrarMensaje('error', '❌ Error al registrar. Intenta de nuevo.');
+                    mostrarMensaje('error', '&#10060; Error al registrar. Intenta de nuevo.');
                 }
             } finally {
                 btn.disabled = false;

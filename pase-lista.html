@@ -349,7 +349,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="index.html" class="sidebar-logo"><span>🛡️</span> Soporte Plataforma</a>
+                <a href="index.html" class="sidebar-logo"><span>&#128737;&#65039;</span> Soporte Plataforma</a>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link"><span class="sidebar-icon">&#9749;</span> Cafetería</a>
@@ -382,41 +382,41 @@
             <div class="pase-container">
                 <!-- Header -->
                 <div class="pase-header">
-                    <h1>📋 Pase de Lista</h1>
+                    <h1>&#128203; Pase de Lista</h1>
                     <p id="nombreSesion">Control de Asistencia Diaria</p>
                 </div>
 
                 <!-- Enlace para alumnos -->
                 <div class="link-section">
-                    <span>🔗 Enlace para alumnos:</span>
+                    <span>&#128279; Enlace para alumnos:</span>
                     <input type="text" id="linkAlumno" readonly value="">
-                    <button class="btn btn-secondary" onclick="copiarEnlace()">📋 Copiar</button>
+                    <button class="btn btn-secondary" onclick="copiarEnlace()">&#128203; Copiar</button>
                 </div>
 
                 <!-- Stats -->
                 <div class="stats-row">
                     <div class="stat-card matutino">
                         <div class="stat-value" id="statMatutino">0</div>
-                        <div class="stat-label">☀️ Matutino</div>
+                        <div class="stat-label">&#9728;&#65039; Matutino</div>
                     </div>
                     <div class="stat-card vespertino">
                         <div class="stat-value" id="statVespertino">0</div>
-                        <div class="stat-label">🌙 Vespertino</div>
+                        <div class="stat-label">&#127750; Vespertino</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="statTotal">0</div>
-                        <div class="stat-label">📊 Total Hoy</div>
+                        <div class="stat-label">&#128202; Total Hoy</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="statAutorizados">0</div>
-                        <div class="stat-label">👥 Autorizados</div>
+                        <div class="stat-label">&#128101; Autorizados</div>
                     </div>
                 </div>
 
                 <!-- Tabs Navigation -->
                 <div class="tabs-nav">
-                    <button class="tab-btn active" onclick="cambiarTab('registros')">📋 Registros de Hoy</button>
-                    <button class="tab-btn" onclick="cambiarTab('alumnos')">👥 Alumnos Autorizados</button>
+                    <button class="tab-btn active" onclick="cambiarTab('registros')">&#128203; Registros de Hoy</button>
+                    <button class="tab-btn" onclick="cambiarTab('alumnos')">&#128101; Alumnos Autorizados</button>
                 </div>
 
                 <!-- Tab: Registros -->
@@ -426,18 +426,18 @@
                         <input type="date" id="filtroFecha" onchange="cargarRegistros()">
                         <select id="filtroTurno" onchange="filtrarLista()">
                             <option value="todos">Todos los turnos</option>
-                            <option value="matutino">☀️ Matutino</option>
-                            <option value="vespertino">🌙 Vespertino</option>
+                            <option value="matutino">&#9728;&#65039; Matutino</option>
+                            <option value="vespertino">&#127750; Vespertino</option>
                         </select>
-                        <input type="text" id="buscador" placeholder="🔍 Buscar por correo o nombre..."
+                        <input type="text" id="buscador" placeholder="&#128269; Buscar por correo o nombre..."
                             oninput="filtrarLista()">
                         <div class="export-row">
                             <button id="btnRefresh" class="btn btn-refresh" onclick="refrescarTabla()">
-                                <span class="refresh-icon">🔄</span> Refrescar
+                                <span class="refresh-icon">&#128260;</span> Refrescar
                             </button>
-                            <button class="btn btn-secondary" onclick="exportarCSV()">📄 CSV</button>
-                            <button class="btn btn-secondary" onclick="exportarExcel()">📊 Excel</button>
-                            <button class="btn btn-danger" onclick="limpiarRegistros()">🗑️ Limpiar</button>
+                            <button class="btn btn-secondary" onclick="exportarCSV()">&#128196; CSV</button>
+                            <button class="btn btn-secondary" onclick="exportarExcel()">&#128202; Excel</button>
+                            <button class="btn btn-danger" onclick="limpiarRegistros()">&#128465; Limpiar</button>
                         </div>
                     </div>
 
@@ -446,18 +446,18 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>⏰ Hora</th>
-                                    <th>📧 Correo</th>
-                                    <th>👤 Nombre</th>
-                                    <th>🏷️ Turno Oficial</th>
-                                    <th>✅ Turno Asistido</th>
-                                    <th>🗑️</th>
+                                    <th>&#9200; Hora</th>
+                                    <th>&#128231; Correo</th>
+                                    <th>&#128100; Nombre</th>
+                                    <th>&#127991; Turno Oficial</th>
+                                    <th>&#9989; Turno Asistido</th>
+                                    <th>&#128465;</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaRegistros"></tbody>
                         </table>
                         <div id="emptyState" class="empty-state hidden">
-                            <div class="icon">📋</div>
+                            <div class="icon">&#128203;</div>
                             <p>No hay registros para la fecha seleccionada</p>
                         </div>
                     </div>
@@ -467,7 +467,7 @@
                 <div id="tabAlumnos" class="tab-content">
                     <div class="alumnos-grid">
                         <div class="alumnos-column">
-                            <h3>☀️ Matutino (<span id="countMatutino">0</span>)</h3>
+                            <h3>&#9728;&#65039; Matutino (<span id="countMatutino">0</span>)</h3>
                             <div class="alumnos-list" id="listaMatutino">
                                 <div class="empty-state">
                                     <p>Cargando...</p>
@@ -475,7 +475,7 @@
                             </div>
                         </div>
                         <div class="alumnos-column">
-                            <h3>🌙 Vespertino (<span id="countVespertino">0</span>)</h3>
+                            <h3>&#127750; Vespertino (<span id="countVespertino">0</span>)</h3>
                             <div class="alumnos-list" id="listaVespertino">
                                 <div class="empty-state">
                                     <p>Cargando...</p>

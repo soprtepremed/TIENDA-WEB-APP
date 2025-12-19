@@ -214,12 +214,12 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <div class="header-icon">📋</div>
+                <div class="header-icon">&#128203;</div>
                 <h1>Control de Asistencia</h1>
                 <p>Registro de Pase de Lista</p>
             </div>
             <div class="info-box">
-                <span>🛡️</span>
+                <span>&#128737;&#65039;</span>
                 <span>Ingresa tu correo y confirma tu turno.</span>
             </div>
             <div class="form-section">
@@ -227,12 +227,12 @@
                 <div class="turno-selector">
                     <button type="button" class="turno-btn active" data-turno="matutino"
                         onclick="seleccionarTurno('matutino')">
-                        <span class="turno-icon">☀️</span>
+                        <span class="turno-icon">&#9728;&#65039;</span>
                         <span class="turno-text">Matutino</span>
                     </button>
                     <button type="button" class="turno-btn" data-turno="vespertino"
                         onclick="seleccionarTurno('vespertino')">
-                        <span class="turno-icon">🌙</span>
+                        <span class="turno-icon">&#127750;</span>
                         <span class="turno-text">Vespertino</span>
                     </button>
                 </div>
@@ -240,7 +240,7 @@
             <div class="form-section">
                 <label class="form-label">2. Correo Electrónico</label>
                 <div class="input-wrapper">
-                    <span class="input-icon">👤</span>
+                    <span class="input-icon">&#128100;</span>
                     <input type="email" id="inputCorreo" class="form-input" placeholder="correo@ejemplo.com">
                 </div>
             </div>
@@ -275,7 +275,7 @@
 
                 if (!email || email.indexOf('@') < 0) {
                     msg.className = 'mensaje error';
-                    msg.textContent = '❌ Ingresa un correo válido';
+                    msg.textContent = '&#10060; Ingresa un correo válido';
                     return;
                 }
 
@@ -284,7 +284,7 @@
 
                 if (!enMat && !enVesp) {
                     msg.className = 'mensaje error';
-                    msg.textContent = '⚠️ Correo no encontrado';
+                    msg.textContent = '&#9888;&#65039; Correo no encontrado';
                     return;
                 }
 
@@ -318,16 +318,16 @@
                     }).catch(function (err) { console.log('Error Google Sheets:', err); });
 
                     msg.className = 'mensaje success';
-                    msg.textContent = '✅ ¡Asistencia registrada! (' + turnoOf + ')';
+                    msg.textContent = '&#9989; ¡Asistencia registrada! (' + turnoOf + ')';
                     document.getElementById('inputCorreo').value = '';
                 } catch (e) {
                     console.error(e);
                     if (e.code === '23505') {
                         msg.className = 'mensaje warning';
-                        msg.textContent = 'ℹ️ Ya registraste tu asistencia hoy';
+                        msg.textContent = '&#8505;&#65039; Ya registraste tu asistencia hoy';
                     } else {
                         msg.className = 'mensaje error';
-                        msg.textContent = '❌ Error al registrar';
+                        msg.textContent = '&#10060; Error al registrar';
                     }
                 }
                 btn.disabled = false;
