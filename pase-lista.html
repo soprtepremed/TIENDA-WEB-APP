@@ -313,6 +313,34 @@
             font-size: 0.8rem;
             color: #9ca3af;
         }
+
+        .btn-refresh {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: #059669;
+        }
+
+        .btn-refresh.spinning .refresh-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .refresh-icon {
+            display: inline-block;
+            transition: transform 0.3s;
+        }
     </style>
 </head>
 
@@ -402,6 +430,9 @@
                         <input type="text" id="buscador" placeholder="🔍 Buscar por correo o nombre..."
                             oninput="filtrarLista()">
                         <div class="export-row">
+                            <button id="btnRefresh" class="btn btn-refresh" onclick="refrescarTabla()">
+                                <span class="refresh-icon">🔄</span> Refrescar
+                            </button>
                             <button class="btn btn-secondary" onclick="exportarCSV()">📄 CSV</button>
                             <button class="btn btn-secondary" onclick="exportarExcel()">📊 Excel</button>
                             <button class="btn btn-danger" onclick="limpiarRegistros()">🗑️ Limpiar</button>

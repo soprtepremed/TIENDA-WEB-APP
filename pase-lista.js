@@ -267,6 +267,14 @@ function copiarEnlace() {
     navigator.clipboard.writeText(input.value).then(() => alert('📋 Enlace copiado'));
 }
 
+async function refrescarTabla() {
+    const btn = document.getElementById('btnRefresh');
+    btn.classList.add('spinning');
+    await cargarRegistros();
+    setTimeout(() => btn.classList.remove('spinning'), 1000);
+    mostrarNotificacion('Tabla actualizada');
+}
+
 function cambiarTab(tab) {
     // Actualizar botones
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -332,3 +340,4 @@ window.exportarExcel = exportarExcel;
 window.copiarEnlace = copiarEnlace;
 window.cambiarTab = cambiarTab;
 window.renderizarAlumnos = renderizarAlumnos;
+window.refrescarTabla = refrescarTabla;
