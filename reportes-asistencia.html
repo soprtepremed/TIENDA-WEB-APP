@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -19,28 +19,27 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="reportes-asistencia.html" class="sidebar-logo">
-                    <span>📊</span> Reportes
+                    <span>ðŸ“Š</span> Reportes
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link">
-                    <span class="sidebar-icon">☕</span> Cafetería
+                    <span class="sidebar-icon">â˜•</span> CafeterÃ­a
                 </a>
 
                 <a href="horarios.html" class="sidebar-link">
-                    <span class="sidebar-icon">⏰</span> Horarios
+                    <span class="sidebar-icon">â°</span> Horarios
                 </a>
                 <a href="reportes-asistencia.html" class="sidebar-link active">
-                    <span class="sidebar-icon">📊</span> Reportes
+                    <span class="sidebar-icon">ðŸ“Š</span> Reportes
                 </a>
                 <a href="historico-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">📅</span> Histórico
+                    <span class="sidebar-icon">ðŸ“…</span> HistÃ³rico
                 </a>
                 <a href="cargar-evaluaciones.html" class="sidebar-link">
-                    <span class="sidebar-icon">📤</span> Cargar Eval.
+                    <span class="sidebar-icon">ðŸ“¤</span> Cargar Eval.
                 </a>
-            </nav>
-            <div class="sidebar-footer">
+            <a href="pase-lista.html" class="sidebar-link"><span class="sidebar-icon">📋</span> Pase de Lista</a></nav><div class="sidebar-footer">
                 <div class="user-profile">
                     <div class="user-avatar" id="sidebarAvatar">AD</div>
                     <div class="user-info">
@@ -49,7 +48,7 @@
                     </div>
                 </div>
                 <button onclick="logout()" class="btn-logout">
-                    Cerrar Sesión
+                    Cerrar SesiÃ³n
                 </button>
             </div>
         </aside>
@@ -61,30 +60,30 @@
 
                     <!-- Header Section -->
                     <div class="section-header">
-                        <h1 class="section-title">📊 Reporte de Asistencia y Evaluaciones</h1>
+                        <h1 class="section-title">ðŸ“Š Reporte de Asistencia y Evaluaciones</h1>
                         <p class="section-subtitle">Consulta y genera reportes de rendimiento de los alumnos</p>
                     </div>
 
                     <!-- Search Section -->
                     <section class="search-section">
                         <div class="search-card">
-                            <h2 class="search-title">🔍 Buscar Alumno</h2>
+                            <h2 class="search-title">ðŸ” Buscar Alumno</h2>
                             <div class="search-form">
                                 <div class="search-input-group">
                                     <label for="searchType" class="search-label">Buscar por:</label>
                                     <select id="searchType" class="search-select">
                                         <option value="id">ID de Alumno</option>
-                                        <option value="email">Correo Electrónico</option>
+                                        <option value="email">Correo ElectrÃ³nico</option>
                                         <option value="nombre">Nombre</option>
                                     </select>
                                 </div>
                                 <div class="search-input-group search-input-main">
-                                    <label for="searchQuery" class="search-label">Valor de búsqueda:</label>
+                                    <label for="searchQuery" class="search-label">Valor de bÃºsqueda:</label>
                                     <input type="text" id="searchQuery" class="search-input"
                                         placeholder="Ingrese el ID, email o nombre del alumno...">
                                 </div>
                                 <button id="btnBuscar" class="btn btn-primary btn-search">
-                                    <span class="btn-icon">🔍</span> Buscar
+                                    <span class="btn-icon">ðŸ”</span> Buscar
                                 </button>
                             </div>
                         </div>
@@ -100,15 +99,15 @@
                                 <h2 class="student-name" id="studentName">Nombre del Alumno</h2>
                                 <div class="student-meta">
                                     <span class="meta-item">
-                                        <span class="meta-icon">🆔</span>
+                                        <span class="meta-icon">ðŸ†”</span>
                                         <span id="studentId">ID: --</span>
                                     </span>
                                     <span class="meta-item">
-                                        <span class="meta-icon">📧</span>
+                                        <span class="meta-icon">ðŸ“§</span>
                                         <span id="studentEmail">email@example.com</span>
                                     </span>
                                     <span class="meta-item">
-                                        <span class="meta-icon">🕐</span>
+                                        <span class="meta-icon">ðŸ•</span>
                                         <span id="studentTurno">Turno: --</span>
                                     </span>
                                 </div>
@@ -118,28 +117,28 @@
                         <!-- Stats Overview -->
                         <div class="stats-overview">
                             <div class="stat-card stat-attendance">
-                                <div class="stat-icon">📋</div>
+                                <div class="stat-icon">ðŸ“‹</div>
                                 <div class="stat-content">
                                     <span class="stat-value" id="statAsistencia">--%</span>
                                     <span class="stat-label">Asistencia</span>
                                 </div>
                             </div>
                             <div class="stat-card stat-evaluations">
-                                <div class="stat-icon">📝</div>
+                                <div class="stat-icon">ðŸ“</div>
                                 <div class="stat-content">
                                     <span class="stat-value" id="statPromedio">--</span>
                                     <span class="stat-label">Promedio Eval.</span>
                                 </div>
                             </div>
                             <div class="stat-card stat-weeks">
-                                <div class="stat-icon">📅</div>
+                                <div class="stat-icon">ðŸ“…</div>
                                 <div class="stat-content">
                                     <span class="stat-value" id="statSemanas">--</span>
                                     <span class="stat-label">Semanas</span>
                                 </div>
                             </div>
                             <div class="stat-card stat-total">
-                                <div class="stat-icon">📊</div>
+                                <div class="stat-icon">ðŸ“Š</div>
                                 <div class="stat-content">
                                     <span class="stat-value" id="statTotal">--</span>
                                     <span class="stat-label">Total Evaluaciones</span>
@@ -151,10 +150,10 @@
                         <div class="tabs-container">
                             <div class="tabs-nav">
                                 <button class="tab-btn active" data-tab="asistencia">
-                                    📋 Historial de Asistencia
+                                    ðŸ“‹ Historial de Asistencia
                                 </button>
                                 <button class="tab-btn" data-tab="evaluaciones">
-                                    📝 Historial de Evaluaciones
+                                    ðŸ“ Historial de Evaluaciones
                                 </button>
                             </div>
 
@@ -164,23 +163,23 @@
                                     <table class="data-table">
                                         <thead>
                                             <tr>
-                                                <th style="text-align: center;">📆 Semana</th>
-                                                <th style="text-align: center;">🏷️ Tipo</th>
+                                                <th style="text-align: center;">ðŸ“† Semana</th>
+                                                <th style="text-align: center;">ðŸ·ï¸ Tipo</th>
                                                 <th style="text-align: center;">Lunes</th>
                                                 <th style="text-align: center;">Martes</th>
-                                                <th style="text-align: center;">Miércoles</th>
+                                                <th style="text-align: center;">MiÃ©rcoles</th>
                                                 <th style="text-align: center;">Jueves</th>
                                                 <th style="text-align: center;">Viernes</th>
-                                                <th style="text-align: center;">📊 % Semana</th>
+                                                <th style="text-align: center;">ðŸ“Š % Semana</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tablaAsistencia">
-                                            <!-- Filas dinámicas -->
+                                            <!-- Filas dinÃ¡micas -->
                                         </tbody>
                                     </table>
                                 </div>
                                 <div id="emptyAsistencia" class="empty-state hidden">
-                                    <div class="empty-icon">📋</div>
+                                    <div class="empty-icon">ðŸ“‹</div>
                                     <p>No hay registros de asistencia para este alumno</p>
                                 </div>
                             </div>
@@ -191,20 +190,20 @@
                                     <table class="data-table">
                                         <thead>
                                             <tr>
-                                                <th style="text-align: center;">📅 Eval</th>
-                                                <th style="text-align: center;">📆 Semana</th>
-                                                <th style="text-align: center;">✓/✗</th>
-                                                <th style="text-align: center;">📊 Calif.</th>
-                                                <th style="text-align: center;">🏷️ Estado</th>
+                                                <th style="text-align: center;">ðŸ“… Eval</th>
+                                                <th style="text-align: center;">ðŸ“† Semana</th>
+                                                <th style="text-align: center;">âœ“/âœ—</th>
+                                                <th style="text-align: center;">ðŸ“Š Calif.</th>
+                                                <th style="text-align: center;">ðŸ·ï¸ Estado</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tablaEvaluaciones">
-                                            <!-- Filas dinámicas -->
+                                            <!-- Filas dinÃ¡micas -->
                                         </tbody>
                                     </table>
                                 </div>
                                 <div id="emptyEvaluaciones" class="empty-state hidden">
-                                    <div class="empty-icon">📝</div>
+                                    <div class="empty-icon">ðŸ“</div>
                                     <p>No hay evaluaciones registradas para este alumno</p>
                                 </div>
                             </div>
@@ -213,23 +212,23 @@
                         <!-- Export Actions -->
                         <div class="export-actions">
                             <button id="btnExportPDF" class="btn btn-secondary">
-                                <span class="btn-icon">📄</span> Exportar PDF
+                                <span class="btn-icon">ðŸ“„</span> Exportar PDF
                             </button>
                             <button id="btnExportExcel" class="btn btn-secondary">
-                                <span class="btn-icon">📊</span> Exportar Excel
+                                <span class="btn-icon">ðŸ“Š</span> Exportar Excel
                             </button>
                             <button id="btnPrint" class="btn btn-secondary">
-                                <span class="btn-icon">🖨️</span> Imprimir
+                                <span class="btn-icon">ðŸ–¨ï¸</span> Imprimir
                             </button>
                         </div>
                     </section>
 
                     <!-- Initial State / Empty State -->
                     <section id="initialState" class="initial-state">
-                        <div class="initial-icon">🔍</div>
+                        <div class="initial-icon">ðŸ”</div>
                         <h2 class="initial-title">Busca un alumno para ver su reporte</h2>
                         <p class="initial-text">
-                            Ingresa el ID, correo electrónico o nombre del alumno en el buscador
+                            Ingresa el ID, correo electrÃ³nico o nombre del alumno en el buscador
                             para ver su historial de asistencia y evaluaciones.
                         </p>
                     </section>
@@ -237,18 +236,18 @@
                     <!-- Loading State -->
                     <section id="loadingState" class="loading-state hidden">
                         <div class="loading-spinner"></div>
-                        <p>Buscando información del alumno...</p>
+                        <p>Buscando informaciÃ³n del alumno...</p>
                     </section>
 
                     <!-- Error State -->
                     <section id="errorState" class="error-state hidden">
-                        <div class="error-icon">⚠️</div>
+                        <div class="error-icon">âš ï¸</div>
                         <h2 class="error-title" id="errorTitle">Alumno no encontrado</h2>
                         <p class="error-text" id="errorText">
-                            No se encontró ningún alumno con los datos proporcionados.
+                            No se encontrÃ³ ningÃºn alumno con los datos proporcionados.
                         </p>
                         <button class="btn btn-primary" onclick="resetSearch()">
-                            <span class="btn-icon">🔄</span> Intentar de nuevo
+                            <span class="btn-icon">ðŸ”„</span> Intentar de nuevo
                         </button>
                     </section>
 
@@ -259,7 +258,7 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <!-- Librerías para Exportación -->
+    <!-- LibrerÃ­as para ExportaciÃ³n -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -270,3 +269,4 @@
 </body>
 
 </html>
+

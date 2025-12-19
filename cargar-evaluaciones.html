@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="reportes-asistencia.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos específicos para esta página */
+        /* Estilos especÃ­ficos para esta pÃ¡gina */
         .upload-container {
             max-width: 800px;
             margin: 0 auto;
@@ -138,7 +138,7 @@
             overflow-y: auto;
             /* Scroll vertical */
             max-height: 650px;
-            /* Aumentado para ver más registros */
+            /* Aumentado para ver mÃ¡s registros */
             border: 1px solid var(--color-border);
             border-radius: 8px;
         }
@@ -158,7 +158,7 @@
             text-align: left;
             border-bottom: 1px solid var(--color-border);
             white-space: nowrap;
-            /* Evita saltos de línea generales */
+            /* Evita saltos de lÃ­nea generales */
         }
 
         .preview-table th {
@@ -171,7 +171,7 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
-        /* Columna Nombre: permite salto de línea y ancho mínimo */
+        /* Columna Nombre: permite salto de lÃ­nea y ancho mÃ­nimo */
         .preview-table td:nth-child(2),
         .preview-table th:nth-child(2) {
             min-width: 250px;
@@ -317,28 +317,27 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="reportes-asistencia.html" class="sidebar-logo">
-                    <span class="logo-icon">📚</span> PREMED
+                    <span class="logo-icon">ðŸ“š</span> PREMED
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link">
-                    <span class="sidebar-icon">☕</span> Cafetería
+                    <span class="sidebar-icon">â˜•</span> CafeterÃ­a
                 </a>
 
                 <a href="horarios.html" class="sidebar-link">
-                    <span class="sidebar-icon">⏰</span> Horarios
+                    <span class="sidebar-icon">â°</span> Horarios
                 </a>
                 <a href="reportes-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">📊</span> Reportes
+                    <span class="sidebar-icon">ðŸ“Š</span> Reportes
                 </a>
                 <a href="historico-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">📅</span> Histórico
+                    <span class="sidebar-icon">ðŸ“…</span> HistÃ³rico
                 </a>
                 <a href="cargar-evaluaciones.html" class="sidebar-link active">
-                    <span class="sidebar-icon">📤</span> Cargar Eval.
+                    <span class="sidebar-icon">ðŸ“¤</span> Cargar Eval.
                 </a>
-            </nav>
-            <div class="sidebar-footer">
+            <a href="pase-lista.html" class="sidebar-link"><span class="sidebar-icon">📋</span> Pase de Lista</a></nav><div class="sidebar-footer">
                 <div class="user-info">
                     <div class="user-avatar" id="sidebarAvatar">AD</div>
                     <div class="user-details">
@@ -352,27 +351,27 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="page-header">
-                <h1>📤 Cargar Evaluaciones</h1>
+                <h1>ðŸ“¤ Cargar Evaluaciones</h1>
                 <p>Importa los resultados de evaluaciones desde un archivo CSV</p>
             </div>
 
             <div class="upload-container">
                 <!-- Zona de carga -->
                 <div class="upload-zone" id="uploadZone">
-                    <div class="icon">📄</div>
-                    <h3>Arrastra tu archivo CSV aquí</h3>
+                    <div class="icon">ðŸ“„</div>
+                    <h3>Arrastra tu archivo CSV aquÃ­</h3>
                     <p>o haz clic para seleccionar</p>
                     <input type="file" id="fileInput" class="file-input" accept=".csv">
                 </div>
 
                 <!-- Info del archivo -->
                 <div class="file-info" id="fileInfo">
-                    <span class="file-icon">📊</span>
+                    <span class="file-icon">ðŸ“Š</span>
                     <div class="file-details">
                         <div class="file-name" id="fileName">archivo.csv</div>
                         <div class="file-size" id="fileSize">0 KB</div>
                     </div>
-                    <button class="btn-remove" id="btnRemove" title="Quitar archivo">✕</button>
+                    <button class="btn-remove" id="btnRemove" title="Quitar archivo">âœ•</button>
                 </div>
 
                 <!-- Vista previa -->
@@ -381,13 +380,13 @@
                         <h3>Vista Previa</h3>
                         <div class="preview-stats">
                             <div class="preview-stat">
-                                📝 <strong id="totalRecords">0</strong> registros
+                                ðŸ“ <strong id="totalRecords">0</strong> registros
                             </div>
                             <div class="preview-stat">
-                                ✅ <strong id="validRecords">0</strong> válidos
+                                âœ… <strong id="validRecords">0</strong> vÃ¡lidos
                             </div>
                             <div class="preview-stat">
-                                ⚠️ <strong id="skippedRecords">0</strong> omitidos
+                                âš ï¸ <strong id="skippedRecords">0</strong> omitidos
                             </div>
                         </div>
                     </div>
@@ -398,7 +397,7 @@
                                     <th>ID</th>
                                     <th>Nombre</th>
                                     <th>Turno</th>
-                                    <th>Realizó</th>
+                                    <th>RealizÃ³</th>
                                     <th>Calif. %</th>
                                     <th>Estado</th>
                                     <th>Fecha Eval.</th>
@@ -414,7 +413,7 @@
                 <div class="actions-section" id="actionsSection">
                     <button class="btn btn-secondary" id="btnCancel">Cancelar</button>
                     <button class="btn btn-primary" id="btnUpload">
-                        📤 Cargar Evaluaciones
+                        ðŸ“¤ Cargar Evaluaciones
                     </button>
                 </div>
 
@@ -428,8 +427,8 @@
 
                 <!-- Resultado -->
                 <div class="result-section" id="resultSection">
-                    <div class="result-icon" id="resultIcon">✅</div>
-                    <div class="result-title" id="resultTitle">¡Carga exitosa!</div>
+                    <div class="result-icon" id="resultIcon">âœ…</div>
+                    <div class="result-title" id="resultTitle">Â¡Carga exitosa!</div>
                     <div class="result-message" id="resultMessage">Se importaron 0 registros.</div>
                     <button class="btn btn-primary" id="btnNewUpload" style="margin-top: 16px;">
                         Cargar otro archivo
@@ -438,12 +437,12 @@
 
                 <!-- Ayuda de formato -->
                 <div class="format-help">
-                    <h4>📋 Formato del archivo CSV</h4>
+                    <h4>ðŸ“‹ Formato del archivo CSV</h4>
                     <p>El archivo debe tener las siguientes columnas (el mismo formato que exportas de tu hoja de
-                        cálculo):</p>
+                        cÃ¡lculo):</p>
                     <code>ID,NOMBRE,TURNO,MODALIDAD,REALIZO EXAMEN,CALIFICACION,FECHA EVALUACION,fecha de inicio,fecha final,ESTADO</code>
                     <p style="margin-top: 12px;">
-                        <strong>Nota:</strong> Las calificaciones en formato "79/90" se convertirán automáticamente a
+                        <strong>Nota:</strong> Las calificaciones en formato "79/90" se convertirÃ¡n automÃ¡ticamente a
                         porcentaje (87.78%).
                     </p>
                 </div>
@@ -456,3 +455,4 @@
 </body>
 
 </html>
+
