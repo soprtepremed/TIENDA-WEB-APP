@@ -267,6 +267,61 @@ function copiarEnlace() {
     navigator.clipboard.writeText(input.value).then(() => alert('📋 Enlace copiado'));
 }
 
+function cambiarTab(tab) {
+    // Actualizar botones
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab === 'registros' ? 'registros' : 'alumnos'));
+    });
+
+    // Actualizar contenido
+    document.getElementById('tabRegistros').classList.toggle('active', tab === 'registros');
+    document.getElementById('tabAlumnos').classList.toggle('active', tab === 'alumnos');
+
+    // Si cambia a alumnos, renderizar la lista
+    if (tab === 'alumnos') {
+        renderizarAlumnos();
+    }
+}
+
+function renderizarAlumnos() {
+    const listaMat = document.getElementById('listaMatutino');
+    const listaVesp = document.getElementById('listaVespertino');
+    const countMat = document.getElementById('countMatutino');
+    const countVesp = document.getElementById('countVespertino');
+
+    // Actualizar contadores
+    countMat.textContent = correosAutorizados.matutino.length;
+    countVesp.textContent = correosAutorizados.vespertino.length;
+
+    // Renderizar matutino
+    if (correosAutorizados.matutino.length === 0) {
+        listaMat.innerHTML = '<div class="empty-state"><p>Sin alumnos</p></div>';
+    } else {
+        listaMat.innerHTML = correosAutorizados.matutino.map(a => `
+            <div class="alumno-item">
+                <div>
+                    <div class="alumno-email">${a.email}</div>
+                    <div class="alumno-nombre">${a.nombre || 'Sin nombre'}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Renderizar vespertino
+    if (correosAutorizados.vespertino.length === 0) {
+        listaVesp.innerHTML = '<div class="empty-state"><p>Sin alumnos</p></div>';
+    } else {
+        listaVesp.innerHTML = correosAutorizados.vespertino.map(a => `
+            <div class="alumno-item">
+                <div>
+                    <div class="alumno-email">${a.email}</div>
+                    <div class="alumno-nombre">${a.nombre || 'Sin nombre'}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
 // Exponer globalmente
 window.cargarRegistros = cargarRegistros;
 window.filtrarLista = filtrarLista;
@@ -275,3 +330,5 @@ window.limpiarRegistros = limpiarRegistros;
 window.exportarCSV = exportarCSV;
 window.exportarExcel = exportarExcel;
 window.copiarEnlace = copiarEnlace;
+window.cambiarTab = cambiarTab;
+window.renderizarAlumnos = renderizarAlumnos;
