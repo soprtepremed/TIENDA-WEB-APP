@@ -8,6 +8,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // FUNCIONES GLOBALES INMEDIATAS - Se cargan antes del body
+        window.turnoSeleccionado = 'matutino';
+        window.seleccionarTurno = function (turno) {
+            window.turnoSeleccionado = turno;
+            document.querySelectorAll('.turno-btn').forEach(function (btn) {
+                btn.classList.toggle('active', btn.dataset.turno === turno);
+            });
+        };
+        window.registrarAsistencia = function () {
+            alert('Cargando, espera un momento...');
+        };
+    </script>
     <style>
         :root {
             --color-navy: #1B3A6B;
