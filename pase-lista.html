@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pase de Lista - Plataforma Premed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .pase-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .pase-header {
+            background: linear-gradient(135deg, var(--color-navy) 0%, #2a4a7f 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .pase-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .pase-header p {
+            margin: 0.5rem 0 0;
+            opacity: 0.9;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-navy);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .stat-card.matutino .stat-value {
+            color: #f59e0b;
+        }
+
+        .stat-card.vespertino .stat-value {
+            color: #6366f1;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .controls-row input,
+        .controls-row select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .controls-row input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .controls-row input[type="date"] {
+            width: 180px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--color-navy);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2a4a7f;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: var(--color-navy);
+        }
+
+        .data-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-matutino {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-vespertino {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: #666;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .export-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .link-section {
+            background: #f0f9ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .link-section input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .controls-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo"><span>🛡️</span> Soporte Plataforma</a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link"><span class="sidebar-icon">☕</span> Cafetería</a>
+                <a href="pase-lista.html" class="sidebar-link active"><span class="sidebar-icon">📋</span> Pase de
+                    Lista</a>
+                <a href="horarios.html" class="sidebar-link"><span class="sidebar-icon">⏰</span> Horarios</a>
+                <a href="reportes-asistencia.html" class="sidebar-link"><span class="sidebar-icon">📊</span>
+                    Reportes</a>
+                <a href="historico-asistencia.html" class="sidebar-link"><span class="sidebar-icon">📅</span>
+                    Histórico</a>
+                <a href="cargar-evaluaciones.html" class="sidebar-link"><span class="sidebar-icon">📤</span> Cargar
+                    Eval.</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar" id="sidebarAvatar">AD</div>
+                    <div class="user-info">
+                        <span class="user-name" id="sidebarUserName">Admin</span>
+                        <span class="user-role" id="sidebarUserRole">Administrador</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="pase-container">
+                <!-- Header -->
+                <div class="pase-header">
+                    <h1>📋 Pase de Lista</h1>
+                    <p id="nombreSesion">Control de Asistencia Diaria</p>
+                </div>
+
+                <!-- Enlace para alumnos -->
+                <div class="link-section">
+                    <span>🔗 Enlace para alumnos:</span>
+                    <input type="text" id="linkAlumno" readonly value="">
+                    <button class="btn btn-secondary" onclick="copiarEnlace()">📋 Copiar</button>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-card matutino">
+                        <div class="stat-value" id="statMatutino">0</div>
+                        <div class="stat-label">☀️ Matutino</div>
+                    </div>
+                    <div class="stat-card vespertino">
+                        <div class="stat-value" id="statVespertino">0</div>
+                        <div class="stat-label">🌙 Vespertino</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">📊 Total Hoy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAutorizados">0</div>
+                        <div class="stat-label">👥 Autorizados</div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls-row">
+                    <input type="date" id="filtroFecha" onchange="cargarRegistros()">
+                    <select id="filtroTurno" onchange="filtrarLista()">
+                        <option value="todos">Todos los turnos</option>
+                        <option value="matutino">☀️ Matutino</option>
+                        <option value="vespertino">🌙 Vespertino</option>
+                    </select>
+                    <input type="text" id="buscador" placeholder="🔍 Buscar por correo o nombre..."
+                        oninput="filtrarLista()">
+                    <div class="export-row">
+                        <button class="btn btn-secondary" onclick="exportarCSV()">📄 CSV</button>
+                        <button class="btn btn-secondary" onclick="exportarExcel()">📊 Excel</button>
+                        <button class="btn btn-danger" onclick="limpiarRegistros()">🗑️ Limpiar</button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>⏰ Hora</th>
+                                <th>📧 Correo</th>
+                                <th>👤 Nombre</th>
+                                <th>🏷️ Turno Oficial</th>
+                                <th>✅ Turno Asistido</th>
+                                <th>🗑️</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaRegistros"></tbody>
+                    </table>
+                    <div id="emptyState" class="empty-state hidden">
+                        <div class="icon">📋</div>
+                        <p>No hay registros para la fecha seleccionada</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="auth-config.js"></script>
+    <script>protectPage();</script>
+    <script src="pase-lista.js"></script>
+</body>
+
+</html>
