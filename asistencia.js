@@ -2,6 +2,39 @@
 // Módulo de Asistencia - JavaScript
 // ===================================
 
+// FUNCIONES GLOBALES (disponibles inmediatamente para onclick)
+// Se redefinen más adelante con la implementación completa
+window.cambiarTab = function (tab) {
+    const container = document.querySelector('.container');
+    if (tab === 'admin') container?.classList.add('admin-expanded');
+    else container?.classList.remove('admin-expanded');
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const t = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+    if (t) t.classList.add('active');
+};
+window.cambiarSubtab = function (subtab) {
+    document.querySelectorAll('.subtab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.subtab === subtab));
+    document.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
+    const t = document.getElementById('subtab' + subtab.charAt(0).toUpperCase() + subtab.slice(1));
+    if (t) t.classList.add('active');
+};
+window.seleccionarTurno = function (turno) {
+    window.turnoSeleccionado = turno;
+    document.querySelectorAll('.turno-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.turno === turno));
+};
+window.marcarAsistencia = function () { console.log('Cargando...'); };
+window.cargarRegistros = function () { };
+window.filtrarLista = function () { };
+window.exportarCSV = function () { };
+window.exportarExcel = function () { };
+window.exportarPDF = function () { };
+window.limpiarRegistros = function () { };
+window.refrescarTablaManual = function () { };
+window.eliminarRegistroIndividual = function () { };
+window.guardarConfiguracion = function () { };
+window.copiarEnlaceAlumno = function () { };
+
 // Configuración de Supabase
 const ASISTENCIA_SUPABASE_URL = 'https://api.premed.mx';
 const ASISTENCIA_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
@@ -208,6 +241,7 @@ function cambiarTab(tab) {
     const targetTab = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     if (targetTab) targetTab.classList.add('active');
 }
+window.cambiarTab = cambiarTab;
 
 function cambiarSubtab(subtab) {
     // Actualizar botones
@@ -222,6 +256,7 @@ function cambiarSubtab(subtab) {
     const targetSubtab = document.getElementById(`subtab${subtab.charAt(0).toUpperCase() + subtab.slice(1)}`);
     if (targetSubtab) targetSubtab.classList.add('active');
 }
+window.cambiarSubtab = cambiarSubtab;
 
 // ===================================
 // REGISTRO DE ASISTENCIA
@@ -233,6 +268,7 @@ function seleccionarTurno(turno) {
         btn.classList.toggle('active', btn.dataset.turno === turno);
     });
 }
+window.seleccionarTurno = seleccionarTurno;
 
 // BLINDAJE 2: Marcar Asistencia Robusto
 async function marcarAsistencia() {
@@ -409,7 +445,7 @@ async function cargarCorreosAutorizados() {
         const supabaseClient = initAsistenciaSupabase();
         if (!supabaseClient) return;
 
-        // Consultar alumnos autorizados (Tabla pública Soporte)
+        // Consultar alumnos autorizados (Tabla soporte.correos_autorizados)
         const { data, error } = await supabaseClient
             .from('correos_autorizados')
             .select('*');
@@ -671,6 +707,110 @@ function exportarCSV() {
     link.click();
 }
 
+function exportarExcel() {
+    if (registrosHoy.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+    }
+
+    const data = registrosHoy.map(r => ({
+        'Fecha': r.fecha,
+        'Hora': formatearHora(r.timestamp),
+        'Correo': r.email,
+        'Turno': r.turno,
+        'Turno Asistido': r.turno_asistido || '--'
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Asistencia');
+    XLSX.writeFile(wb, `asistencia_${fechaSeleccionada}.xlsx`);
+}
+
+function exportarPDF() {
+    if (registrosHoy.length === 0) {
+        alert('No hay datos para exportar.');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text('Reporte de Asistencia', 14, 22);
+    doc.setFontSize(11);
+    doc.text(`Fecha: ${fechaSeleccionada}`, 14, 30);
+
+    const tableData = registrosHoy.map(r => [
+        formatearHora(r.timestamp),
+        r.email,
+        r.turno,
+        r.turno_asistido || '--'
+    ]);
+
+    doc.autoTable({
+        head: [['Hora', 'Correo', 'Turno', 'Turno Asistido']],
+        body: tableData,
+        startY: 38,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [27, 58, 107] }
+    });
+
+    doc.save(`asistencia_${fechaSeleccionada}.pdf`);
+}
+
+async function guardarConfiguracion() {
+    const nombreInput = document.getElementById('configNombre');
+    const scriptInput = document.getElementById('configScript');
+
+    if (!nombreInput || !scriptInput) return;
+
+    const nombre = nombreInput.value.trim();
+    const script = scriptInput.value.trim();
+
+    if (!nombre) {
+        alert('Por favor ingresa un nombre de sesión.');
+        return;
+    }
+
+    try {
+        const { error } = await asistenciaSupabase
+            .from('configuracion')
+            .update({
+                nombre_sesion: nombre,
+                script_url: script || DEFAULT_SCRIPT_URL
+            })
+            .eq('id', 1);
+
+        if (error) throw error;
+
+        configuracion.nombre_sesion = nombre;
+        configuracion.script_url = script || DEFAULT_SCRIPT_URL;
+
+        const nombreSesionElem = document.getElementById('nombreSesion');
+        if (nombreSesionElem) nombreSesionElem.textContent = nombre;
+
+        alert('✅ Configuración guardada');
+    } catch (e) {
+        console.error('Error guardando configuración:', e);
+        alert('Error al guardar la configuración');
+    }
+}
+
+function copiarEnlaceAlumno() {
+    const linkInput = document.getElementById('linkAlumno');
+    if (linkInput) {
+        navigator.clipboard.writeText(linkInput.value).then(() => {
+            alert('📋 Enlace copiado al portapapeles');
+        }).catch(() => {
+            // Fallback
+            linkInput.select();
+            document.execCommand('copy');
+            alert('📋 Enlace copiado');
+        });
+    }
+}
+
 async function limpiarRegistros() {
     if (!confirm('¿Estás seguro de eliminar TODOS los registros de hoy?')) return;
 
@@ -767,3 +907,21 @@ async function refrescarTablaManual() {
         mostrarMensaje('success', '🔄 Datos actualizados');
     }, 500);
 }
+
+// ===================================
+// EXPONER FUNCIONES GLOBALMENTE
+// ===================================
+window.cambiarTab = cambiarTab;
+window.cambiarSubtab = cambiarSubtab;
+window.seleccionarTurno = seleccionarTurno;
+window.marcarAsistencia = marcarAsistencia;
+window.cargarRegistros = cargarRegistros;
+window.filtrarLista = filtrarLista;
+window.exportarCSV = exportarCSV;
+window.exportarExcel = exportarExcel;
+window.exportarPDF = exportarPDF;
+window.limpiarRegistros = limpiarRegistros;
+window.refrescarTablaManual = refrescarTablaManual;
+window.eliminarRegistroIndividual = eliminarRegistroIndividual;
+window.guardarConfiguracion = guardarConfiguracion;
+window.copiarEnlaceAlumno = copiarEnlaceAlumno;
