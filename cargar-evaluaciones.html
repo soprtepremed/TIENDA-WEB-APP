@@ -317,25 +317,25 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="reportes-asistencia.html" class="sidebar-logo">
-                    <span class="logo-icon">ðŸ“š</span> PREMED
+                    <span class="logo-icon">&#128218;</span> PREMED
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link">
-                    <span class="sidebar-icon">â˜•</span> CafeterÃ­a
+                    <span class="sidebar-icon">&#9749;</span> Cafetería
                 </a>
 
                 <a href="horarios.html" class="sidebar-link">
-                    <span class="sidebar-icon">â°</span> Horarios
+                    <span class="sidebar-icon">&#9200;</span> Horarios
                 </a>
                 <a href="reportes-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">ðŸ“Š</span> Reportes
+                    <span class="sidebar-icon">&#128202;</span> Reportes
                 </a>
                 <a href="historico-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">ðŸ“…</span> HistÃ³rico
+                    <span class="sidebar-icon">&#128197;</span> Histórico
                 </a>
                 <a href="cargar-evaluaciones.html" class="sidebar-link active">
-                    <span class="sidebar-icon">ðŸ“¤</span> Cargar Eval.
+                    <span class="sidebar-icon">&#128229;</span> Cargar Eval.
                 </a>
                 <a href="pase-lista.html" class="sidebar-link">
                     <span class="sidebar-icon">&#128203;</span> Pase de Lista
@@ -355,27 +355,27 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="page-header">
-                <h1>ðŸ“¤ Cargar Evaluaciones</h1>
+                <h1>&#128229; Cargar Evaluaciones</h1>
                 <p>Importa los resultados de evaluaciones desde un archivo CSV</p>
             </div>
 
             <div class="upload-container">
                 <!-- Zona de carga -->
                 <div class="upload-zone" id="uploadZone">
-                    <div class="icon">ðŸ“„</div>
-                    <h3>Arrastra tu archivo CSV aquÃ­</h3>
+                    <div class="icon">&#128196;</div>
+                    <h3>Arrastra tu archivo CSV aquí</h3>
                     <p>o haz clic para seleccionar</p>
                     <input type="file" id="fileInput" class="file-input" accept=".csv">
                 </div>
 
                 <!-- Info del archivo -->
                 <div class="file-info" id="fileInfo">
-                    <span class="file-icon">ðŸ“Š</span>
+                    <span class="file-icon">&#128202;</span>
                     <div class="file-details">
                         <div class="file-name" id="fileName">archivo.csv</div>
                         <div class="file-size" id="fileSize">0 KB</div>
                     </div>
-                    <button class="btn-remove" id="btnRemove" title="Quitar archivo">âœ•</button>
+                    <button class="btn-remove" id="btnRemove" title="Quitar archivo">&#10006;</button>
                 </div>
 
                 <!-- Vista previa -->
@@ -384,13 +384,13 @@
                         <h3>Vista Previa</h3>
                         <div class="preview-stats">
                             <div class="preview-stat">
-                                ðŸ“ <strong id="totalRecords">0</strong> registros
+                                &#128205; <strong id="totalRecords">0</strong> registros
                             </div>
                             <div class="preview-stat">
-                                âœ… <strong id="validRecords">0</strong> vÃ¡lidos
+                                &#9989; <strong id="validRecords">0</strong> válidos
                             </div>
                             <div class="preview-stat">
-                                âš ï¸ <strong id="skippedRecords">0</strong> omitidos
+                                &#9888;&#65039; <strong id="skippedRecords">0</strong> omitidos
                             </div>
                         </div>
                     </div>
@@ -401,7 +401,7 @@
                                     <th>ID</th>
                                     <th>Nombre</th>
                                     <th>Turno</th>
-                                    <th>RealizÃ³</th>
+                                    <th>Realizó</th>
                                     <th>Calif. %</th>
                                     <th>Estado</th>
                                     <th>Fecha Eval.</th>
@@ -417,7 +417,7 @@
                 <div class="actions-section" id="actionsSection">
                     <button class="btn btn-secondary" id="btnCancel">Cancelar</button>
                     <button class="btn btn-primary" id="btnUpload">
-                        ðŸ“¤ Cargar Evaluaciones
+                        &#128229; Cargar Evaluaciones
                     </button>
                 </div>
 
@@ -431,8 +431,8 @@
 
                 <!-- Resultado -->
                 <div class="result-section" id="resultSection">
-                    <div class="result-icon" id="resultIcon">âœ…</div>
-                    <div class="result-title" id="resultTitle">Â¡Carga exitosa!</div>
+                    <div class="result-icon" id="resultIcon">&#9989;</div>
+                    <div class="result-title" id="resultTitle">¡Carga exitosa!</div>
                     <div class="result-message" id="resultMessage">Se importaron 0 registros.</div>
                     <button class="btn btn-primary" id="btnNewUpload" style="margin-top: 16px;">
                         Cargar otro archivo
@@ -441,12 +441,12 @@
 
                 <!-- Ayuda de formato -->
                 <div class="format-help">
-                    <h4>ðŸ“‹ Formato del archivo CSV</h4>
+                    <h4>&#128203; Formato del archivo CSV</h4>
                     <p>El archivo debe tener las siguientes columnas (el mismo formato que exportas de tu hoja de
-                        cÃ¡lculo):</p>
+                        cálculo):</p>
                     <code>ID,NOMBRE,TURNO,MODALIDAD,REALIZO EXAMEN,CALIFICACION,FECHA EVALUACION,fecha de inicio,fecha final,ESTADO</code>
                     <p style="margin-top: 12px;">
-                        <strong>Nota:</strong> Las calificaciones en formato "79/90" se convertirÃ¡n automÃ¡ticamente a
+                        <strong>Nota:</strong> Las calificaciones en formato "79/90" se convertirán automáticamente a
                         porcentaje (87.78%).
                     </p>
                 </div>
