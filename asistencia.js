@@ -369,6 +369,7 @@ async function marcarAsistencia() {
         btnMarcar.textContent = textoOriginal;
     }
 }
+window.marcarAsistencia = marcarAsistencia;
 
 async function enviarAGoogleSheets(email, turno, turnoAsistidoReal = '') {
     if (!configuracion.script_url) return;
