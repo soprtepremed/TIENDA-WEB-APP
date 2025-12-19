@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Asistencia - Plataforma Premed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-navy: #1B3A6B;
+            --color-gold: #D4AF37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--color-navy);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            color: var(--color-navy);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .info-box span {
+            color: #0369a1;
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--color-navy);
+            margin-bottom: 0.75rem;
+        }
+
+        .turno-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .turno-btn {
+            padding: 1.25rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .turno-btn:hover {
+            border-color: var(--color-navy);
+        }
+
+        .turno-btn.active {
+            border-color: var(--color-gold);
+            background: #fffbeb;
+        }
+
+        .turno-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .turno-text {
+            font-weight: 600;
+            color: var(--color-navy);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-navy);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--color-navy);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit:hover {
+            background: #2a4a7f;
+        }
+
+        .btn-submit:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .mensaje {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .mensaje.success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .mensaje.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .mensaje.warning {
+            display: block;
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="header-icon">📋</div>
+                <h1>Control de Asistencia</h1>
+                <p id="nombreSesion">Registro de Pase de Lista</p>
+            </div>
+
+            <div class="info-box">
+                <span>🛡️</span>
+                <span>Ingresa tu correo y confirma tu turno actual.</span>
+            </div>
+
+            <!-- Selector de Turno -->
+            <div class="form-section">
+                <label class="form-label">1. ¿En qué turno asististe?</label>
+                <div class="turno-selector">
+                    <button type="button" class="turno-btn active" data-turno="matutino"
+                        onclick="seleccionarTurno('matutino')">
+                        <span class="turno-icon">☀️</span>
+                        <span class="turno-text">Matutino</span>
+                    </button>
+                    <button type="button" class="turno-btn" data-turno="vespertino"
+                        onclick="seleccionarTurno('vespertino')">
+                        <span class="turno-icon">🌙</span>
+                        <span class="turno-text">Vespertino</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Correo -->
+            <div class="form-section">
+                <label class="form-label">2. Correo Electrónico</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input type="email" id="inputCorreo" class="form-input" placeholder="correo@ejemplo.com">
+                </div>
+            </div>
+
+            <!-- Mensaje -->
+            <div id="mensaje" class="mensaje"></div>
+
+            <!-- Botón -->
+            <button id="btnRegistrar" class="btn-submit" onclick="registrarAsistencia()">
+                MARCAR ASISTENCIA
+            </button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Config
+        const SUPABASE_URL = 'https://api.premed.mx';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
+
+        let supabase;
+        let turnoSeleccionado = 'matutino';
+        let correosAutorizados = { matutino: [], vespertino: [] };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { db: { schema: 'soporte' } });
+            await cargarCorreos();
+            console.log('✅ Registro listo');
+        });
+
+        async function cargarCorreos() {
+            try {
+                const { data } = await supabase.from('correos_autorizados').select('*').eq('activo', true);
+                correosAutorizados = { matutino: [], vespertino: [] };
+                (data || []).forEach(item => {
+                    const email = item.email?.toLowerCase();
+                    if (!email) return;
+                    const info = { email, nombre: item.nombre_alumno || '' };
+                    if (item.turno === 'matutino') correosAutorizados.matutino.push(info);
+                    else if (item.turno === 'vespertino') correosAutorizados.vespertino.push(info);
+                });
+                console.log('📧 Correos cargados:', correosAutorizados.matutino.length + correosAutorizados.vespertino.length);
+            } catch (e) { console.error('Error:', e); }
+        }
+
+        function seleccionarTurno(turno) {
+            turnoSeleccionado = turno;
+            document.querySelectorAll('.turno-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.turno === turno);
+            });
+        }
+
+        function mostrarMensaje(tipo, texto) {
+            const div = document.getElementById('mensaje');
+            div.className = `mensaje ${tipo}`;
+            div.textContent = texto;
+        }
+
+        async function registrarAsistencia() {
+            const email = document.getElementById('inputCorreo').value.toLowerCase().trim();
+            const btn = document.getElementById('btnRegistrar');
+
+            // Validar email
+            if (!email || !email.includes('@')) {
+                mostrarMensaje('error', '❌ Ingresa un correo válido');
+                return;
+            }
+
+            // Buscar en autorizados
+            const enMat = correosAutorizados.matutino.find(c => c.email === email);
+            const enVesp = correosAutorizados.vespertino.find(c => c.email === email);
+
+            if (!enMat && !enVesp) {
+                mostrarMensaje('error', '⚠️ Correo no encontrado en la lista de alumnos');
+                return;
+            }
+
+            // Obtener datos
+            const alumno = enMat || enVesp;
+            const turnoOficial = enMat ? 'matutino' : 'vespertino';
+
+            // Determinar turno asistido por hora
+            const hora = new Date().getHours();
+            let turnoAsistido = 'otro';
+            if (hora >= 7 && hora < 14) turnoAsistido = 'matutino';
+            else if (hora >= 14 && hora < 22) turnoAsistido = 'vespertino';
+
+            btn.disabled = true;
+            btn.textContent = 'Registrando...';
+
+            try {
+                const { error } = await supabase.from('pase_lista').insert({
+                    email: email,
+                    nombre: alumno.nombre,
+                    turno_oficial: turnoOficial,
+                    turno_asistido: turnoAsistido
+                });
+
+                if (error) throw error;
+
+                mostrarMensaje('success', `✅ ¡Asistencia registrada! (${turnoOficial})`);
+                document.getElementById('inputCorreo').value = '';
+
+            } catch (e) {
+                console.error('Error:', e);
+                if (e.code === '23505') {
+                    mostrarMensaje('warning', 'ℹ️ Ya registraste tu asistencia hoy');
+                } else {
+                    mostrarMensaje('error', '❌ Error al registrar. Intenta de nuevo.');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'MARCAR ASISTENCIA';
+            }
+        }
+
+        window.seleccionarTurno = seleccionarTurno;
+        window.registrarAsistencia = registrarAsistencia;
+    </script>
+</body>
+
+</html>
