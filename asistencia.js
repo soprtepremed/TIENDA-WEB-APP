@@ -97,12 +97,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar enlace de alumno
     const linkAlumnoInput = document.getElementById('linkAlumno');
     if (linkAlumnoInput) {
-        // Generar enlace basado en la URL actual, reemplazando asistencia.html por registro.html
-        // O si estamos en root, adjuntar registro.html
+        // Generar enlace basado en la URL actual, reemplazando asistencia.html por registro-v2.html
+        // O si estamos en root, adjuntar registro-v2.html
         const currentUrl = window.location.href;
         const registroUrl = currentUrl.includes('asistencia.html')
-            ? currentUrl.replace('asistencia.html', 'registro.html')
-            : currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1) + 'registro.html';
+            ? currentUrl.replace('asistencia.html', 'registro-v2.html')
+            : currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1) + 'registro-v2.html';
 
         linkAlumnoInput.value = registroUrl;
     }
