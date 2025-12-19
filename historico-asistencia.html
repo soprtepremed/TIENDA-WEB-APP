@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HistÃ³rico General de Asistencia - PREMED</title>
-    <meta name="description" content="Reporte general histÃ³rico de asistencia por turnos y semanas">
+    <title>Histórico General de Asistencia - PREMED</title>
+    <meta name="description" content="Reporte general histórico de asistencia por turnos y semanas">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -332,12 +332,12 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="reportes-asistencia.html" class="sidebar-logo">
-                    <span class="logo-icon">ðŸ“š</span> PREMED
+                    <span class="logo-icon">&#128218;</span> PREMED
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link">
-                    <span class="sidebar-icon">â˜•</span> CafeterÃ­a
+                    <span class="sidebar-icon">&#9749;</span> Cafetería
                 </a>
 
                 <a href="horarios.html" class="sidebar-link">
@@ -347,7 +347,7 @@
                     <span class="sidebar-icon">ðŸ“Š</span> Reportes
                 </a>
                 <a href="historico-asistencia.html" class="sidebar-link active">
-                    <span class="sidebar-icon">ðŸ“…</span> HistÃ³rico
+                    <span class="sidebar-icon">&#128197;</span> Histórico
                 </a>
                 <a href="cargar-evaluaciones.html" class="sidebar-link">
                     <span class="sidebar-icon">ðŸ“¤</span> Cargar Eval.
@@ -365,7 +365,7 @@
                     </div>
                 </div>
                 <button onclick="logout()" class="btn-logout">
-                    Cerrar SesiÃ³n
+                    Cerrar Sesión
                 </button>
             </div>
         </aside>
@@ -377,31 +377,31 @@
 
                     <!-- Header -->
                     <div class="section-header">
-                        <h1 class="section-title">ðŸ“… HistÃ³rico General de Asistencia</h1>
+                        <h1 class="section-title">&#128197; Histórico General de Asistencia</h1>
                         <p class="section-subtitle">Consulta listas completas por turno y semana</p>
                     </div>
 
                     <!-- Panel de Filtros Moderno -->
                     <div class="filters-container">
 
-                        <!-- 1. SelecciÃ³n de Turno -->
+                        <!-- 1. Selección de Turno -->
                         <div class="filter-section-title">1. Selecciona el Turno</div>
                         <div class="turnos-wrapper">
                             <button class="btn-turno active" data-turno="matutino" onclick="selectTurno('matutino')">
-                                â˜€ï¸ Matutino (Presencial)
+                                &#9728;&#65039; Matutino (Presencial)
                             </button>
                             <button class="btn-turno" data-turno="vespertino" onclick="selectTurno('vespertino')">
-                                ðŸŒ† Vespertino (Presencial)
+                                &#127750; Vespertino (Presencial)
                             </button>
                             <button class="btn-turno" data-turno="en_linea" onclick="selectTurno('en_linea')">
-                                ðŸ’» En LÃ­nea
+                                &#128187; En Línea
                             </button>
                         </div>
 
-                        <!-- 2. SelecciÃ³n de Semana -->
+                        <!-- 2. Selección de Semana -->
                         <div class="filter-section-title">2. Selecciona la Semana Disponible</div>
                         <div id="weeksContainer" class="weeks-grid">
-                            <!-- AquÃ­ se inyectarÃ¡n las tarjetas de semana -->
+                            <!-- Aquí se inyectarán las tarjetas de semana -->
                             <div class="weeks-empty">Cargando semanas disponibles...</div>
                         </div>
 
@@ -427,9 +427,9 @@
                                 <span class="summary-label">Promedio Grupal</span>
                             </div>
 
-                            <!-- BotÃ³n de Riesgo -->
+                            <!-- Botón de Riesgo -->
                             <button onclick="showRiskModal()" class="btn-risk">
-                                âš ï¸ Ver Alumnos en Riesgo
+                                &#9888;&#65039; Ver Alumnos en Riesgo
                             </button>
 
                             <div class="summary-item" style="text-align: right;">
@@ -449,14 +449,14 @@
                                             <th>Nombre</th>
                                             <th style="text-align:center">Lun</th>
                                             <th style="text-align:center">Mar</th>
-                                            <th style="text-align:center">MiÃ©</th>
+                                            <th style="text-align:center">Mié</th>
                                             <th style="text-align:center">Jue</th>
                                             <th style="text-align:center">Vie</th>
                                             <th style="text-align:center">% Asistencia</th>
                                         </tr>
                                     </thead>
                                     <tbody id="listaAsistenciaBody">
-                                        <!-- Filas dinÃ¡micas -->
+                                        <!-- Filas dinámicas -->
                                     </tbody>
                                 </table>
                             </div>
@@ -465,7 +465,7 @@
                         <!-- Export Buttons -->
                         <div class="export-actions" style="justify-content: flex-end; margin-top: 20px;">
                             <button id="btnExportExcelGeneral" class="btn btn-secondary">
-                                <span class="btn-icon">ðŸ“Š</span> Descargar Excel
+                                <span class="btn-icon">📊</span> Descargar Excel
                             </button>
                         </div>
 
@@ -473,10 +473,10 @@
 
                     <!-- Empty State for filters -->
                     <div id="initialState" class="initial-state">
-                        <div class="initial-icon">ðŸ‘†</div>
+                        <div class="initial-icon">&#128070;</div>
                         <h2 class="initial-title">Selecciona Un Turno y Semana</h2>
                         <p class="initial-text">
-                            El sistema cargarÃ¡ el histÃ³rico completo de asistencias para el periodo seleccionado.
+                            El sistema cargará el histórico completo de asistencias para el periodo seleccionado.
                         </p>
                     </div>
 
@@ -489,11 +489,11 @@
     <div id="riskModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>âš ï¸ Alumnos con MÃºltiples Inasistencias (>3)</h3>
+                <h3>&#9888;&#65039; Alumnos con Múltiples Inasistencias (>3)</h3>
                 <button onclick="closeRiskModal()" class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p class="modal-subtitle">Listado de alumnos con 4 o mÃ¡s faltas en la semana seleccionada.</p>
+                <p class="modal-subtitle">Listado de alumnos con 4 o más faltas en la semana seleccionada.</p>
                 <div class="table-scroll-container" style="max-height: 400px;">
                     <table class="general-table">
                         <thead>

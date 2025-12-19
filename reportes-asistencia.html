@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 <button onclick="logout()" class="btn-logout">
-                    Cerrar SesiÃ³n
+                    Cerrar Sesión
                 </button>
             </div>
         </aside>
@@ -167,23 +167,23 @@
                                     <table class="data-table">
                                         <thead>
                                             <tr>
-                                                <th style="text-align: center;">ðŸ“† Semana</th>
-                                                <th style="text-align: center;">ðŸ·ï¸ Tipo</th>
+                                                <th style="text-align: center;">&#128197; Semana</th>
+                                                <th style="text-align: center;">&#128203; Tipo</th>
                                                 <th style="text-align: center;">Lunes</th>
                                                 <th style="text-align: center;">Martes</th>
-                                                <th style="text-align: center;">MiÃ©rcoles</th>
+                                                <th style="text-align: center;">Miércoles</th>
                                                 <th style="text-align: center;">Jueves</th>
                                                 <th style="text-align: center;">Viernes</th>
-                                                <th style="text-align: center;">ðŸ“Š % Semana</th>
+                                                <th style="text-align: center;">&#128202; % Semana</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tablaAsistencia">
-                                            <!-- Filas dinÃ¡micas -->
+                                            <!-- Filas dinámicas -->
                                         </tbody>
                                     </table>
                                 </div>
                                 <div id="emptyAsistencia" class="empty-state hidden">
-                                    <div class="empty-icon">ðŸ“‹</div>
+                                    <div class="empty-icon">&#128219;</div>
                                     <p>No hay registros de asistencia para este alumno</p>
                                 </div>
                             </div>
@@ -194,20 +194,20 @@
                                     <table class="data-table">
                                         <thead>
                                             <tr>
-                                                <th style="text-align: center;">ðŸ“… Eval</th>
-                                                <th style="text-align: center;">ðŸ“† Semana</th>
-                                                <th style="text-align: center;">âœ“/âœ—</th>
-                                                <th style="text-align: center;">ðŸ“Š Calif.</th>
-                                                <th style="text-align: center;">ðŸ·ï¸ Estado</th>
+                                                <th style="text-align: center;">&#128197; Eval</th>
+                                                <th style="text-align: center;">&#128197; Semana</th>
+                                                <th style="text-align: center;">&#10003;/&#10007;</th>
+                                                <th style="text-align: center;">&#128202; Calif.</th>
+                                                <th style="text-align: center;">&#128308; Estado</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tablaEvaluaciones">
-                                            <!-- Filas dinÃ¡micas -->
+                                            <!-- Filas dinámicas -->
                                         </tbody>
                                     </table>
                                 </div>
                                 <div id="emptyEvaluaciones" class="empty-state hidden">
-                                    <div class="empty-icon">ðŸ“</div>
+                                    <div class="empty-icon">&#128221;</div>
                                     <p>No hay evaluaciones registradas para este alumno</p>
                                 </div>
                             </div>
@@ -216,23 +216,23 @@
                         <!-- Export Actions -->
                         <div class="export-actions">
                             <button id="btnExportPDF" class="btn btn-secondary">
-                                <span class="btn-icon">ðŸ“„</span> Exportar PDF
+                                <span class="btn-icon">&#128462;</span> Exportar PDF
                             </button>
                             <button id="btnExportExcel" class="btn btn-secondary">
-                                <span class="btn-icon">ðŸ“Š</span> Exportar Excel
+                                <span class="btn-icon">&#128202;</span> Exportar Excel
                             </button>
                             <button id="btnPrint" class="btn btn-secondary">
-                                <span class="btn-icon">ðŸ–¨ï¸</span> Imprimir
+                                <span class="btn-icon">&#128424;</span> Imprimir
                             </button>
                         </div>
                     </section>
 
                     <!-- Initial State / Empty State -->
                     <section id="initialState" class="initial-state">
-                        <div class="initial-icon">ðŸ”</div>
+                        <div class="initial-icon">&#128269;</div>
                         <h2 class="initial-title">Busca un alumno para ver su reporte</h2>
                         <p class="initial-text">
-                            Ingresa el ID, correo electrÃ³nico o nombre del alumno en el buscador
+                            Ingresa el ID, correo electrónico o nombre del alumno en el buscador
                             para ver su historial de asistencia y evaluaciones.
                         </p>
                     </section>
@@ -240,18 +240,18 @@
                     <!-- Loading State -->
                     <section id="loadingState" class="loading-state hidden">
                         <div class="loading-spinner"></div>
-                        <p>Buscando informaciÃ³n del alumno...</p>
+                        <p>Buscando información del alumno...</p>
                     </section>
 
                     <!-- Error State -->
                     <section id="errorState" class="error-state hidden">
-                        <div class="error-icon">âš ï¸</div>
+                        <div class="error-icon">&#9888;&#65039;</div>
                         <h2 class="error-title" id="errorTitle">Alumno no encontrado</h2>
                         <p class="error-text" id="errorText">
-                            No se encontrÃ³ ningÃºn alumno con los datos proporcionados.
+                            No se encontró ningún alumno con los datos proporcionados.
                         </p>
                         <button class="btn btn-primary" onclick="resetSearch()">
-                            <span class="btn-icon">ðŸ”„</span> Intentar de nuevo
+                            <span class="btn-icon">&#128260;</span> Intentar de nuevo
                         </button>
                     </section>
 
@@ -262,7 +262,7 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <!-- LibrerÃ­as para ExportaciÃ³n -->
+    <!-- Librerías para Exportación -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
