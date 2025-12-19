@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -18,21 +18,24 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="reportes.html" class="sidebar-logo">
-                    <span>ðŸ“Š</span> Reportes
+                    <span>📊</span> Reportes
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link">
-                    <span class="sidebar-icon">â˜•</span> CafeterÃ­a
+                    <span class="sidebar-icon">&#9749;</span> Cafetería
                 </a>
-
                 <a href="videos.html" class="sidebar-link">
-                    <span class="sidebar-icon">ðŸŽ¥</span> Videos
+                    <span class="sidebar-icon">&#127909;</span> Videos
                 </a>
                 <a href="reportes-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">ðŸ“Š</span> Reportes
+                    <span class="sidebar-icon">&#128202;</span> Reportes
                 </a>
-            <a href="pase-lista.html" class="sidebar-link"><span class="sidebar-icon">📋</span> Pase de Lista</a></nav><div class="sidebar-footer">
+                <a href="pase-lista.html" class="sidebar-link">
+                    <span class="sidebar-icon">&#128203;</span> Pase de Lista
+                </a>
+            </nav>
+            <div class="sidebar-footer">
                 <div class="user-profile">
                     <div class="user-avatar" id="sidebarAvatar">AD</div>
                     <div class="user-info">
@@ -41,25 +44,25 @@
                     </div>
                 </div>
                 <button onclick="logout()" class="btn-logout">
-                    Cerrar SesiÃ³n
+                    Cerrar Sesión
                 </button>
             </div>
         </aside>
 
-        <!-- Main Content (CafeterÃ­a App) -->
+        <!-- Main Content (Cafetería App) -->
         <main class="main-content">
             <!-- Header -->
             <header class="header">
                 <div class="container">
                     <div class="header-content">
                         <h1 class="logo">
-                            <span class="logo-icon">â˜•</span>
+                            <span class="logo-icon">☕</span>
                             Cafe Premed
                         </h1>
                         <nav class="nav">
                             <a href="index.html" class="nav-item">Productos</a>
-                            <a href="ventas.html" class="nav-item">ðŸ’° Ventas</a>
-                            <div class="nav-item active">ðŸ“Š Reportes</div>
+                            <a href="ventas.html" class="nav-item">💰 Ventas</a>
+                            <div class="nav-item active">📊 Reportes</div>
                         </nav>
                     </div>
                 </div>
@@ -72,7 +75,7 @@
                     <section class="section">
                         <div class="section-header">
                             <h2 class="section-title">Corte de Caja</h2>
-                            <p class="section-subtitle">Resumen diario de ventas por mÃ©todo de pago</p>
+                            <p class="section-subtitle">Resumen diario de ventas por método de pago</p>
                         </div>
 
                         <div class="date-selector-container">
@@ -83,7 +86,7 @@
                         <div class="stats-grid">
                             <!-- Cash Card -->
                             <div class="stat-card">
-                                <div class="stat-icon cash">ðŸ’µ</div>
+                                <div class="stat-icon cash">💵</div>
                                 <div class="stat-info">
                                     <h3 class="stat-label">Efectivo</h3>
                                     <div class="stat-value" id="totalCash">$0.00</div>
@@ -93,7 +96,7 @@
 
                             <!-- Card Card -->
                             <div class="stat-card">
-                                <div class="stat-icon card">ðŸ’³</div>
+                                <div class="stat-icon card">💳</div>
                                 <div class="stat-info">
                                     <h3 class="stat-label">Tarjeta</h3>
                                     <div class="stat-value" id="totalCard">$0.00</div>
@@ -103,7 +106,7 @@
 
                             <!-- Transfer Card -->
                             <div class="stat-card">
-                                <div class="stat-icon transfer">ðŸ¦</div>
+                                <div class="stat-icon transfer">🏦</div>
                                 <div class="stat-info">
                                     <h3 class="stat-label">Transferencia</h3>
                                     <div class="stat-value" id="totalTransfer">$0.00</div>
@@ -114,7 +117,7 @@
 
                         <!-- Total Summary -->
                         <div class="total-summary-card">
-                            <h3 class="total-summary-label">Total del DÃ­a</h3>
+                            <h3 class="total-summary-label">Total del Día</h3>
                             <div class="total-summary-value" id="totalDaily">$0.00</div>
                         </div>
                     </section>
@@ -132,7 +135,7 @@
                                     <tr>
                                         <th>Fecha / Hora</th>
                                         <th>Total</th>
-                                        <th>MÃ©todo Pago</th>
+                                        <th>Método Pago</th>
                                         <th>Productos</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -142,7 +145,7 @@
                                 </tbody>
                             </table>
                             <div id="emptyHistory" class="empty-history" style="display: none;">
-                                <div class="empty-icon">ðŸ“…</div>
+                                <div class="empty-icon">📅</div>
                                 <p>No hay ventas registradas para esta fecha</p>
                             </div>
                         </div>
@@ -166,7 +169,7 @@
             <!-- Footer -->
             <footer class="footer">
                 <div class="container">
-                    <p class="footer-text">Â© 2025 Cafe Premed - Sistema de Punto de Venta</p>
+                    <p class="footer-text">© 2025 Cafe Premed - Sistema de Punto de Venta</p>
                 </div>
             </footer>
 
@@ -186,5 +189,3 @@
 </body>
 
 </html>
-
-
