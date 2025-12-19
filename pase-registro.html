@@ -269,15 +269,6 @@
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // FUNCIONES GLOBALES INMEDIATAS
-        window.seleccionarTurno = function (turno) {
-            window.turnoSeleccionado = turno;
-            document.querySelectorAll('.turno-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.turno === turno);
-            });
-        };
-        window.registrarAsistencia = function () { console.log('Cargando...'); };
-
         // Config
         const SUPABASE_URL = 'https://api.premed.mx';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
