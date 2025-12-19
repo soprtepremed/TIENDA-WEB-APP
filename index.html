@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <!-- Deploy to Hostinger -->
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soporte Plataforma - Sistema de GestiÃ³n</title>
-    <meta name="description" content="Sistema de gestiÃ³n y soporte para Plataforma">
+    <title>Soporte Plataforma - Sistema de Gestión</title>
+    <meta name="description" content="Sistema de gestión y soporte para Plataforma">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,26 +19,33 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="index.html" class="sidebar-logo">
-                    <span>ðŸ›¡ï¸</span> Soporte Plataforma
+                    <span>🛡️</span> Soporte Plataforma
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link active">
-                    <span class="sidebar-icon">â˜•</span> CafeterÃ­a
+                    <span class="sidebar-icon">☕</span> Cafetería
                 </a>
-                                <a href="horarios.html" class="sidebar-link">
-                    <span class="sidebar-icon">â°</span> Horarios
+                <a href="pase-lista.html" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Pase de Lista
+                </a>
+                <a href="horarios.html" class="sidebar-link">
+                    <span class="sidebar-icon">⏰</span> Horarios
                 </a>
                 <a href="reportes-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">ðŸ“Š</span> Reportes
+                    <span class="sidebar-icon">📊</span> Reportes
                 </a>
                 <a href="historico-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">ðŸ“…</span> HistÃ³rico
+                    <span class="sidebar-icon">📅</span> Histórico
                 </a>
                 <a href="cargar-evaluaciones.html" class="sidebar-link">
-                    <span class="sidebar-icon">ðŸ“¤</span> Cargar Eval.
+                    <span class="sidebar-icon">📤</span> Cargar Eval.
                 </a>
-            <a href="pase-lista.html" class="sidebar-link"><span class="sidebar-icon">📋</span> Pase de Lista</a></nav>            <div class="sidebar-footer">
+                <a href="pase-lista.html" class="sidebar-link">
+                    <span class="sidebar-icon">&#128203;</span> Pase de Lista
+                </a>
+            </nav>
+            <div class="sidebar-footer">
                 <div class="user-profile">
                     <div class="user-avatar" id="sidebarAvatar">AD</div>
                     <div class="user-info">
@@ -47,25 +54,25 @@
                     </div>
                 </div>
                 <button onclick="logout()" class="btn-logout">
-                    Cerrar SesiÃ³n
+                    Cerrar Sesión
                 </button>
             </div>
         </aside>
 
-        <!-- Main Content (CafeterÃ­a App) -->
+        <!-- Main Content (Cafetería App) -->
         <main class="main-content">
             <!-- Header -->
             <header class="header">
                 <div class="container">
                     <div class="header-content">
                         <h1 class="logo">
-                            <span class="logo-icon">â˜•</span>
+                            <span class="logo-icon">☕</span>
                             Cafe Premed
                         </h1>
                         <nav class="nav">
                             <div class="nav-item active">Productos</div>
-                            <a href="ventas.html" class="nav-item">ðŸ’° Ventas</a>
-                            <a href="reportes.html" class="nav-item">ðŸ“Š Reportes</a>
+                            <a href="ventas.html" class="nav-item">💰 Ventas</a>
+                            <a href="reportes.html" class="nav-item">📊 Reportes</a>
                         </nav>
                     </div>
                 </div>
@@ -92,9 +99,9 @@
 
                                 <!-- Product Description -->
                                 <div class="form-group">
-                                    <label for="productDescription" class="form-label">DescripciÃ³n</label>
+                                    <label for="productDescription" class="form-label">Descripción</label>
                                     <input type="text" id="productDescription" name="productDescription"
-                                        class="form-input" placeholder="DescripciÃ³n breve del producto">
+                                        class="form-input" placeholder="Descripción breve del producto">
                                 </div>
 
                                 <!-- Quantity -->
@@ -113,10 +120,10 @@
 
                                 <!-- Minimum Stock -->
                                 <div class="form-group">
-                                    <label for="productMinStock" class="form-label">Stock MÃ­nimo</label>
+                                    <label for="productMinStock" class="form-label">Stock Mínimo</label>
                                     <input type="number" id="productMinStock" name="productMinStock" class="form-input"
                                         placeholder="10" min="0" step="1" value="10">
-                                    <small class="form-hint">Se mostrarÃ¡ alerta cuando la cantidad sea menor a este
+                                    <small class="form-hint">Se mostrará alerta cuando la cantidad sea menor a este
                                         valor</small>
                                 </div>
 
@@ -127,7 +134,7 @@
                                         <input type="file" id="productImage" name="productImage" class="form-input-file"
                                             accept="image/*">
                                         <label for="productImage" class="file-upload-label">
-                                            <span class="file-upload-icon">ðŸ“</span>
+                                            <span class="file-upload-icon">📁</span>
                                             <span class="file-upload-text">Seleccionar imagen</span>
                                         </label>
                                         <div id="imagePreview" class="image-preview"></div>
@@ -138,11 +145,11 @@
                             <!-- Submit Button -->
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary">
-                                    <span class="btn-icon">âœ“</span>
+                                    <span class="btn-icon">✓</span>
                                     Registrar Producto
                                 </button>
                                 <button type="reset" class="btn btn-secondary">
-                                    <span class="btn-icon">â†»</span>
+                                    <span class="btn-icon">↻</span>
                                     Limpiar Formulario
                                 </button>
                             </div>
@@ -161,7 +168,7 @@
                         </div>
 
                         <div id="emptyState" class="empty-state">
-                            <div class="empty-state-icon">ðŸ“¦</div>
+                            <div class="empty-state-icon">📦</div>
                             <h3 class="empty-state-title">No hay productos registrados</h3>
                             <p class="empty-state-text">Comience agregando su primer producto usando el formulario de
                                 arriba</p>
@@ -173,7 +180,7 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="container">
-                <p class="footer-text">Â© 2025 Cafe Premed - Sistema de Punto de Venta</p>
+                <p class="footer-text">© 2025 Cafe Premed - Sistema de Punto de Venta</p>
             </div>
         </footer>
         <!-- Firebase SDK -->
@@ -185,14 +192,13 @@
         <script src="auth-config.js"></script>
         <script>protectPage();</script>
 
-        <!-- ConfiguraciÃ³n de Firebase -->
+        <!-- Configuración de Firebase -->
         <script src="firebase-config.js"></script>
 
-        <!-- Script principal de la aplicaciÃ³n -->
+        <!-- Script principal de la aplicación -->
         <script src="app.js"></script>
         </main> <!-- End Main Content Wrapper -->
     </div> <!-- End App Container -->
 </body>
 
 </html>
-
