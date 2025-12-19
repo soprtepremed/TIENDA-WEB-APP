@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Asistencia</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .test-section {
+            background: #2a2a2a;
+            border: 2px solid #00ff00;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #004400;
+            border-left: 4px solid #00ff00;
+        }
+
+        .error {
+            background: #440000;
+            border-left: 4px solid #ff0000;
+            color: #ff6666;
+        }
+
+        .warning {
+            background: #444400;
+            border-left: 4px solid #ffff00;
+            color: #ffff66;
+        }
+
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #00cc00;
+        }
+
+        input {
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 8px;
+            border-radius: 4px;
+            width: 300px;
+            margin: 10px 0;
+        }
+
+        h1,
+        h2 {
+            color: #00ff00;
+        }
+
+        .console-output {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔬 Diagnóstico de Sistema de Asistencia</h1>
+    <p>Herramienta de diagnóstico para identificar problemas de conexión y autorización</p>
+
+    <div class="test-section">
+        <h2>1. Verificación de Librerías</h2>
+        <div id="libraryTest"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Inicialización de Supabase</h2>
+        <div id="supabaseInit"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Prueba de Conexión al Servidor</h2>
+        <button onclick="testConnection()">Probar Conexión</button>
+        <div id="connectionTest"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Cargar Correos Autorizados</h2>
+        <button onclick="loadAuthorizedEmails()">Cargar Correos</button>
+        <div id="emailTest"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Verificar Email Específico</h2>
+        <input type="email" id="testEmail" placeholder="correo@ejemplo.com">
+        <button onclick="checkEmail()">Verificar Email</button>
+        <div id="emailCheckResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Logs del Sistema</h2>
+        <button onclick="clearLogs()">Limpiar Logs</button>
+        <div id="logs" class="console-output"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración
+        const ASISTENCIA_SUPABASE_URL = 'https://api.premed.mx';
+        const ASISTENCIA_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE';
+
+        let asistenciaSupabase;
+        let correosAutorizados = { matutino: [], vespertino: [] };
+
+        // Sistema de logs
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff6666' : type === 'success' ? '#00ff00' : '#ffff66';
+            logsDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        function showResult(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="test-result ${type}">${message}</div>`;
+        }
+
+        // Test 1: Verificar librerías
+        function checkLibraries() {
+            if (window.supabase) {
+                showResult('libraryTest', '✅ Librería Supabase cargada correctamente', 'success');
+                log('✅ Librería Supabase disponible', 'success');
+                return true;
+            } else {
+                showResult('libraryTest', '❌ Librería Supabase NO está disponible', 'error');
+                log('❌ Librería Supabase NO disponible', 'error');
+                return false;
+            }
+        }
+
+        // Test 2: Inicializar Supabase
+        function initSupabase() {
+            try {
+                if (!window.supabase) {
+                    showResult('supabaseInit', '❌ No se puede inicializar: librería no disponible', 'error');
+                    return false;
+                }
+
+                asistenciaSupabase = window.supabase.createClient(
+                    ASISTENCIA_SUPABASE_URL,
+                    ASISTENCIA_SUPABASE_ANON_KEY,
+                    {
+                        db: { schema: 'soporte' },
+                        auth: { persistSession: true, autoRefreshToken: true }
+                    }
+                );
+
+                showResult('supabaseInit', `✅ Cliente Supabase inicializado correctamente<br>
+                    📡 URL: ${ASISTENCIA_SUPABASE_URL}<br>
+                    🗂️ Schema: soporte`, 'success');
+                log('✅ Cliente Supabase inicializado (esquema: soporte)', 'success');
+                return true;
+            } catch (error) {
+                showResult('supabaseInit', `❌ Error al inicializar: ${error.message}`, 'error');
+                log(`❌ Error al inicializar Supabase: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Test 3: Probar conexión
+        async function testConnection() {
+            try {
+                log('🔄 Probando conexión a Supabase...', 'info');
+                showResult('connectionTest', '⏳ Probando conexión...', 'warning');
+
+                if (!asistenciaSupabase) {
+                    initSupabase();
+                }
+
+                const { data, error } = await asistenciaSupabase
+                    .from('configuracion')
+                    .select('*')
+                    .single();
+
+                if (error) throw error;
+
+                showResult('connectionTest', `✅ Conexión exitosa<br>
+                    📋 Configuración encontrada: ${data.nombre_sesion || 'Sin nombre'}<br>
+                    🔗 Script URL: ${data.script_url ? 'Configurado' : 'No configurado'}`, 'success');
+                log('✅ Conexión a Supabase exitosa', 'success');
+                return true;
+            } catch (error) {
+                showResult('connectionTest', `❌ Error de conexión: ${error.message}<br>
+                    Código: ${error.code || 'N/A'}<br>
+                    Detalles: ${error.details || 'N/A'}`, 'error');
+                log(`❌ Error de conexión: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Test 4: Cargar correos autorizados
+        async function loadAuthorizedEmails() {
+            try {
+                log('🔄 Cargando correos autorizados...', 'info');
+                showResult('emailTest', '⏳ Cargando correos...', 'warning');
+
+                if (!asistenciaSupabase) {
+                    initSupabase();
+                }
+
+                const { data, error } = await asistenciaSupabase
+                    .from('correos_autorizados')
+                    .select('*');
+
+                if (error) throw error;
+
+                log(`📊 Datos recibidos: ${data ? data.length : 0} registros`, 'info');
+
+                // Filtrar activos
+                const alumnosActivos = (data || []).filter(d => d.activo === true);
+
+                correosAutorizados = { matutino: [], vespertino: [] };
+
+                alumnosActivos.forEach(item => {
+                    const email = item.email ? item.email.toLowerCase() : '';
+                    if (!email) return;
+
+                    if (item.turno === 'matutino') {
+                        correosAutorizados.matutino.push(email);
+                    } else if (item.turno === 'vespertino') {
+                        correosAutorizados.vespertino.push(email);
+                    }
+                });
+
+                const totalMatutino = correosAutorizados.matutino.length;
+                const totalVespertino = correosAutorizados.vespertino.length;
+
+                showResult('emailTest', `✅ Correos cargados exitosamente<br>
+                    📊 Total en BD: ${data.length}<br>
+                    ✅ Activos: ${alumnosActivos.length}<br>
+                    ☀️ Matutino: ${totalMatutino}<br>
+                    🌙 Vespertino: ${totalVespertino}`, 'success');
+
+                log(`✅ Correos cargados: ${totalMatutino} matutino, ${totalVespertino} vespertino`, 'success');
+
+                // Mostrar algunos ejemplos
+                if (totalMatutino > 0) {
+                    log(`Ejemplo Matutino: ${correosAutorizados.matutino[0]}`, 'info');
+                }
+                if (totalVespertino > 0) {
+                    log(`Ejemplo Vespertino: ${correosAutorizados.vespertino[0]}`, 'info');
+                }
+
+                return true;
+            } catch (error) {
+                showResult('emailTest', `❌ Error al cargar correos: ${error.message}<br>
+                    Código: ${error.code || 'N/A'}`, 'error');
+                log(`❌ Error al cargar correos: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Test 5: Verificar email específico
+        function checkEmail() {
+            const emailInput = document.getElementById('testEmail');
+            const email = emailInput.value.toLowerCase().trim();
+
+            if (!email || !email.includes('@')) {
+                showResult('emailCheckResult', '❌ Por favor ingresa un email válido', 'error');
+                return;
+            }
+
+            log(`🔍 Verificando email: ${email}`, 'info');
+
+            const enMatutino = correosAutorizados.matutino.includes(email);
+            const enVespertino = correosAutorizados.vespertino.includes(email);
+
+            if (!enMatutino && !enVespertino) {
+                showResult('emailCheckResult', `❌ Email NO encontrado en la lista de autorizados<br>
+                    📧 Email buscado: ${email}<br>
+                    ⚠️ Este email NO puede registrar asistencia`, 'error');
+                log(`❌ Email ${email} NO autorizado`, 'error');
+
+                // Buscar coincidencias parciales
+                const similarMatutino = correosAutorizados.matutino.filter(e => e.includes(email.split('@')[0]));
+                const similarVespertino = correosAutorizados.vespertino.filter(e => e.includes(email.split('@')[0]));
+
+                if (similarMatutino.length > 0 || similarVespertino.length > 0) {
+                    log('💡 Correos similares encontrados:', 'info');
+                    similarMatutino.forEach(e => log(`  - ${e} (matutino)`, 'info'));
+                    similarVespertino.forEach(e => log(`  - ${e} (vespertino)`, 'info'));
+                }
+            } else {
+                const turno = enMatutino ? 'Matutino ☀️' : 'Vespertino 🌙';
+                showResult('emailCheckResult', `✅ Email ENCONTRADO<br>
+                    📧 Email: ${email}<br>
+                    🎯 Turno: ${turno}<br>
+                    ✅ Este email PUEDE registrar asistencia`, 'success');
+                log(`✅ Email ${email} autorizado (${turno})`, 'success');
+            }
+        }
+
+        // Auto-ejecutar al cargar
+        window.addEventListener('DOMContentLoaded', async () => {
+            log('🚀 Iniciando diagnóstico automático...', 'info');
+
+            // Test 1
+            const hasLibraries = checkLibraries();
+
+            // Test 2
+            if (hasLibraries) {
+                initSupabase();
+            }
+
+            log('✅ Diagnóstico inicial completado', 'success');
+            log('💡 Haz clic en los botones para ejecutar pruebas específicas', 'info');
+        });
+    </script>
+</body>
+
+</html>
