@@ -303,6 +303,20 @@
                 try {
                     var result = await sbClient.from('pase_lista').insert({ email: email, nombre: alumno.nombre, turno_oficial: turnoOf, turno_asistido: turnoAs, fecha: fechaLocal });
                     if (result.error) throw result.error;
+
+                    // Enviar también a Google Sheets
+                    fetch('https://script.google.com/macros/s/AKfycbwpHkJIv1aR5AXv2Jpwq2Kb7-FyhNXIvZ4yq-BMmzoqs3rdFeFkwrQL0rjAm2TtHDFSLA/exec', {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: email,
+                            nombre: alumno.nombre,
+                            turno: turnoOf,
+                            turno_asistido: turnoAs
+                        })
+                    }).catch(function (err) { console.log('Error Google Sheets:', err); });
+
                     msg.className = 'mensaje success';
                     msg.textContent = '✅ ¡Asistencia registrada! (' + turnoOf + ')';
                     document.getElementById('inputCorreo').value = '';
