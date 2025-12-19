@@ -296,8 +296,12 @@
                 btn.disabled = true;
                 btn.textContent = 'Registrando...';
 
+                // Fecha local
+                var hoy = new Date();
+                var fechaLocal = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
+
                 try {
-                    var result = await sbClient.from('pase_lista').insert({ email: email, nombre: alumno.nombre, turno_oficial: turnoOf, turno_asistido: turnoAs });
+                    var result = await sbClient.from('pase_lista').insert({ email: email, nombre: alumno.nombre, turno_oficial: turnoOf, turno_asistido: turnoAs, fecha: fechaLocal });
                     if (result.error) throw result.error;
                     msg.className = 'mensaje success';
                     msg.textContent = '✅ ¡Asistencia registrada! (' + turnoOf + ')';
