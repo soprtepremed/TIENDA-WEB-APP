@@ -220,7 +220,7 @@ window.processCSVUpload = async function () {
                 });
 
                 // ============================================================
-                // LÓGICA DE UPSERT MANUAL (Sin Constraint Unique en DB)
+                // LÓGICA DE UPSERT MANUAL (Actualizar si existe)
                 // ============================================================
                 // 1. Buscar registros existentes que coincidan con (id_alumno + semana)
                 const weeksInBatch = [...new Set(cleanBatch.map(r => r.fecha_inicio_semana).filter(Boolean))];
@@ -245,7 +245,7 @@ window.processCSVUpload = async function () {
                         cleanBatch.forEach(row => {
                             const key = `${row.id_alumno}|${row.fecha_inicio_semana}`;
                             if (existingMap[key]) {
-                                row.id = existingMap[key]; // Esto habilita el upsert por PK
+                                row.id = existingMap[key]; // Habilita update por PK
                             }
                         });
                     }
@@ -254,7 +254,7 @@ window.processCSVUpload = async function () {
                 // 3. Ejecutar Upsert (Sin onConflict explícito, usa PK 'id')
                 const { data, error } = await supabaseSoporte
                     .from(tableName)
-                    .upsert(cleanBatch); // Supabase usará 'id' si existe, si no, hará INSERT
+                    .upsert(cleanBatch);
 
                 if (error) {
                     log(`Error en lote ${i / BATCH_SIZE + 1}: ${error.message}`, 'error');
