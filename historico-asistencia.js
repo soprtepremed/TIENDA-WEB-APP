@@ -215,15 +215,46 @@ window.processCSVUpload = async function () {
                         // Opcional: cleanRow['turno'] = targetTable.includes('en_linea') ? 'En Línea' : 'Matutino';
                     }
 
+
                     return cleanRow;
                 });
 
+                // ============================================================
+                // LÓGICA DE UPSERT MANUAL (Sin Constraint Unique en DB)
+                // ============================================================
+                // 1. Buscar registros existentes que coincidan con (id_alumno + semana)
+                const weeksInBatch = [...new Set(cleanBatch.map(r => r.fecha_inicio_semana).filter(Boolean))];
+                const idsInBatch = cleanBatch.map(r => r.id_alumno).filter(Boolean);
+
+                if (weeksInBatch.length > 0 && idsInBatch.length > 0) {
+                    const { data: existingRows, error: fetchError } = await supabaseSoporte
+                        .from(tableName)
+                        .select('id, id_alumno, fecha_inicio_semana')
+                        .in('fecha_inicio_semana', weeksInBatch)
+                        .in('id_alumno', idsInBatch);
+
+                    if (!fetchError && existingRows) {
+                        // Crear mapa de búsqueda: "ID_ALUMNO|FECHA" -> ID_DB
+                        const existingMap = {};
+                        existingRows.forEach(row => {
+                            const key = `${row.id_alumno}|${row.fecha_inicio_semana}`;
+                            existingMap[key] = row.id;
+                        });
+
+                        // 2. Inyectar 'id' a los registros que ya existen para forzar UPDATE
+                        cleanBatch.forEach(row => {
+                            const key = `${row.id_alumno}|${row.fecha_inicio_semana}`;
+                            if (existingMap[key]) {
+                                row.id = existingMap[key]; // Esto habilita el upsert por PK
+                            }
+                        });
+                    }
+                }
+
+                // 3. Ejecutar Upsert (Sin onConflict explícito, usa PK 'id')
                 const { data, error } = await supabaseSoporte
                     .from(tableName)
-                    .upsert(cleanBatch, {
-                        onConflict: 'id_alumno,fecha_inicio_semana', // Asegúrate que tu tabla tenga esta constraint Unique
-                        ignoreDuplicates: false
-                    });
+                    .upsert(cleanBatch); // Supabase usará 'id' si existe, si no, hará INSERT
 
                 if (error) {
                     log(`Error en lote ${i / BATCH_SIZE + 1}: ${error.message}`, 'error');
