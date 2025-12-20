@@ -144,36 +144,76 @@ window.processCSVUpload = async function () {
             for (let i = 0; i < rows.length; i += BATCH_SIZE) {
                 const batch = rows.slice(i, i + BATCH_SIZE);
 
-                // Lista de columnas válidas en la base de datos
-                const VALID_COLUMNS = [
-                    'fecha_inicio_semana',
-                    'fecha_fin_semana',
-                    'id_alumno',
-                    'nombre_alumno',
-                    'turno',
-                    'lunes',
-                    'martes',
-                    'miercoles',
-                    'jueves',
-                    'viernes'
-                ];
 
-                // Limpiar datos (convertir vacíos a null y filtrar columnas extras como 'MES')
+                // Mapeo inteligente con columnas permitidas
                 const cleanBatch = batch.map(row => {
                     const cleanRow = {};
 
-                    VALID_COLUMNS.forEach(col => {
-                        // Solo procesar si la columna existe en el row (o dejarlo undefined/null si es opcional pero la DB lo acepta)
-                        // Si viene en el CSV, lo usamos.
-                        if (Object.prototype.hasOwnProperty.call(row, col)) {
-                            let val = row[col];
-                            if (val === undefined || val === null || val.trim() === '') {
-                                cleanRow[col] = null;
-                            } else {
-                                cleanRow[col] = val.trim();
-                            }
+                    // Mapa de sinónimos comunes (LowerCase -> DB Column)
+                    const headerMap = {
+                        'matricula': 'id_alumno',
+                        'control': 'id_alumno',
+                        'numero': 'id_alumno',
+                        'id': 'id_alumno',
+                        'alumno': 'nombre_alumno',
+                        'nombre': 'nombre_alumno',
+                        'nombre completo': 'nombre_alumno',
+                        'estudiante': 'nombre_alumno',
+                        'semana': 'fecha_inicio_semana',
+                        'fecha inicio': 'fecha_inicio_semana',
+                        'inicio': 'fecha_inicio_semana',
+                        'fecha': 'fecha_inicio_semana',
+                        'fin': 'fecha_fin_semana',
+                        'fecha fin': 'fecha_fin_semana',
+                        'lun': 'lunes',
+                        'mar': 'martes',
+                        'mie': 'miercoles',
+                        'mié': 'miercoles',
+                        'mir': 'miercoles', // typo comun
+                        'jue': 'jueves',
+                        'vie': 'viernes',
+                        'turn': 'turno',
+                        'modalidad': 'turno'
+                    };
+
+                    // Lista oficial de columnas DB
+                    const DB_COLUMNS = [
+                        'fecha_inicio_semana', 'fecha_fin_semana', 'id_alumno',
+                        'nombre_alumno', 'turno', 'lunes', 'martes',
+                        'miercoles', 'jueves', 'viernes'
+                    ];
+
+                    // Iterar sobre las keys del row del CSV
+                    Object.keys(row).forEach(csvKey => {
+                        const val = row[csvKey];
+                        // Normalizar key del CSV
+                        const normKey = csvKey.toLowerCase().trim().replace(/_/g, ' ');
+
+                        // 1. Match Exacto
+                        if (DB_COLUMNS.includes(normKey.replace(/ /g, '_'))) {
+                            cleanRow[normKey.replace(/ /g, '_')] = (val || '').trim() || null;
+                            return;
                         }
+
+                        // 2. Match por Sinónimos
+                        if (headerMap[normKey]) {
+                            const dbCol = headerMap[normKey];
+                            // Priorizar si ya existe valor (no sobrescribir con nulos si hay duplicados raros)
+                            if (!cleanRow[dbCol]) {
+                                cleanRow[dbCol] = (val || '').trim() || null;
+                            }
+                            return;
+                        }
+
+                        // 3. Match Parcial (e.g. "Nombre del Alumno" -> contiene "nombre" y "alumno")
+                        // Esto es mas arriesgado, mejor nos quedamos con sinónimos directos y exactos para no falsear datos.
                     });
+
+                    // Rellenar turno si falta y lo tenemos en el contexto global (opcional, pero útil)
+                    if (!cleanRow['turno']) {
+                        // Podríamos inferirlo del select 'uploadTarget', pero el CSV debería traerlo idealmente
+                        // Opcional: cleanRow['turno'] = targetTable.includes('en_linea') ? 'En Línea' : 'Matutino';
+                    }
 
                     return cleanRow;
                 });
