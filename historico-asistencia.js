@@ -144,19 +144,37 @@ window.processCSVUpload = async function () {
             for (let i = 0; i < rows.length; i += BATCH_SIZE) {
                 const batch = rows.slice(i, i + BATCH_SIZE);
 
-                // Limpiar datos (convertir vacíos a null, etc)
+                // Lista de columnas válidas en la base de datos
+                const VALID_COLUMNS = [
+                    'fecha_inicio_semana',
+                    'fecha_fin_semana',
+                    'id_alumno',
+                    'nombre_alumno',
+                    'turno',
+                    'lunes',
+                    'martes',
+                    'miercoles',
+                    'jueves',
+                    'viernes'
+                ];
+
+                // Limpiar datos (convertir vacíos a null y filtrar columnas extras como 'MES')
                 const cleanBatch = batch.map(row => {
                     const cleanRow = {};
-                    // Copiar solo lo que sirve y limpiar
-                    for (const key in row) {
-                        let val = row[key];
-                        if (val === undefined || val === null || val.trim() === '') {
-                            cleanRow[key] = null;
-                        } else {
-                            cleanRow[key] = val.trim();
+
+                    VALID_COLUMNS.forEach(col => {
+                        // Solo procesar si la columna existe en el row (o dejarlo undefined/null si es opcional pero la DB lo acepta)
+                        // Si viene en el CSV, lo usamos.
+                        if (Object.prototype.hasOwnProperty.call(row, col)) {
+                            let val = row[col];
+                            if (val === undefined || val === null || val.trim() === '') {
+                                cleanRow[col] = null;
+                            } else {
+                                cleanRow[col] = val.trim();
+                            }
                         }
-                    }
-                    // Asegurar id_alumno es string o número segun DB (Supabase lo maneja, pero cuidado con vacíos)
+                    });
+
                     return cleanRow;
                 });
 
