@@ -666,7 +666,7 @@ window.showRiskModal = function () {
     tbody.innerHTML = '';
 
     if (riskStudents.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">🎉 ¡Excelente! No hay alumnos en riesgo crítico esta semana.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">🎉 ¡Excelente! No hay alumnos en riesgo crítico esta semana.</td></tr>';
     } else {
         // Ordenar por número de faltas (mayor a menor)
         riskStudents.sort((a, b) => b.totalFaltas - a.totalFaltas);
@@ -678,6 +678,12 @@ window.showRiskModal = function () {
                 <td>${st.nombre_alumno}</td>
                 <td style="text-align:center; color:#dc2626; font-weight:bold;">${st.totalFaltas}</td>
                 <td style="text-align:center;">${st.percent}%</td>
+                <td style="text-align:center;">
+                    <a href="https://ventaspremed.kommo.com/leads/detail/${st.id_alumno}" target="_blank" 
+                       style="background:#3b82f6; color:white; padding:6px 12px; border-radius:6px; text-decoration:none; font-size:0.85rem; display:inline-block;">
+                       Contactar
+                    </a>
+                </td>
             `;
             tbody.appendChild(row);
         });
