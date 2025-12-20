@@ -25,6 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     // Cargar semanas del turno por defecto al iniciar
     loadAvailableWeeks();
+
+    // Listener para mostrar nombre del archivo
+    const fileInput = document.getElementById('csvFileInput');
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Haga clic o arrastre un archivo CSV aquí';
+            document.getElementById('fileNameDisplay').textContent = fileName;
+        });
+    }
 });
 
 function initEventListeners() {
@@ -55,6 +64,187 @@ window.selectTurno = function (turno) {
     // Cargar nuevas semanas
     loadAvailableWeeks();
 }
+
+// Lógica de Tabs Principales
+window.switchMainTab = function (tab) {
+    // 1. Alternar botones
+    document.getElementById('tabConsultar').classList.remove('active');
+    document.getElementById('tabCargar').classList.remove('active');
+
+    if (tab === 'consultar') {
+        document.getElementById('tabConsultar').classList.add('active');
+        document.getElementById('sectionConsultar').classList.remove('hidden');
+        document.getElementById('sectionCargar').classList.add('hidden');
+    } else {
+        document.getElementById('tabCargar').classList.add('active');
+        document.getElementById('sectionCargar').classList.remove('hidden');
+        document.getElementById('sectionConsultar').classList.add('hidden');
+    }
+}
+
+// =====================================================
+// Lógica de Carga CSV
+// =====================================================
+window.processCSVUpload = async function () {
+    const fileInput = document.getElementById('csvFileInput');
+    const logArea = document.getElementById('uploadLog');
+    const targetTable = document.getElementById('uploadTarget').value; // 'presencial' o 'en_linea'
+    const btnProcesar = document.getElementById('btnProcessUpload');
+
+    const log = (msg, type = 'info') => {
+        const color = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#fbbf24';
+        logArea.innerHTML += `<div style="color:${color}; margin-top:2px;">> ${msg}</div>`;
+        logArea.scrollTop = logArea.scrollHeight;
+    };
+
+    if (fileInput.files.length === 0) {
+        alert('Por favor selecciona un archivo CSV.');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const tableName = targetTable === 'en_linea' ? 'historico_asistencia_en_linea' : 'historico_asistencia_presencial';
+
+    log(`Iniciando carga de archivo: ${file.name}`, 'info');
+    log(`Destino: ${tableName}`, 'info');
+
+    btnProcesar.disabled = true;
+    btnProcesar.innerText = 'Procesando...';
+    document.getElementById('uploadLog').classList.remove('hidden');
+
+    const reader = new FileReader();
+
+    reader.onload = async function (e) {
+        const text = e.target.result;
+        try {
+            const rows = parseCSVSimple(text);
+            log(`Filas detectadas: ${rows.length}`, 'info');
+
+            if (rows.length === 0) {
+                throw new Error('El archivo parece estar vacío o no tiene el formato correcto.');
+            }
+
+            // Validar columnas requeridas
+            const requiredCols = ['fecha_inicio_semana', 'id_alumno', 'nombre_alumno', 'turno'];
+            const header = Object.keys(rows[0]);
+            const missing = requiredCols.filter(col => !header.includes(col));
+
+            if (missing.length > 0) {
+                throw new Error(`Faltan columnas requeridas: ${missing.join(', ')}`);
+            }
+
+            // Lotes de 100 para no saturar
+            const BATCH_SIZE = 100;
+            let insertedCount = 0;
+            let updatedCount = 0;
+            let errorCount = 0;
+
+            log(`Comenzando inserción en lotes de ${BATCH_SIZE}...`, 'info');
+
+            for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+                const batch = rows.slice(i, i + BATCH_SIZE);
+
+                // Limpiar datos (convertir vacíos a null, etc)
+                const cleanBatch = batch.map(row => {
+                    const cleanRow = {};
+                    // Copiar solo lo que sirve y limpiar
+                    for (const key in row) {
+                        let val = row[key];
+                        if (val === undefined || val === null || val.trim() === '') {
+                            cleanRow[key] = null;
+                        } else {
+                            cleanRow[key] = val.trim();
+                        }
+                    }
+                    // Asegurar id_alumno es string o número segun DB (Supabase lo maneja, pero cuidado con vacíos)
+                    return cleanRow;
+                });
+
+                const { data, error } = await supabaseSoporte
+                    .from(tableName)
+                    .upsert(cleanBatch, {
+                        onConflict: 'id_alumno,fecha_inicio_semana', // Asegúrate que tu tabla tenga esta constraint Unique
+                        ignoreDuplicates: false
+                    });
+
+                if (error) {
+                    log(`Error en lote ${i / BATCH_SIZE + 1}: ${error.message}`, 'error');
+                    errorCount += batch.length;
+                } else {
+                    insertedCount += batch.length;
+                    log(`Lote ${i / BATCH_SIZE + 1} procesado (${batch.length} registros).`, 'success');
+                }
+            }
+
+            log(`FINALIZADO. Procesados: ${insertedCount} | Errores: ${errorCount}`, 'success');
+            alert(`Carga completada.\nRegistros procesados: ${insertedCount}\nErrores: ${errorCount}`);
+
+        } catch (err) {
+            log(`Error Crítico: ${err.message}`, 'error');
+            console.error(err);
+            alert('Error al procesar el archivo. Revisa el log para más detalles.');
+        } finally {
+            btnProcesar.disabled = false;
+            btnProcesar.innerText = '▶ Procesar y Cargar';
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+// Parser CSV Simple (Soporta comillas básicas)
+function parseCSVSimple(str) {
+    const arr = [];
+    let quote = false;  // 'true' means we're inside a quoted field
+
+    // Iterate over each character, keep track of current row and field (col)
+    let row = 0, col = 0, c = 0;
+    let data = [''];  // Array of parsed rows (array of strings)
+
+    // 1. Dividir líneas (Respetando saltos de línea dentro de comillas si es posible, 
+    // pero para este caso simple asumiremos split por \n y manejo básico)
+    // Mejor usaremos un parser línea a línea más robusto
+
+    const lines = str.split(/\r\n|\n/);
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // Regex para splitear por comas ignorando las que están dentro de comillas
+        // Fuente común de regex para CSV
+        // Nota: Esto es básico.
+        const values = [];
+        let currentVal = '';
+        let inQuotes = false;
+
+        for (let j = 0; j < line.length; j++) {
+            const char = line[j];
+
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                values.push(currentVal.replace(/^"|"$/g, '')); // Limpiar comillas envolventes
+                currentVal = '';
+            } else {
+                currentVal += char;
+            }
+        }
+        values.push(currentVal.replace(/^"|"$/g, '')); // Push último valor
+
+        // Mapear headers a valores
+        if (values.length > 0) {
+            const rowObj = {};
+            headers.forEach((h, index) => {
+                rowObj[h] = values[index] || null;
+            });
+            arr.push(rowObj);
+        }
+    }
+    return arr;
+}
+
 
 // Seleccionar semana (Click en "píldora")
 window.selectSemana = function (fechaInicio, elemento) {
