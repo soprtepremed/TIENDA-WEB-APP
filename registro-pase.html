@@ -296,7 +296,7 @@
 
                 if (!email || email.indexOf('@') < 0) {
                     msg.className = 'mensaje error';
-                    msg.textContent = '&#10060; Ingresa un correo válido';
+                    msg.innerHTML = '&#10060; Ingresa un correo válido';
                     return;
                 }
 
@@ -306,7 +306,7 @@
 
                 if (!enMat && !enVesp && !enOnline) {
                     msg.className = 'mensaje error';
-                    msg.textContent = '&#9888;&#65039; Correo no encontrado';
+                    msg.innerHTML = '&#9888;&#65039; Correo no encontrado';
                     return;
                 }
 
@@ -315,6 +315,7 @@
                 if (enMat) turnoOf = 'matutino';
                 else if (enVesp) turnoOf = 'vespertino';
                 else if (enOnline) turnoOf = 'en_linea';
+
                 var hora = new Date().getHours();
                 var turnoAs = hora >= 7 && hora < 14 ? 'matutino' : (hora >= 14 && hora < 22 ? 'vespertino' : 'otro');
 
@@ -343,16 +344,16 @@
                     }).catch(function (err) { console.log('Error Google Sheets:', err); });
 
                     msg.className = 'mensaje success';
-                    msg.textContent = '&#9989; ¡Asistencia registrada! (' + turnoOf + ')';
+                    msg.innerHTML = '&#9989; ¡Asistencia registrada! (' + turnoOf + ')';
                     document.getElementById('inputCorreo').value = '';
                 } catch (e) {
                     console.error(e);
                     if (e.code === '23505') {
                         msg.className = 'mensaje warning';
-                        msg.textContent = '&#8505;&#65039; Ya registraste tu asistencia hoy';
+                        msg.innerHTML = '&#8505;&#65039; Ya registraste tu asistencia hoy';
                     } else {
                         msg.className = 'mensaje error';
-                        msg.textContent = '&#10060; Error al registrar';
+                        msg.innerHTML = '&#10060; Error al registrar';
                     }
                 }
                 btn.disabled = false;
