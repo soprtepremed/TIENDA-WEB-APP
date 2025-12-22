@@ -8,7 +8,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9s
 
 let supabaseClient;
 let registros = [];
-let correosAutorizados = { matutino: [], vespertino: [] };
+let correosAutorizados = { matutino: [], vespertino: [], en_linea: [] };
 
 // Fecha actual
 const hoy = new Date();
@@ -51,24 +51,56 @@ function initSupabase() {
 
 async function cargarCorreosAutorizados() {
     try {
-        const { data, error } = await supabaseClient.from('correos_autorizados').select('*').eq('activo', true);
-        if (error) throw error;
-
-        correosAutorizados = { matutino: [], vespertino: [] };
-        (data || []).forEach(item => {
-            const email = item.email?.toLowerCase();
-            if (!email) return;
-            if (item.turno === 'matutino') correosAutorizados.matutino.push({ email, nombre: item.nombre_alumno || '' });
-            else if (item.turno === 'vespertino') correosAutorizados.vespertino.push({ email, nombre: item.nombre_alumno || '' });
+        // Cear un cliente temporal para acceder al esquema 'premed'
+        // Esto es necesario porque el cliente principal está atado a 'soporte'
+        const clientPremed = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            db: { schema: 'premed' }
         });
 
-        const total = correosAutorizados.matutino.length + correosAutorizados.vespertino.length;
+        const { data, error } = await clientPremed
+            .from('alumnos')
+            .select('*')
+            .eq('activo', true);
+
+        if (error) throw error;
+
+        correosAutorizados = { matutino: [], vespertino: [], en_linea: [] };
+
+        (data || []).forEach(item => {
+            const email = item.email?.toLowerCase();
+            const nombre = (item.nombre || '') + ' ' + (item.apellido || '');
+            const turno = item.turno?.toLowerCase();
+            const modalidad = item.modalidad?.toLowerCase(); // 'presencial' o 'en_linea'
+
+            if (!email) return;
+
+            // Lógica de Clasificación
+            if (modalidad === 'en_linea' || modalidad === 'online') {
+                correosAutorizados.en_linea.push({ email, nombre });
+            } else if (turno === 'matutino') {
+                correosAutorizados.matutino.push({ email, nombre });
+            } else if (turno === 'vespertino') {
+                correosAutorizados.vespertino.push({ email, nombre });
+            }
+        });
+
+        const total = correosAutorizados.matutino.length +
+            correosAutorizados.vespertino.length +
+            correosAutorizados.en_linea.length;
+
         const statAutorizados = document.getElementById('statAutorizados');
         if (statAutorizados) statAutorizados.textContent = total;
 
-        console.log(`✅ Correos autorizados: ${total}`);
+        console.log(`✅ Alumnos activos cargados de PREMED: ${total}`);
+        console.log('Detalle:', {
+            mat: correosAutorizados.matutino.length,
+            vesp: correosAutorizados.vespertino.length,
+            online: correosAutorizados.en_linea.length
+        });
+
     } catch (e) {
-        console.error('Error cargando correos:', e);
+        console.error('Error cargando alumnos de premed:', e);
+        alert('Error cargando lista de alumnos. Verifique conexión.');
     }
 }
 
@@ -294,18 +326,21 @@ function cambiarTab(tab) {
 function renderizarAlumnos() {
     const listaMat = document.getElementById('listaMatutino');
     const listaVesp = document.getElementById('listaVespertino');
+    const listaOnline = document.getElementById('listaEnLinea');
+
     const countMat = document.getElementById('countMatutino');
     const countVesp = document.getElementById('countVespertino');
+    const countOnline = document.getElementById('countEnLinea');
 
     // Actualizar contadores
     countMat.textContent = correosAutorizados.matutino.length;
     countVesp.textContent = correosAutorizados.vespertino.length;
+    countOnline.textContent = correosAutorizados.en_linea.length;
 
-    // Renderizar matutino
-    if (correosAutorizados.matutino.length === 0) {
-        listaMat.innerHTML = '<div class="empty-state"><p>Sin alumnos</p></div>';
-    } else {
-        listaMat.innerHTML = correosAutorizados.matutino.map(a => `
+    // Helper para generar HTML
+    const generarHTML = (lista) => {
+        if (lista.length === 0) return '<div class="empty-state"><p>Sin alumnos</p></div>';
+        return lista.map(a => `
             <div class="alumno-item">
                 <div>
                     <div class="alumno-email">${a.email}</div>
@@ -313,21 +348,11 @@ function renderizarAlumnos() {
                 </div>
             </div>
         `).join('');
-    }
+    };
 
-    // Renderizar vespertino
-    if (correosAutorizados.vespertino.length === 0) {
-        listaVesp.innerHTML = '<div class="empty-state"><p>Sin alumnos</p></div>';
-    } else {
-        listaVesp.innerHTML = correosAutorizados.vespertino.map(a => `
-            <div class="alumno-item">
-                <div>
-                    <div class="alumno-email">${a.email}</div>
-                    <div class="alumno-nombre">${a.nombre || 'Sin nombre'}</div>
-                </div>
-            </div>
-        `).join('');
-    }
+    listaMat.innerHTML = generarHTML(correosAutorizados.matutino);
+    listaVesp.innerHTML = generarHTML(correosAutorizados.vespertino);
+    listaOnline.innerHTML = generarHTML(correosAutorizados.en_linea);
 }
 
 // Exponer globalmente

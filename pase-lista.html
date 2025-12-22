@@ -465,7 +465,7 @@
 
                 <!-- Tab: Alumnos Autorizados -->
                 <div id="tabAlumnos" class="tab-content">
-                    <div class="alumnos-grid">
+                    <div class="alumnos-grid" style="grid-template-columns: repeat(3, 1fr);">
                         <div class="alumnos-column">
                             <h3>&#9728;&#65039; Matutino (<span id="countMatutino">0</span>)</h3>
                             <div class="alumnos-list" id="listaMatutino">
@@ -477,6 +477,14 @@
                         <div class="alumnos-column">
                             <h3>&#127750; Vespertino (<span id="countVespertino">0</span>)</h3>
                             <div class="alumnos-list" id="listaVespertino">
+                                <div class="empty-state">
+                                    <p>Cargando...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alumnos-column">
+                            <h3>&#128187; En Línea (<span id="countEnLinea">0</span>)</h3>
+                            <div class="alumnos-list" id="listaEnLinea">
                                 <div class="empty-state">
                                     <p>Cargando...</p>
                                 </div>
