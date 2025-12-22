@@ -68,7 +68,13 @@ async function cargarCorreosAutorizados() {
 
         (data || []).forEach(item => {
             const email = item.email?.toLowerCase();
-            const nombre = (item.nombre || '') + ' ' + (item.apellido || '');
+            let nombre = (item.nombre || '').trim();
+            const apellido = (item.apellido || '').trim();
+
+            // Evitar duplicar apellido si ya viene incluido en el nombre
+            if (apellido && !nombre.toLowerCase().includes(apellido.toLowerCase())) {
+                nombre = `${nombre} ${apellido}`;
+            }
             const turno = item.turno?.toLowerCase();
             const modalidad = item.modalidad?.toLowerCase(); // 'presencial' o 'en_linea'
 
