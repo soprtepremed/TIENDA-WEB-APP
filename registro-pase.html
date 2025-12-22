@@ -251,21 +251,42 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
         var sbClient;
-        var correosAuth = { matutino: [], vespertino: [] };
+        var correosAuth = { matutino: [], vespertino: [], en_linea: [] };
 
         document.addEventListener('DOMContentLoaded', async function () {
+            // Cliente para soporte (donde se guarda la asistencia)
             sbClient = window.supabase.createClient('https://api.premed.mx', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE', { db: { schema: 'soporte' } });
-            var res = await sbClient.from('correos_autorizados').select('*').eq('activo', true);
+
+            // Cliente para premed (donde se leen los alumnos)
+            var sbClientPremed = window.supabase.createClient('https://api.premed.mx', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE', { db: { schema: 'premed' } });
+
+            var res = await sbClientPremed.from('alumnos').select('*').eq('activo', true);
             if (res.data) {
                 res.data.forEach(function (item) {
                     var e = item.email ? item.email.toLowerCase() : '';
                     if (!e) return;
-                    var info = { email: e, nombre: item.nombre_alumno || '' };
-                    if (item.turno === 'matutino') correosAuth.matutino.push(info);
-                    else if (item.turno === 'vespertino') correosAuth.vespertino.push(info);
+
+                    // CONSTRUCCIÓN DE NOMBRE (Sin duplicados)
+                    var nombre = (item.nombre || '').trim();
+                    var apellido = (item.apellido || '').trim();
+                    if (apellido && !nombre.toLowerCase().includes(apellido.toLowerCase())) {
+                        nombre = nombre + ' ' + apellido;
+                    }
+
+                    var info = { email: e, nombre: nombre };
+                    var turno = item.turno ? item.turno.toLowerCase() : '';
+                    var mod = item.modalidad ? item.modalidad.toLowerCase() : '';
+
+                    if (mod === 'en_linea' || mod === 'online') {
+                        correosAuth.en_linea.push(info);
+                    } else if (turno === 'matutino') {
+                        correosAuth.matutino.push(info);
+                    } else if (turno === 'vespertino') {
+                        correosAuth.vespertino.push(info);
+                    }
                 });
             }
-            console.log('Listo:', correosAuth.matutino.length + correosAuth.vespertino.length);
+            console.log('Listo. Mat:', correosAuth.matutino.length, 'Vesp:', correosAuth.vespertino.length, 'Online:', correosAuth.en_linea.length);
 
             // Registrar la funcion real
             window.registrarAsistencia = async function () {
@@ -281,15 +302,19 @@
 
                 var enMat = correosAuth.matutino.find(function (c) { return c.email === email; });
                 var enVesp = correosAuth.vespertino.find(function (c) { return c.email === email; });
+                var enOnline = correosAuth.en_linea.find(function (c) { return c.email === email; });
 
-                if (!enMat && !enVesp) {
+                if (!enMat && !enVesp && !enOnline) {
                     msg.className = 'mensaje error';
                     msg.textContent = '&#9888;&#65039; Correo no encontrado';
                     return;
                 }
 
-                var alumno = enMat || enVesp;
-                var turnoOf = enMat ? 'matutino' : 'vespertino';
+                var alumno = enMat || enVesp || enOnline;
+                var turnoOf = 'otro';
+                if (enMat) turnoOf = 'matutino';
+                else if (enVesp) turnoOf = 'vespertino';
+                else if (enOnline) turnoOf = 'en_linea';
                 var hora = new Date().getHours();
                 var turnoAs = hora >= 7 && hora < 14 ? 'matutino' : (hora >= 14 && hora < 22 ? 'vespertino' : 'otro');
 
