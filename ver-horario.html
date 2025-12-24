@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Horarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="horarios.css">
+    <style>
+        /* Ajustes específicos para solo lectura */
+        .horarios-layout {
+            grid-template-columns: 1fr;
+            /* Ocupar todo el ancho, sin panel izquierdo */
+        }
+
+        .main-content {
+            margin-left: 0;
+            /* Sin sidebar */
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .app-container {
+            flex-direction: column;
+        }
+
+        .top-bar {
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .actions {
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+        }
+
+        .card-profesor::before {
+            /* Ocultar icono de edición si existiera */
+            display: none;
+        }
+
+        /* Deshabilitar cursor de drag o edit */
+        .materia-card {
+            cursor: default;
+        }
+
+        .materia-card:hover {
+            transform: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 2rem;
+            top: 2rem;
+            text-decoration: none;
+            color: var(--color-navy);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media print {
+
+            .actions,
+            .back-btn {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="auth-config.js"></script> <!-- Requerido para config de supabase -->
+    <script src="ver-horario.js" defer></script>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <a href="index.html" class="back-btn">&#8592; Volver al Inicio</a>
+
+            <div class="top-bar">
+                <h1 class="page-title">HORARIO DE CURSOS</h1>
+                <div class="actions">
+                    <button id="btnImprimir" class="btn-secondary" onclick="window.print()">&#128424; Imprimir</button>
+                </div>
+            </div>
+
+            <!-- LAYOUT: Solo horarios -->
+            <div class="horarios-layout">
+
+                <div class="horarios-view">
+
+                    <!-- TABLA 1: MATUTINO -->
+                    <div class="turno-section">
+                        <div class="turno-header">Grupo Presencial Matutino</div>
+                        <table class="horario-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-hora">Horario</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Las filas se rellenan igual que en el original, pero vacías inicialmente o con estructura fija 
+                                     Si preferimos usar la misma estructura fija del HTML original para mantener estilos exactos: -->
+                                <!-- 9 to 10 AM -->
+                                <tr>
+                                    <td class="col-hora">9:00 am a 10:00 am</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 10 to 11 AM -->
+                                <tr>
+                                    <td class="col-hora">10:00 am a 11:00 am</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 11 to 12 PM -->
+                                <tr>
+                                    <td class="col-hora">11:00 am a 12:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 12 to 1 PM -->
+                                <tr>
+                                    <td class="col-hora">12:00 pm a 1:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- TABLA 2: VESPERTINO -->
+                    <div class="turno-section">
+                        <div class="turno-header">Grupo Presencial Vespertino</div>
+                        <table class="horario-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-hora">Horario</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 4-5 PM -->
+                                <tr>
+                                    <td class="col-hora">4:00 pm a 5:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 5-6 PM -->
+                                <tr>
+                                    <td class="col-hora">5:00 pm a 6:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 6-7 PM -->
+                                <tr>
+                                    <td class="col-hora">6:00 pm a 7:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 7-8 PM -->
+                                <tr>
+                                    <td class="col-hora">7:00 pm a 8:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- TABLA 3: EN LÍNEA -->
+                    <div class="turno-section">
+                        <div class="turno-header">Grupo En Línea</div>
+                        <table class="horario-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-hora">Horario</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 3-4 PM -->
+                                <tr>
+                                    <td class="col-hora">3:00 pm a 4:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 4-5 PM -->
+                                <tr>
+                                    <td class="col-hora">4:00 pm a 5:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 5-6 PM -->
+                                <tr>
+                                    <td class="col-hora">5:00 pm a 6:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                                <!-- 6-7 PM -->
+                                <tr>
+                                    <td class="col-hora">6:00 pm a 7:00 pm</td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                    <td class="dropzone"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
