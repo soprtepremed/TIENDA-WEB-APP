@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="reportes-asistencia.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos especÃ­ficos para esta pÃ¡gina */
+        /* Estilos específicos para esta página */
         .upload-container {
             max-width: 800px;
             margin: 0 auto;
@@ -138,7 +138,7 @@
             overflow-y: auto;
             /* Scroll vertical */
             max-height: 650px;
-            /* Aumentado para ver mÃ¡s registros */
+            /* Aumentado para ver más registros */
             border: 1px solid var(--color-border);
             border-radius: 8px;
         }
@@ -158,7 +158,7 @@
             text-align: left;
             border-bottom: 1px solid var(--color-border);
             white-space: nowrap;
-            /* Evita saltos de lÃ­nea generales */
+            /* Evita saltos de línea generales */
         }
 
         .preview-table th {
@@ -171,7 +171,7 @@
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
-        /* Columna Nombre: permite salto de lÃ­nea y ancho mÃ­nimo */
+        /* Columna Nombre: permite salto de línea y ancho mínimo */
         .preview-table td:nth-child(2),
         .preview-table th:nth-child(2) {
             min-width: 250px;
@@ -322,7 +322,7 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link">
-                    <span class="sidebar-icon">&#9749;</span> Cafetería
+                    <span class="sidebar-icon">&#9749;</span> Cafeter�a
                 </a>
 
                 <a href="horarios.html" class="sidebar-link">
@@ -332,10 +332,13 @@
                     <span class="sidebar-icon">&#128202;</span> Reportes
                 </a>
                 <a href="historico-asistencia.html" class="sidebar-link">
-                    <span class="sidebar-icon">&#128197;</span> Histórico
+                    <span class="sidebar-icon">&#128197;</span> Hist�rico
                 </a>
-                <a href="cargar-evaluaciones.html" class="sidebar-link active">
+                <a href="cargar-evaluaciones.html" class="sidebar-link">
                     <span class="sidebar-icon">&#128229;</span> Cargar Eval.
+                </a>
+                <a href="actualizacion-pruebas.html" class="sidebar-link">
+                    <span class="sidebar-icon">&#128736;</span> Actualizaci�n Pruebas
                 </a>
                 <a href="pase-lista.html" class="sidebar-link">
                     <span class="sidebar-icon">&#128203;</span> Pase de Lista
@@ -363,7 +366,7 @@
                 <!-- Zona de carga -->
                 <div class="upload-zone" id="uploadZone">
                     <div class="icon">&#128196;</div>
-                    <h3>Arrastra tu archivo CSV aquí</h3>
+                    <h3>Arrastra tu archivo CSV aqu�</h3>
                     <p>o haz clic para seleccionar</p>
                     <input type="file" id="fileInput" class="file-input" accept=".csv">
                 </div>
@@ -387,7 +390,7 @@
                                 &#128205; <strong id="totalRecords">0</strong> registros
                             </div>
                             <div class="preview-stat">
-                                &#9989; <strong id="validRecords">0</strong> válidos
+                                &#9989; <strong id="validRecords">0</strong> v�lidos
                             </div>
                             <div class="preview-stat">
                                 &#9888;&#65039; <strong id="skippedRecords">0</strong> omitidos
@@ -401,7 +404,7 @@
                                     <th>ID</th>
                                     <th>Nombre</th>
                                     <th>Turno</th>
-                                    <th>Realizó</th>
+                                    <th>Realiz�</th>
                                     <th>Calif. %</th>
                                     <th>Estado</th>
                                     <th>Fecha Eval.</th>
@@ -432,7 +435,7 @@
                 <!-- Resultado -->
                 <div class="result-section" id="resultSection">
                     <div class="result-icon" id="resultIcon">&#9989;</div>
-                    <div class="result-title" id="resultTitle">¡Carga exitosa!</div>
+                    <div class="result-title" id="resultTitle">�Carga exitosa!</div>
                     <div class="result-message" id="resultMessage">Se importaron 0 registros.</div>
                     <button class="btn btn-primary" id="btnNewUpload" style="margin-top: 16px;">
                         Cargar otro archivo
@@ -443,10 +446,10 @@
                 <div class="format-help">
                     <h4>&#128203; Formato del archivo CSV</h4>
                     <p>El archivo debe tener las siguientes columnas (el mismo formato que exportas de tu hoja de
-                        cálculo):</p>
+                        c�lculo):</p>
                     <code>ID,NOMBRE,TURNO,MODALIDAD,REALIZO EXAMEN,CALIFICACION,FECHA EVALUACION,fecha de inicio,fecha final,ESTADO</code>
                     <p style="margin-top: 12px;">
-                        <strong>Nota:</strong> Las calificaciones en formato "79/90" se convertirán automáticamente a
+                        <strong>Nota:</strong> Las calificaciones en formato "79/90" se convertir�n autom�ticamente a
                         porcentaje (87.78%).
                     </p>
                 </div>

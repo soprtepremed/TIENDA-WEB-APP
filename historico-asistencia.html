@@ -1,18 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Histórico General de Asistencia - PREMED</title>
-    <meta name="description" content="Reporte general histórico de asistencia por turnos y semanas">
+    <title>Hist�rico General de Asistencia - PREMED</title>
+    <meta name="description" content="Reporte general hist�rico de asistencia por turnos y semanas">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="reportes-asistencia.css">
     <style>
-        /* Estilos especÃ­ficos para este mÃ³dulo */
+        /* Estilos específicos para este módulo */
         .filters-container {
             background: white;
             padding: 24px;
@@ -111,7 +111,7 @@
             pointer-events: none;
         }
 
-        /* Estado vacÃ­o */
+        /* Estado vacío */
         .weeks-empty {
             width: 100%;
             text-align: center;
@@ -132,7 +132,7 @@
 
         .table-scroll-container {
             max-height: 600px;
-            /* AquÃ­ estÃ¡ el scroll vertical */
+            /* Aquí está el scroll vertical */
             overflow-y: auto;
             overflow-x: auto;
         }
@@ -145,7 +145,7 @@
         .general-table th,
         .general-table td {
             padding: 14px 16px;
-            /* Un poco mÃ¡s de aire */
+            /* Un poco más de aire */
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
         }
@@ -173,7 +173,7 @@
             /* Separador visual */
         }
 
-        /* CorrecciÃ³n z-index para la esquina superior izquierda */
+        /* Corrección z-index para la esquina superior izquierda */
         .general-table thead th:nth-child(1) {
             z-index: 40;
             background: #f1f5f9;
@@ -213,7 +213,7 @@
             font-weight: 600;
         }
 
-        /* BotÃ³n de Riesgo */
+        /* Botón de Riesgo */
         .btn-risk {
             background-color: #fef2f2;
             color: #dc2626;
@@ -356,7 +356,7 @@
 
 <body>
     <div class="app-container">
-        <!-- Sidebar se inyectarÃ¡ o copiarÃ¡ aquÃ­ con la nueva opciÃ³n -->
+        <!-- Sidebar se inyectará o copiará aquí con la nueva opción -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <a href="reportes-asistencia.html" class="sidebar-logo">
@@ -365,7 +365,7 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="sidebar-link">
-                    <span class="sidebar-icon">&#9749;</span> Cafetería
+                    <span class="sidebar-icon">&#9749;</span> Cafeter�a
                 </a>
 
                 <a href="horarios.html" class="sidebar-link">
@@ -375,10 +375,13 @@
                     <span class="sidebar-icon">&#128202;</span> Reportes
                 </a>
                 <a href="historico-asistencia.html" class="sidebar-link active">
-                    <span class="sidebar-icon">&#128197;</span> Histórico
+                    <span class="sidebar-icon">&#128197;</span> Hist�rico
                 </a>
                 <a href="cargar-evaluaciones.html" class="sidebar-link">
                     <span class="sidebar-icon">&#128229;</span> Cargar Eval.
+                </a>
+                <a href="actualizacion-pruebas.html" class="sidebar-link">
+                    <span class="sidebar-icon">&#128736;</span> Actualizaci�n Pruebas
                 </a>
                 <a href="pase-lista.html" class="sidebar-link">
                     <span class="sidebar-icon">&#128203;</span> Pase de Lista
@@ -393,7 +396,7 @@
                     </div>
                 </div>
                 <button onclick="logout()" class="btn-logout">
-                    Cerrar Sesión
+                    Cerrar Sesi�n
                 </button>
             </div>
         </aside>
@@ -414,18 +417,18 @@
                         </button>
                     </div>
 
-                    <!-- SECCIÓN 1: CONSULTAR (Original) -->
+                    <!-- SECCI�N 1: CONSULTAR (Original) -->
                     <div id="sectionConsultar">
                         <!-- Header -->
                         <div class="section-header">
-                            <h1 class="section-title">&#128197; Histórico General de Asistencia</h1>
+                            <h1 class="section-title">&#128197; Hist�rico General de Asistencia</h1>
                             <p class="section-subtitle">Consulta listas completas por turno y semana</p>
                         </div>
 
                         <!-- Panel de Filtros Moderno -->
                         <div class="filters-container">
 
-                            <!-- 1. Selección de Turno -->
+                            <!-- 1. Selecci�n de Turno -->
                             <div class="filter-section-title">1. Selecciona el Turno</div>
                             <div class="turnos-wrapper">
                                 <button class="btn-turno active" data-turno="matutino"
@@ -436,14 +439,14 @@
                                     &#127750; Vespertino (Presencial)
                                 </button>
                                 <button class="btn-turno" data-turno="en_linea" onclick="selectTurno('en_linea')">
-                                    &#128187; En Línea
+                                    &#128187; En L�nea
                                 </button>
                             </div>
 
-                            <!-- 2. Selección de Semana -->
+                            <!-- 2. Selecci�n de Semana -->
                             <div class="filter-section-title">2. Selecciona la Semana Disponible</div>
                             <div id="weeksContainer" class="weeks-grid">
-                                <!-- Aquí se inyectarán las tarjetas de semana -->
+                                <!-- Aqu� se inyectar�n las tarjetas de semana -->
                                 <div class="weeks-empty">Cargando semanas disponibles...</div>
                             </div>
 
@@ -469,7 +472,7 @@
                                     <span class="summary-label">Promedio Grupal</span>
                                 </div>
 
-                                <!-- Botón de Riesgo -->
+                                <!-- Bot�n de Riesgo -->
                                 <button onclick="showRiskModal()" class="btn-risk">
                                     &#9888;&#65039; Ver Alumnos en Riesgo
                                 </button>
@@ -491,14 +494,14 @@
                                                 <th>Nombre</th>
                                                 <th style="text-align:center">Lun</th>
                                                 <th style="text-align:center">Mar</th>
-                                                <th style="text-align:center">Mié</th>
+                                                <th style="text-align:center">Mi�</th>
                                                 <th style="text-align:center">Jue</th>
                                                 <th style="text-align:center">Vie</th>
                                                 <th style="text-align:center">% Asistencia</th>
                                             </tr>
                                         </thead>
                                         <tbody id="listaAsistenciaBody">
-                                            <!-- Filas dinámicas -->
+                                            <!-- Filas din�micas -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -519,28 +522,28 @@
                             <div class="initial-icon">&#128070;</div>
                             <h2 class="initial-title">Selecciona Un Turno y Semana</h2>
                             <p class="initial-text">
-                                El sistema cargará el histórico completo de asistencias para el periodo seleccionado.
+                                El sistema cargar� el hist�rico completo de asistencias para el periodo seleccionado.
                             </p>
                         </div>
                     </div> <!-- End Section Consultar -->
 
-                    <!-- SECCIÓN 2: CARGAR CSV (Nueva) -->
+                    <!-- SECCI�N 2: CARGAR CSV (Nueva) -->
                     <div id="sectionCargar" class="hidden">
                         <div class="section-header">
-                            <h1 class="section-title">&#128229; Cargar Histórico masivo</h1>
+                            <h1 class="section-title">&#128229; Cargar Hist�rico masivo</h1>
                             <p class="section-subtitle">Sube archivos CSV para actualizar el historial</p>
                         </div>
 
                         <div class="filters-container">
-                            <div class="filter-section-title">1. Configuración de Carga</div>
+                            <div class="filter-section-title">1. Configuraci�n de Carga</div>
 
                             <div class="form-grid" style="grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px;">
                                 <div class="form-group">
                                     <label class="form-label">Destino de los Datos (Tabla)</label>
                                     <select id="uploadTarget" class="form-input">
-                                        <option value="presencial">🏢 Histórico Presencial
+                                        <option value="presencial">?? Hist�rico Presencial
                                             (historico_asistencia_presencial)</option>
-                                        <option value="en_linea">💻 Histórico En Línea (historico_asistencia_en_linea)
+                                        <option value="en_linea">?? Hist�rico En L�nea (historico_asistencia_en_linea)
                                         </option>
                                     </select>
                                 </div>
@@ -552,7 +555,7 @@
                                     <input type="file" id="csvFileInput" accept=".csv" class="form-input-file">
                                     <span class="file-upload-icon">&#128196;</span>
                                     <span class="file-upload-text" id="fileNameDisplay">Haga clic o arrastre un archivo
-                                        CSV aquí</span>
+                                        CSV aqu�</span>
                                 </label>
                             </div>
 
@@ -580,7 +583,7 @@
                             </code>
                             <p style="font-size: 0.85rem; color: #64748b; margin-top: 10px;">
                                 * Las fechas deben estar en formato YYYY-MM-DD.<br>
-                                * El turno debe ser 'Matutino', 'Vespertino' o 'En Línea'.
+                                * El turno debe ser 'Matutino', 'Vespertino' o 'En L�nea'.
                             </p>
                         </div>
                     </div>
@@ -594,11 +597,11 @@
     <div id="riskModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>&#9888;&#65039; Alumnos con Múltiples Inasistencias (>3)</h3>
+                <h3>&#9888;&#65039; Alumnos con M�ltiples Inasistencias (>3)</h3>
                 <button onclick="closeRiskModal()" class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p class="modal-subtitle">Listado de alumnos con 4 o más faltas en la semana seleccionada.</p>
+                <p class="modal-subtitle">Listado de alumnos con 4 o m�s faltas en la semana seleccionada.</p>
                 <div class="table-scroll-container" style="max-height: 400px;">
                     <table class="general-table">
                         <thead>
@@ -611,7 +614,7 @@
                             </tr>
                         </thead>
                         <tbody id="riskTableBody">
-                            <!-- Ingesta dinÃ¡mica -->
+                            <!-- Ingesta dinámica -->
                         </tbody>
                     </table>
                 </div>
